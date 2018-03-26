@@ -1,6 +1,6 @@
 # Prometheus
 
-This directory contains a sample development deloyment of Prometheus using tempory storage (e.g. emptyDir space)
+This directory contains a sample development deployment of Prometheus using temporary storage (e.g. emptyDir space)
 
 ## Quick start
 
