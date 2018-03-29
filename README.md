@@ -20,8 +20,8 @@ Deployment of ProjectX is outlined in the [deployment section](deployment/README
 
 Guides on how the Discoverers work can be found here: 
 
-- [Kubernetes](docs/guides/discoverer/kubernetes/README.md)
-- [Openstack](docs/guides/discoverer/openstack/README.md)
+- [Kubernetes](docs/discoverer/kubernetes/README.md)
+- [Openstack](docs/discoverer/openstack/README.md)
 
 ## Troubleshooting
 
