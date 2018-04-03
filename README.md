@@ -23,6 +23,10 @@ Guides on how the Discoverers work can be found here:
 - [Kubernetes](docs/discoverer/kubernetes/README.md)
 - [Openstack](docs/discoverer/openstack/README.md)
 
+Guides on how to setup metrics/monitoring can be found here:
+- [Prometheus](deployment/prometheus/README.md)
+- [Grafana](deployment/grafana/README.md)
+
 ## Troubleshooting
 
 If you encounter any problems that the documentation does not address, please [file an issue](https://github.com/heptio/gimbal/issues).

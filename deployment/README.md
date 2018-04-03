@@ -17,7 +17,12 @@ $ kubectl create -f contour/02-rbac.yaml
 
 # Deploy Contour
 $ kubectl apply -f contour/02-contour.yaml
+
+# Deploy Contour Service
+$ kubectl apply -f contour/02-service.yaml
 ```
+
+_NOTE: The current configuration exposes the Envoy Admin UI so that Prometheus can scrape for metrics!_
 
 ## Discoverers
 
