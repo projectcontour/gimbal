@@ -44,6 +44,6 @@ Grafana requires some configuration after it's deployed, use the following steps
 Add sample dashboard to validate data source is collecting data:
 
 1. From main page, click on `plus` icon and choose `Import dashboard`
-2. Enter `3131` in the first box
+2. Enter `1621` in the first box
 3. Under the `prometheus` section choose the data source created in previous section
 4. Click `Import`
