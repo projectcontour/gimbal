@@ -50,7 +50,7 @@ metadata:
   name: prometheus-node-exporter
   namespace: contour-monitoring
   annotations:
-    prometheus.io/scrape: true
+    prometheus.io/scrape: "true"
   labels:
     app: prometheus
     component: node-exporter
