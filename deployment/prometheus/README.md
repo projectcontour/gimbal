@@ -1,6 +1,6 @@
 # Prometheus
 
-This directory contains a sample development deployment of Prometheus using temporary storage (e.g. emptyDir space)
+This directory contains a sample development deployment of Prometheus and Alert Manager using temporary storage (e.g. emptyDir space).
 
 ## Quick start
 
@@ -21,7 +21,13 @@ kubectl apply -f prometheus/deployment/prometheus-node-exporter.yaml
 ## Access the Prometheus Web UI
 
 ```sh
-kubectl -n contour-monitoring port-forward $(kubectl get pods -l app=prometheus -n contour-monitoring -o jsonpath='{.items[0].metadata.name}') 9090:9090
+kubectl -n contour-monitoring port-forward $(kubectl -n contour-monitoring get pods -l app=prometheus -l component=server -o jsonpath='{.items[0].metadata.name}') 9090:9090
 ```
 
-then go to http://localhost:9090 in your browser
+then go to [http://localhost:9090](http://localhost:9090) in your browser
+
+## Access the Alert Manager Web UI
+
+```sh
+kubectl -n contour-monitoring port-forward $(kubectl -n contour-monitoring get pods -l app=prometheus -l component=alertmanager -o jsonpath='{.items[0].metadata.name}') 9093:9093
+```
