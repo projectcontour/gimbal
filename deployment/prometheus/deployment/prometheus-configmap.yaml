@@ -15,6 +15,9 @@ data:
     # If you are using Kubernetes 1.7.2 or earlier, please take note of the comments
     # for the kubernetes-cadvisor job; you will need to edit or remove this job.
 
+    rule_files:
+    - '/etc/prometheus-rules/*.rules'
+    
     # Scrape config for API servers.
     #
     # Kubernetes exposes API servers as endpoints to the default/kubernetes
@@ -293,3 +296,26 @@ data:
       - source_labels: [__meta_kubernetes_pod_name]
         action: replace
         target_label: kubernetes_pod_name
+
+    alerting:
+      alertmanagers:
+      # Discover alert manager instances using K8s service discovery
+      - kubernetes_sd_configs:
+          - role: pod
+        scheme: http
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_namespace]
+          regex: contour-monitoring
+          action: keep
+        - source_labels: [__meta_kubernetes_pod_label_app]
+          regex: prometheus
+          action: keep
+        - source_labels: [__meta_kubernetes_pod_label_component]
+          regex: alertmanager
+          action: keep
+        - source_labels: [__meta_kubernetes_pod_container_port_number]
+          regex:
+          action: drop

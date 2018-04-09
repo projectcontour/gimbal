@@ -91,23 +91,12 @@ spec:
         volumeMounts:
         - name: config-volume
           mountPath: /etc/prometheus
-        # - name: config-volume-alert-rules
-        #   mountPath: /etc/prometheus-rules
+        - name: config-volume-alert-rules
+          mountPath: /etc/prometheus-rules
         - name: cert-file
           mountPath: /etc/ssl/etcd.pem
         - name: key-file
           mountPath: /etc/ssl/etcd-key.pem
-
-      #Alert manager
-      # - name: alertmanager
-      #   image: quay.io/prometheus/alertmanager:v0.11.0
-      #   args:
-      #     - -config.file=/etc/prometheus/alertmanager.yml
-      #   ports:
-      #   - containerPort: 9093
-      #   volumeMounts:
-      #   - name: config-volume-alertmanager
-      #     mountPath: /etc/prometheus
 
       # blackbox exporter
       # - name: blackbox
@@ -121,7 +110,6 @@ spec:
       #     mountPath: /config
 
       volumes:
-      #Prometheus Server
       - name: config-volume
         configMap:
           name: prometheus
@@ -131,13 +119,9 @@ spec:
       - name: key-file
         hostPath:
           path: /etc/kubernetes/ssl/etcd-key.pem
-      #Alert manager
-      # - name: config-volume-alertmanager
-      #   configMap:
-      #     name: prometheus-alertmanager
-      # - name: config-volume-alert-rules
-      #   configMap:
-      #     name: prometheus-alert-rules
+      - name: config-volume-alert-rules
+        configMap:
+          name: prometheus-alert-rules
       #black box exporter
       # - name: blackbox-config
       #   configMap:
