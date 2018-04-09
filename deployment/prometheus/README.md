@@ -21,7 +21,7 @@ kubectl apply -f prometheus/deployment/prometheus-node-exporter.yaml
 ## Access the Prometheus Web UI
 
 ```sh
-kubectl -n contour-monitoring port-forward $(kubectl -n contour-monitoring get pods -l app=prometheus -l component=server -o jsonpath='{.items[0].metadata.name}') 9090:9090
+kubectl -n gimbal-monitoring port-forward $(kubectl -n gimbal-monitoring get pods -l app=prometheus -l component=server -o jsonpath='{.items[0].metadata.name}') 9090:9090
 ```
 
 then go to [http://localhost:9090](http://localhost:9090) in your browser
@@ -29,5 +29,5 @@ then go to [http://localhost:9090](http://localhost:9090) in your browser
 ## Access the Alert Manager Web UI
 
 ```sh
-kubectl -n contour-monitoring port-forward $(kubectl -n contour-monitoring get pods -l app=prometheus -l component=alertmanager -o jsonpath='{.items[0].metadata.name}') 9093:9093
+kubectl -n gimbal-monitoring port-forward $(kubectl -n gimbal-monitoring get pods -l app=prometheus -l component=alertmanager -o jsonpath='{.items[0].metadata.name}') 9093:9093
 ```

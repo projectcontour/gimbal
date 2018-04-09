@@ -16,7 +16,7 @@ $ kubectl create -f contour/01-common.yaml
 $ kubectl create -f contour/02-rbac.yaml
 
 # Deploy Contour
-$ kubectl apply -f contour/02-contour.yaml
+$ kubectl apply -f contour/02-gimbal.yaml
 
 # Deploy Contour Service
 $ kubectl apply -f contour/02-service.yaml
@@ -29,8 +29,8 @@ _NOTE: The current configuration exposes the Envoy Admin UI so that Prometheus c
 Service discovery is enabled via the Discoverers which have both Kubernetes and Openstack implementations.
 
 ```
-# Create contour-discoverer namespace
-kubectl create -f contour-discoverer/01-common.yaml
+# Create gimbal-discoverer namespace
+kubectl create -f gimbal-discoverer/01-common.yaml
 ```
 
 ### Kubernetes
@@ -41,10 +41,10 @@ The Kubernetes Discoverer is responsible for looking at all services and endpoin
 
 ```
 # Kubernetes secret
-$ kubectl create secret generic remote-discover-kubecfg --from-file=./config -n contour-discoverer
+$ kubectl create secret generic remote-discover-kubecfg --from-file=./config -n gimbal-discoverer
 
 # Deploy Discoverer
-$ kubectl apply -f contour-discoverer/02-kubernetes-discoverer.yaml
+$ kubectl apply -f gimbal-discoverer/02-kubernetes-discoverer.yaml
 ```
 
 Technical details on how the Kubernetes Discoverer works can be found in the [docs section](../docs/discoverer/kubernetes/README.md).
@@ -57,7 +57,7 @@ The Openstack Discoverer is responsible for looking at all LBaSS and members in 
 
 ```
 # Deploy Discoverer
-$ kubectl apply -f contour-discoverer/02-openstack-discoverer.yaml
+$ kubectl apply -f gimbal-discoverer/02-openstack-discoverer.yaml
 ```
 
 Technical details on how the Openstack Discoverer works can be found in the [docs section](../docs/discoverer/openstack/README.md).
@@ -68,16 +68,16 @@ Once the components are deployed, the deployment can be verified with the follow
 
 ```
 # Verify Discoverer Components
-$ kubectl get po -n contour-discoverer
+$ kubectl get po -n gimbal-discoverer
 
-# Verify Contour
-$ kubectl get po -n heptio-contour
+# Verify Gimbal
+$ kubectl get po -n heptio-gimbal
 
 # Deploy a Route CRD
 $ kubectl apply -f example-workload/route.yaml
 
-# Port forward to the contour pod
-$ kubectl port-forward $(kubectl get pods -n heptio-contour -l app=contour -o jsonpath='{.items[0].metadata.name}') 9000:80 -n heptio-contour
+# Port forward to the gimbal pod
+$ kubectl port-forward $(kubectl get pods -n heptio-gimbal -l app=gimbal -o jsonpath='{.items[0].metadata.name}') 9000:80 -n heptio-gimbal
 
 # Make a request
 $ curl -i -H "Host: kuard.local" localhost:9000

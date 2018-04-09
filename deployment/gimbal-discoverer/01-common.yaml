@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name:  gimbal-discoverer
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: gimbal-discoverer
+  namespace:  gimbal-discoverer
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: gimbal-discoverer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: gimbal-discoverer
+subjects:
+- kind: ServiceAccount
+  name: gimbal-discoverer
+  namespace: gimbal-discoverer
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: gimbal-discoverer
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - services
+  - endpoints
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete

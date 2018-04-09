@@ -3,7 +3,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: prometheus-alert-rules
-  namespace: contour-monitoring
+  namespace: gimbal-monitoring
 data:
   alert.rules: |-
     groups:

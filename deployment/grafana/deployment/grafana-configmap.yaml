@@ -4,7 +4,7 @@ metadata:
   labels:
     app: grafana
   name: grafana-dashs
-  namespace: contour-monitoring
+  namespace: gimbal-monitoring
 data:
   {}
 ---
@@ -14,7 +14,7 @@ metadata:
   labels:
     app: grafana
   name: grafana-config
-  namespace: contour-monitoring
+  namespace: gimbal-monitoring
 data:
   grafana.ini: |
     ; instance_name = ${HOSTNAME}

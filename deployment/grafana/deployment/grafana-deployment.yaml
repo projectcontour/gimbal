@@ -5,7 +5,7 @@ metadata:
   labels:
     app: grafana
   name: grafana
-  namespace: contour-monitoring
+  namespace: gimbal-monitoring
 spec:
   replicas: 1
   template:

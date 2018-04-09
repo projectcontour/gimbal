@@ -1,0 +1,66 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: openstack-discoverer
+    cluster: origin
+  name: origin-openstack-discoverer
+  namespace:  gimbal-discoverer
+spec:
+  selector:
+    matchLabels:
+      app: openstack-discoverer
+      cluster: origin
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: openstack-discoverer
+        cluster: origin
+    spec:
+      containers:
+        - image: gcr.io/heptio-images/gimbal-discoverer:master
+          imagePullPolicy: Always
+          name: openstack-discoverer
+          command: ["/openstack-discoverer"]
+          args: ["--cluster-name", "$(CLUSTER_NAME)", "--openstack-certificate-authority","/etc/remote-openstack-config/ca.pem"]
+          env:
+            - name: CLUSTER_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: remote-discover-openstack
+                  key: cluster-name
+            - name: OS_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: remote-discover-openstack
+                  key: username
+            - name: OS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: remote-discover-openstack
+                  key: password
+            - name: OS_AUTH_URL
+              valueFrom:
+                secretKeyRef:
+                  name: remote-discover-openstack
+                  key: auth-url
+            - name: OS_TENANT_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: remote-discover-openstack
+                  key: tenant-name
+          volumeMounts:
+          - name: discover-openstack-config
+            readOnly: true
+            mountPath: "/etc/remote-openstack-config"
+      volumes:
+        - name: discover-openstack-config
+          secret:
+            secretName: remote-discover-openstack
+            items:
+            - key: certificate-authority-data
+              path: ca.pem
+      dnsPolicy: ClusterFirst
+      serviceAccountName: gimbal-discoverer
+      terminationGracePeriodSeconds: 30

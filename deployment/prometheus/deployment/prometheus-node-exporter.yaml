@@ -6,7 +6,7 @@ metadata:
     app: prometheus
     component: node-exporter
   name: prometheus-node-exporter
-  namespace: contour-monitoring
+  namespace: gimbal-monitoring
 spec:
   updateStrategy:
     type: OnDelete
@@ -48,7 +48,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: prometheus-node-exporter
-  namespace: contour-monitoring
+  namespace: gimbal-monitoring
   annotations:
     prometheus.io/scrape: "true"
   labels:
