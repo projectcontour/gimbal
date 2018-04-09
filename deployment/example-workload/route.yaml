@@ -70,7 +70,7 @@ spec:
   sessionAffinity: None
   type: ClusterIP
 ---
-apiVersion: contour.heptio.com/v1alpha1
+apiVersion: gimbal.heptio.com/v1alpha1
 kind: Route
 metadata: 
   name: sample-route-kuard
@@ -82,7 +82,7 @@ spec:
         - serviceName: kuard
           servicePort: 80
 ---
-apiVersion: contour.heptio.com/v1alpha1
+apiVersion: gimbal.heptio.com/v1alpha1
 kind: Route
 metadata: 
   name: sample-route-nginx
@@ -94,7 +94,7 @@ spec:
         - serviceName: nginx
           servicePort: 80
 ---
-apiVersion: contour.heptio.com/v1alpha1
+apiVersion: gimbal.heptio.com/v1alpha1
 kind: Route
 metadata: 
   name: sample-route-both

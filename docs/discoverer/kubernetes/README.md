@@ -2,7 +2,7 @@
 
 ## Overview 
 
-The Kubernetes discoverer provides service discovery for a Kubernetes cluster. It does this by monitoring available Services and Endpoints for a single Kubernetes cluster and synchronizing them into the host Contour cluster. 
+The Kubernetes discoverer provides service discovery for a Kubernetes cluster. It does this by monitoring available Services and Endpoints for a single Kubernetes cluster and synchronizing them into the host Gimbal cluster. 
 
 The Discoverer will leverage the watch feature of the Kubernetes API to receive changes dynamically, rather than having to poll the API. All available services & endpoints will be synchronized to the the same namespace matching the source system.
 
@@ -20,20 +20,20 @@ Arguments are available to customize the discoverer, most have defaults but othe
 |---|---|---|
 | version  |  false | Show version, build information and quit  
 | num-threads  | 2  |  Specify number of threads to use when processing queue items
-| contour-kubecfg-file  | ""  | Location of kubecfg file for access to Kubernetes cluster hosting Contour
+| gimbal-kubecfg-file  | ""  | Location of kubecfg file for access to Kubernetes cluster hosting Gimbal
 | discover-kubecfg-file | ""  | Location of kubecfg file for access to remote Kubernetes cluster to watch for services / endpoints 
 | cluster-name  | ""  |   Name of cluster scraping for services & endpoints 
 | debug | false | Enable debug logging 
 
 ### Credentials
 
-A valid [Kubernetes config file](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/) is required to access the remote cluster. This config file is stored as a Kubernetes secret in the Contour cluster. 
+A valid [Kubernetes config file](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/) is required to access the remote cluster. This config file is stored as a Kubernetes secret in the Gimbal cluster. 
 
-The following example creates a secret from a file locally and places it in the namespace `contour-discoverer`: 
+The following example creates a secret from a file locally and places it in the namespace `gimbal-discoverer`: 
 
 ```
 # -- Sample secret creation
-$ kubectl create secret generic remote-discover-kubecfg --from-file=./config -n contour-discoverer
+$ kubectl create secret generic remote-discover-kubecfg --from-file=./config -n gimbal-discoverer
 ```
 
 #### Sample Kubernetes config file
@@ -64,10 +64,10 @@ users:
 
 ### Data flow
 
-Data flows from the remote cluster into the Contour cluster. The steps on how they replicate are as follows:
+Data flows from the remote cluster into the Gimbal cluster. The steps on how they replicate are as follows:
 
 1. Connection is made to remote cluster and all services and corresponding endpoints are retrieved from the cluster
-2. Those objects are then synchronized to the Contour cluster in the same namespace as the remote cluster. For example, if a service named `testsvc01` exists in the namespace `team1` then the same service will be written to the Contour cluster in the `team1` namespace. Labels will also be added during the synchronization (See the [labels](#labels) section for more details).
+2. Those objects are then synchronized to the Gimbal cluster in the same namespace as the remote cluster. For example, if a service named `testsvc01` exists in the namespace `team1` then the same service will be written to the Gimbal cluster in the `team1` namespace. Labels will also be added during the synchronization (See the [labels](#labels) section for more details).
 3. Once the initial list of objects is synchronized, any further updates will happen automatically when a service or endpoint is `created`, `updated`, or `deleted`.
 
 ### Labels
@@ -76,6 +76,6 @@ All synchronized services & endpoints will contain the same properties as the so
 
 Labels added to service and endpoints:
 ```
-contour.heptio.com/service=<serviceName>
-contour.heptio.com/cluster=<nodeName>
+gimbal.heptio.com/service=<serviceName>
+gimbal.heptio.com/cluster=<nodeName>
 ```
