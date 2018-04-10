@@ -28,9 +28,12 @@ import (
 	gopheropenstack "github.com/gophercloud/gophercloud/openstack"
 	"github.com/heptio/gimbal/discovery/pkg/buildinfo"
 	"github.com/heptio/gimbal/discovery/pkg/k8s"
+	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
 	"github.com/heptio/gimbal/discovery/pkg/openstack"
 	"github.com/heptio/gimbal/discovery/pkg/signals"
 	"github.com/heptio/gimbal/discovery/pkg/util"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 )
 
@@ -44,6 +47,8 @@ var (
 	reconciliationPeriod              time.Duration
 	httpClientTimeout                 time.Duration
 	openstackCertificateAuthorityFile string
+	prometheusListenAddress           int
+	discovererMetrics                 localmetrics.DiscovererMetrics
 )
 
 func init() {
@@ -55,6 +60,7 @@ func init() {
 	flag.DurationVar(&reconciliationPeriod, "reconciliation-period", 30*time.Second, "The interval of time between reconciliation loop runs.")
 	flag.DurationVar(&httpClientTimeout, "http-client-timeout", 5*time.Second, "The HTTP client request timeout.")
 	flag.StringVar(&openstackCertificateAuthorityFile, "openstack-certificate-authority", "", "Path to cert file of the OpenStack API certificate authority.")
+	flag.IntVar(&prometheusListenAddress, "prometheus-listen-address", 8080, "The address to listen on for Prometheus HTTP requests")
 	flag.Parse()
 }
 
@@ -73,35 +79,52 @@ func main() {
 		log.Level = logrus.DebugLevel
 	}
 
+	log.Info("Gimbal Discoverer Starting up...")
+
+	// Init prometheus metrics
+	discovererMetrics = localmetrics.NewMetrics()
+
+	// Register with Prometheus's default registry
+	for _, v := range discovererMetrics.Metrics {
+		prometheus.MustRegister(v)
+	}
+
 	if clusterName == "" {
+		discovererMetrics.GenericMetricError("!!INVALID!!", "InvalidClusterName")
 		log.Fatal("The OpenStack cluster name must be provided using the --cluster-name flag")
 	}
 
 	gimbalKubeClient, err := k8s.NewClient(gimbalKubeCfgFile, log)
 	if err != nil {
+		discovererMetrics.GenericMetricError(clusterName, "InvalidK8SGimbalClient")
 		log.Fatal("Failed to create kubernetes client", err)
 	}
 
 	username := os.Getenv("OS_USERNAME")
 	if username == "" {
+		discovererMetrics.GenericMetricError(clusterName, "MissingENVVAR")
 		log.Fatal("The OpenStack username must be provided using the OS_USERNAME environment variable.")
 	}
 	password := os.Getenv("OS_PASSWORD")
 	if password == "" {
+		discovererMetrics.GenericMetricError(clusterName, "MissingENVVAR")
 		log.Fatal("The OpenStack password must be provided using the OS_PASSWORD environment variable.")
 	}
 	identityEndpoint := os.Getenv("OS_AUTH_URL")
 	if identityEndpoint == "" {
+		discovererMetrics.GenericMetricError(clusterName, "MissingENVVAR")
 		log.Fatal("The OpenStack Authentication URL must be provided using the OS_AUTH_URL environment variable.")
 	}
 	tenantName := os.Getenv("OS_TENANT_NAME")
 	if tenantName == "" {
+		discovererMetrics.GenericMetricError(clusterName, "MissingENVVAR")
 		log.Fatal("The OpenStack tenant name must be provided using the OS_TENANT_NAME environment variable")
 	}
 
 	// Create and configure client
 	osClient, err := gopheropenstack.NewClient(identityEndpoint)
 	if err != nil {
+		discovererMetrics.GenericMetricError(clusterName, "InvalidOpenstackClient")
 		log.Fatalf("Failed to create OpenStack client: %v", err)
 	}
 	osClient.HTTPClient.Timeout = httpClientTimeout
@@ -117,16 +140,19 @@ func main() {
 		TenantName:       tenantName,
 	}
 	if err := gopheropenstack.Authenticate(osClient, osAuthOptions); err != nil {
+		discovererMetrics.GenericMetricError(clusterName, "AuthError")
 		log.Fatalf("Failed to authenticate with OpenStack: %v", err)
 	}
 
 	identity, err := openstack.NewIdentityV3(osClient)
 	if err != nil {
+		discovererMetrics.GenericMetricError(clusterName, "AuthError")
 		log.Fatalf("Failed to create Identity V3 API client: %v", err)
 	}
 
 	lbv2, err := openstack.NewLoadBalancerV2(osClient)
 	if err != nil {
+		discovererMetrics.GenericMetricError(clusterName, "AuthError")
 		log.Fatalf("Failed to create Network V2 API client: %v", err)
 	}
 
@@ -138,8 +164,16 @@ func main() {
 		identity,
 		log,
 		numProcessThreads,
+		discovererMetrics,
 	)
 	stopCh := signals.SetupSignalHandler()
+
+	go func() {
+		// Expose the registered metrics via HTTP.
+		http.Handle("/metrics", promhttp.Handler())
+		log.Info("Listening for Prometheus metrics on port: ", prometheusListenAddress)
+		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", prometheusListenAddress), nil))
+	}()
 
 	go reconciler.Run(stopCh)
 
@@ -150,10 +184,12 @@ func main() {
 func httpTransportWithCA(log *logrus.Logger, caFile string) http.RoundTripper {
 	ca, err := ioutil.ReadFile(caFile)
 	if err != nil {
+		discovererMetrics.GenericMetricError(clusterName, "AuthError")
 		log.Fatalf("Error reading certificate authority for OpenStack: %v", err)
 	}
 	pool := x509.NewCertPool()
 	if ok := pool.AppendCertsFromPEM(ca); !ok {
+		discovererMetrics.GenericMetricError(clusterName, "AuthError")
 		log.Fatalf("Failed to add certificate authority to CA pool. Verify certificate is a valid, PEM-encoded certificate.")
 	}
 	// Use default transport with CA

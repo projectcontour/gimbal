@@ -16,27 +16,33 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"time"
 
 	"github.com/heptio/gimbal/discovery/pkg/buildinfo"
 	"github.com/heptio/gimbal/discovery/pkg/k8s"
+	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
 	"github.com/heptio/gimbal/discovery/pkg/signals"
 	"github.com/heptio/gimbal/discovery/pkg/util"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	_ "k8s.io/api/core/v1"
 	kubeinformers "k8s.io/client-go/informers"
 )
 
 var (
-	printVersion          bool
-	gimbalKubeCfgFile     string
-	discovererKubeCfgFile string
-	numProcessThreads     int
-	workingNamespace      string
-	clusterName           string
-	resyncInterval        time.Duration
-	debug                 bool
+	printVersion            bool
+	gimbalKubeCfgFile       string
+	discovererKubeCfgFile   string
+	numProcessThreads       int
+	workingNamespace        string
+	clusterName             string
+	resyncInterval          time.Duration
+	debug                   bool
+	prometheusListenAddress int
+	discovererMetrics       localmetrics.DiscovererMetrics
 )
 
 func init() {
@@ -47,6 +53,7 @@ func init() {
 	flag.StringVar(&clusterName, "cluster-name", "", "Name of cluster")
 	flag.DurationVar(&resyncInterval, "resync-interval", time.Minute*30, "Default resync period for watcher to refresh")
 	flag.BoolVar(&debug, "debug", false, "Enable debug logging.")
+	flag.IntVar(&prometheusListenAddress, "prometheus-listen-address", 8080, "The address to listen on for Prometheus HTTP requests")
 	flag.Parse()
 }
 
@@ -62,30 +69,42 @@ func main() {
 		os.Exit(0)
 	}
 
+	log.Info("Gimbal Discoverer Starting up...")
+
+	// Init prometheus metrics
+	discovererMetrics = localmetrics.NewMetrics()
+
+	// Register with Prometheus's default registry
+	for _, v := range discovererMetrics.Metrics {
+		prometheus.MustRegister(v)
+	}
+
 	if debug {
 		log.Level = logrus.DebugLevel
 	}
 
 	// Verify cluster name is passed
 	if clusterName == "" {
-		log.Fatalf("`cluster-name` arg is required!")
+		discovererMetrics.GenericMetricError("!!INVALID!!", "InvalidClusterName")
+		log.Fatalf("The Kubernetes cluster name must be provided using the `--cluster-name` flag")
 	}
 
-	// Discovered cluster is passed.
+	// Discovered cluster is passed
 	if discovererKubeCfgFile == "" {
+		discovererMetrics.GenericMetricError(clusterName, "InvalidDiscoverKubecfgFile")
 		log.Fatalf("`discover-kubecfg-file` arg is required!")
 	}
-
-	log.Info("Gimbal Discoverer Starting up...")
 
 	// Init
 	gimbalKubeClient, err := k8s.NewClient(gimbalKubeCfgFile, log)
 	if err != nil {
+		discovererMetrics.GenericMetricError(clusterName, "InvalidK8SGimbalClient")
 		log.Error("Could not init k8sclient! ", err)
 	}
 
 	k8sDiscovererClient, err := k8s.NewClient(discovererKubeCfgFile, log)
 	if err != nil {
+		discovererMetrics.GenericMetricError(clusterName, "InvalidK8SDiscovererClient")
 		log.Error("Could not init k8s discoverer client! ", err)
 	}
 
@@ -93,8 +112,9 @@ func main() {
 
 	kubeInformerFactory := kubeinformers.NewSharedInformerFactory(k8sDiscovererClient, resyncInterval)
 
-	c := k8s.NewController(log, gimbalKubeClient, kubeInformerFactory, clusterName, numProcessThreads)
+	c := k8s.NewController(log, gimbalKubeClient, kubeInformerFactory, clusterName, numProcessThreads, discovererMetrics)
 	if err != nil {
+		discovererMetrics.GenericMetricError(clusterName, "ControllerInit")
 		log.Error("Could not init Controller! ", err)
 	}
 
@@ -103,9 +123,16 @@ func main() {
 
 	go kubeInformerFactory.Start(stopCh)
 
+	go func() {
+		// Expose the registered metrics via HTTP.
+		http.Handle("/metrics", promhttp.Handler())
+		log.Info("Listening for Prometheus metrics on port: ", prometheusListenAddress)
+		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", prometheusListenAddress), nil))
+	}()
+
 	// Kick it off
 	if err = c.Run(stopCh); err != nil {
+		discovererMetrics.GenericMetricError(clusterName, "ControllerError")
 		log.Fatalf("Error running controller: %s", err.Error())
 	}
-
 }

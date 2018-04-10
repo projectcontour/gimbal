@@ -20,6 +20,7 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/loadbalancers"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/pools"
+	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
 	"github.com/heptio/gimbal/discovery/pkg/sync"
 	"github.com/heptio/gimbal/discovery/pkg/translator"
 	"github.com/sirupsen/logrus"
@@ -54,10 +55,13 @@ type Reconciler struct {
 	SyncPeriod time.Duration
 	Logger     *logrus.Logger
 	syncqueue  sync.Queue
+
+	Metrics localmetrics.DiscovererMetrics
 }
 
 // NewReconciler returns an OpenStack reconciler
-func NewReconciler(clusterName string, gimbalKubeClient kubernetes.Interface, syncPeriod time.Duration, lbLister LoadBalancerLister, projectLister ProjectLister, log *logrus.Logger, queueWorkers int) Reconciler {
+func NewReconciler(clusterName string, gimbalKubeClient kubernetes.Interface, syncPeriod time.Duration, lbLister LoadBalancerLister,
+	projectLister ProjectLister, log *logrus.Logger, queueWorkers int, metrics localmetrics.DiscovererMetrics) Reconciler {
 	return Reconciler{
 		ClusterName:        clusterName,
 		GimbalKubeClient:   gimbalKubeClient,
@@ -65,11 +69,13 @@ func NewReconciler(clusterName string, gimbalKubeClient kubernetes.Interface, sy
 		LoadBalancerLister: lbLister,
 		ProjectLister:      projectLister,
 		Logger:             log,
+		Metrics:            metrics,
 		syncqueue: sync.Queue{
 			KubeClient:  gimbalKubeClient,
 			Logger:      log,
 			Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
 			Threadiness: queueWorkers,
+			Metrics:     metrics,
 		},
 	}
 }
@@ -102,6 +108,7 @@ func (r *Reconciler) reconcile() {
 	// Get all the openstack tenants that must be synced
 	projects, err := r.ProjectLister.ListProjects()
 	if err != nil {
+		r.Metrics.GenericMetricError(r.ClusterName, "Reconciler")
 		log.Errorf("error listing OpenStack projects: %v", err)
 		return
 	}
@@ -111,6 +118,7 @@ func (r *Reconciler) reconcile() {
 		// Get load balancers that are defined in the project
 		loadbalancers, err := r.ListLoadBalancers(project.ID)
 		if err != nil {
+			r.Metrics.GenericMetricError(r.ClusterName, "Reconciler")
 			log.Errorf("error reconciling project %q: %v", projectName, err)
 			continue
 		}
@@ -118,6 +126,7 @@ func (r *Reconciler) reconcile() {
 		// Get all pools defined in the project
 		pools, err := r.ListPools(project.ID)
 		if err != nil {
+			r.Metrics.GenericMetricError(r.ClusterName, "Reconciler")
 			log.Errorf("error reconciling project %q: %v", projectName, err)
 			continue
 		}
@@ -127,12 +136,14 @@ func (r *Reconciler) reconcile() {
 		clusterLabelSelector := fmt.Sprintf("%s=%s", translator.GimbalLabelCluster, r.ClusterName)
 		currentServices, err := r.GimbalKubeClient.CoreV1().Services(projectName).List(metav1.ListOptions{LabelSelector: clusterLabelSelector})
 		if err != nil {
+			r.Metrics.GenericMetricError(r.ClusterName, "Reconciler")
 			log.Errorf("error listing services in namespace %q: %v", projectName, err)
 			continue
 		}
 
 		currentEndpoints, err := r.GimbalKubeClient.CoreV1().Endpoints(projectName).List(metav1.ListOptions{LabelSelector: clusterLabelSelector})
 		if err != nil {
+			r.Metrics.GenericMetricError(r.ClusterName, "Reconciler")
 			log.Errorf("error listing endpoints in namespace:%q: %v", projectName, err)
 			continue
 		}

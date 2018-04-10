@@ -17,9 +17,12 @@ spec:
       labels:
         app: kubernetes-discoverer
         cluster: k8s
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
     spec:
       containers:
-      - image: gcr.io/heptio-images/gimbal-discoverer:master
+      - image: stevesloka/gimbal-discoverer:master
         imagePullPolicy: Always
         name: kubernetes-discoverer
         command: ["/kubernetes-discoverer"]
