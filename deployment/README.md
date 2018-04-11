@@ -47,17 +47,8 @@ Envoy is the data component of Contour and handles the network traffic, Contour 
 # Navigate to deployment directory
 $ cd deployment
 
-# Create namespace / service account
-$ kubectl create -f contour/01-common.yaml
-
-# Create RBAC policies for Service Account
-$ kubectl create -f contour/02-rbac.yaml
-
 # Deploy Contour
-$ kubectl apply -f contour/02-deployment.yaml
-
-# Deploy Contour Service
-$ kubectl apply -f contour/02-service.yaml
+$ kubectl create -f contour/
 ```
 
 _NOTE: The current configuration exposes the Envoy Admin UI so that Prometheus can scrape for metrics!_
@@ -110,26 +101,8 @@ This directory contains a sample development deployment of Prometheus and Alert 
 ### Quick start
 
 ```sh
-# Create namespace (If required)
-$ kubectl apply -f prometheus/01-namespace.yaml
-
-# Create prometheus config
-$ kubectl apply -f prometheus/02-prometheus-configmap.yaml
-
-# Create alert manager config
-$ kubectl apply -f prometheus/02-prometheus-alertmanager-configmap.yaml
-
-# Create alert rules config
-$ kubectl apply -f prometheus/02-prometheus-alertrules-configmap.yaml
-
-# Create prometheus deployment
-$ kubectl apply -f prometheus/03-prometheus-deployment.yaml
-
-# Create alertmanager deployment
-$ kubectl apply -f prometheus/03-prometheus-alertmanager-deployment.yaml
-
-# Create the prometheus node exporter
-$ kubectl apply -f prometheus/03-prometheus-node-exporter.yaml
+# Deploy 
+$ kubectl apply -f prometheus
 
 # Deploy kube-state-metrics to gather cluster information
 $ git clone https://github.com/kubernetes/kube-state-metrics.git
@@ -160,22 +133,13 @@ Sample development deployment of Grafana using temporary storage.
 ### Quick Start
 
 ```sh
-# Apply Namespace (if required)
-$ kubectl apply -f grafana/01-namepace.yaml
+# Deploy
+$ kubectl apply -f grafana/
 
 # Create secret with grafana credentials
 $ kubectl create secret generic grafana -n gimbal-monitoring \
     --from-literal=grafana-admin-password=admin \
     --from-literal=grafana-admin-user=admin 
-
-# Configmap
-$ kubectl apply -f grafana/02-grafana-configmap.yaml
-
-# Deployment
-$ kubectl apply -f grafana/03-grafana-deployment.yaml
-
-# Service
-$ kubectl apply -f grafana/03-grafana-service.yaml
 ```
 
 ### Accessing Grafana UI
