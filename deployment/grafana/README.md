@@ -6,22 +6,34 @@ Sample development deployment of Grafana using temporary storage.
 
 ```sh
 
+# Navigate to grafana directory from root
+$ cd deployment/grafana
+
+# Apply Namespace (if required)
+$ kubectl apply -f deployment/01-namepace.yaml
+
 # Set admin password
-GRAFANA_PASSWORD=
+$ GRAFANA_PASSWORD=admin
 
 # Create secret with grafana credentials
-kubectl create secret generic grafana -n gimbal-monitoring \
+$ kubectl create secret generic grafana -n gimbal-monitoring \
     --from-literal=grafana-admin-password=${GRAFANA_PASSWORD} \
-    --from-literal=grafana-admin-user=admin
+    --from-literal=grafana-admin-user=admin 
 
-# Apply resources
-kubectl apply -f deployment/
+# Apply Configmap
+$ kubectl apply -f deployment/02-grafana-configmap.yaml
+
+# Apply Deployment
+$ kubectl apply -f deployment/03-grafana-deployment.yaml
+
+# Apply Configmap
+$ kubectl apply -f deployment/03-grafana-service.yaml
 ```
 
 ## Accessing Grafana UI
 
 ```sh
-kubectl port-forward $(kubectl get pods -l app=grafana -n gimbal-monitoring -o jsonpath='{.items[0].metadata.name}') 3000
+$ kubectl port-forward $(kubectl get pods -l app=grafana -n gimbal-monitoring -o jsonpath='{.items[0].metadata.name}') 3000 -n gimbal-monitoring
 ```
 
 Access Grafana at http://localhost:3000 in your browser. Use `admin` as the username.

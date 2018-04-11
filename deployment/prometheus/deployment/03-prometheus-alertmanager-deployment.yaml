@@ -4,6 +4,7 @@ metadata:
   labels:
     app: prometheus
     component: alertmanager
+  namespace: gimbal-monitoring
   name: prometheus-alertmanager
 ---
 apiVersion: v1

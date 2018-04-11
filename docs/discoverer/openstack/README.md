@@ -36,8 +36,30 @@ Credentials required:
 - Password: Password for User
 - AuthURL: Openstack API Url
 - TenantName: Tenant used to discover services
+- Cluster Name: Unique name of cluster to identify
+- Certificate Authority Data: CA Certificate (if required)
 
 _NOTE: These are exposed to the deployment via environment variables._
+
+#### Example
+
+Following is an example secret that will need to be customized. Replace all the values in the `data` section with their `base64` encoded versions. 
+
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: remote-discover-openstack
+  namespace: gimbal-discoverer
+type: Opaque
+data:
+  cluster-name: clustername_base64
+  username: username_base64
+  password: password_base64
+  auth-url: authurl_base64
+  tenant-name: tenantname_base64
+  certificate-authority-data: certdata_base64
+```
 
 ### Data flow
 

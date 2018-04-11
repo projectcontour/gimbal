@@ -33,7 +33,7 @@ spec:
         volumeMounts:
         - name: contour-config
           mountPath: /config
-      - image: gcr.io/heptio-images/contour:routecrd-alphav1
+      - image: gcr.io/heptio-images/contour:v0.4.1
         imagePullPolicy: Always
         ports:
         - containerPort: 8000
@@ -42,7 +42,7 @@ spec:
         command: ["contour"]
         args: ["serve", "--incluster", "--envoy-http-port", "80"] # serve on port 80
       initContainers:
-      - image: gcr.io/heptio-images/contour:routecrd-alphav1
+      - image: gcr.io/heptio-images/contour:v0.4.1
         imagePullPolicy: Always
         name: envoy-initconfig
         command: ["contour"]
@@ -54,6 +54,6 @@ spec:
       - name: contour-config
         emptyDir: {}
       dnsPolicy: ClusterFirst
-      serviceAccountName: contour
+      serviceAccountName: gimbal
       terminationGracePeriodSeconds: 30
 ---
