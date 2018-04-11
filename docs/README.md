@@ -11,7 +11,5 @@ The following guides will describe how components of Gimbal function and interac
 - [Kubernetes Discoverer](guides/discoverer/kubernetes/README.md)
 - [Openstack](docs/discoverer/openstack/README.md)
 
-Guides on how to setup metrics/monitoring can be found here:
-- [Prometheus](deployment/prometheus/README.md)
-- [Grafana](deployment/grafana/README.md)
+Guides on how to setup / deploy Gimbal can be found in the [deployment guide](../deployment/README.md). 
 

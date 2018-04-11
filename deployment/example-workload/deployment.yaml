@@ -66,44 +66,6 @@ spec:
     protocol: TCP
     targetPort: 80
   selector:
-    app: kuard
+    app: nginx
   sessionAffinity: None
   type: ClusterIP
----
-apiVersion: gimbal.heptio.com/v1alpha1
-kind: Route
-metadata: 
-  name: sample-route-kuard
-spec: 
-  host: kuard.local
-  routes: 
-    - pathPrefix: /
-      upstreams: 
-        - serviceName: kuard
-          servicePort: 80
----
-apiVersion: gimbal.heptio.com/v1alpha1
-kind: Route
-metadata: 
-  name: sample-route-nginx
-spec: 
-  host: nginx.local
-  routes: 
-    - pathPrefix: /
-      upstreams: 
-        - serviceName: nginx
-          servicePort: 80
----
-apiVersion: gimbal.heptio.com/v1alpha1
-kind: Route
-metadata: 
-  name: sample-route-both
-spec: 
-  host: both.local
-  routes: 
-    - pathPrefix: /
-      upstreams: 
-        - serviceName: nginx
-          servicePort: 80
-        - serviceName: kuard
-          servicePort: 80

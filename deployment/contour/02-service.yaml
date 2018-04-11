@@ -23,4 +23,4 @@ spec:
    targetPort: 8443
  selector:
    app: contour
- type: LoadBalancer
+ type: ClusterIP

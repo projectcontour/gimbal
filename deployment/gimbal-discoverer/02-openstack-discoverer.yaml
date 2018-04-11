@@ -4,19 +4,19 @@ metadata:
   labels:
     app: openstack-discoverer
     cluster: origin
-  name: origin-openstack-discoverer
+  name: openstack-discoverer
   namespace:  gimbal-discoverer
 spec:
   selector:
     matchLabels:
       app: openstack-discoverer
-      cluster: origin
+      cluster: openstack
   replicas: 1
   template:
     metadata:
       labels:
         app: openstack-discoverer
-        cluster: origin
+        cluster: openstack
     spec:
       containers:
         - image: gcr.io/heptio-images/gimbal-discoverer:master

@@ -36,8 +36,18 @@ Credentials required:
 - Password: Password for User
 - AuthURL: Openstack API Url
 - TenantName: Tenant used to discover services
+- Cluster Name: Unique name of cluster to identify
+- Certificate Authority Data: CA Certificate (if required)
 
 _NOTE: These are exposed to the deployment via environment variables._
+
+#### Example
+
+Following example creates a Kubernetes secret which the Openstack discoverer will consume and get credentials & other information to be able to discover services & endpoints: 
+
+```sh
+$ kubectl create secret generic remote-discover-openstack --from-file=certificate-authority-data=./ca.pem --from-literal=cluster-name=openstack --from-literal=username=admin --from-literal=password=abc123 --from-literal=auth-url=https://api.openstack:5000/ --from-literal=tenant-name=heptio
+```
 
 ### Data flow
 
