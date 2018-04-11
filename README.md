@@ -35,5 +35,9 @@ If you encounter any problems that the documentation does not address, please [f
 
 Thanks for taking the time to join our community and start contributing!
 
+### Before you start
 - Please familiarize yourself with the [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
-- Check out the [issues](https://github.com/heptio/gimbal/issues) and our roadmap.
+- See [CONTRIBUTING.md](CONTRIBUTING.md) for instructions on the developer certificate of origin that we require.
+
+### Pull Requests
+- We welcome pull requests. Fee free to dig through the [issues](https://github.com/heptio/gimbal/issues) and jump in.
