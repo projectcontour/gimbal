@@ -6,5 +6,5 @@ metadata:
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: gimbal
+  name: contour
   namespace: heptio-contour

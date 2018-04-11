@@ -54,6 +54,6 @@ spec:
       - name: contour-config
         emptyDir: {}
       dnsPolicy: ClusterFirst
-      serviceAccountName: gimbal
+      serviceAccountName: contour
       terminationGracePeriodSeconds: 30
 ---
