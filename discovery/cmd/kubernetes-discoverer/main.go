@@ -81,7 +81,6 @@ func main() {
 
 	// Verify cluster name is passed
 	if clusterName == "" {
-		discovererMetrics.GenericMetricError("!!INVALID!!", "InvalidClusterName")
 		log.Fatalf("The Kubernetes cluster name must be provided using the `--cluster-name` flag")
 	}
 
@@ -107,8 +106,7 @@ func main() {
 
 	c := k8s.NewController(log, gimbalKubeClient, kubeInformerFactory, clusterName, numProcessThreads, discovererMetrics)
 	if err != nil {
-		discovererMetrics.GenericMetricError(clusterName, "ControllerInit")
-		log.Error("Could not init Controller! ", err)
+		log.Fatal("Could not init Controller! ", err)
 	}
 
 	// set up signals so we handle the first shutdown signal gracefully

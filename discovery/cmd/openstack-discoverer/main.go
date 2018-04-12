@@ -180,12 +180,10 @@ func main() {
 func httpTransportWithCA(log *logrus.Logger, caFile string) http.RoundTripper {
 	ca, err := ioutil.ReadFile(caFile)
 	if err != nil {
-		discovererMetrics.GenericMetricError(clusterName, "AuthError")
 		log.Fatalf("Error reading certificate authority for OpenStack: %v", err)
 	}
 	pool := x509.NewCertPool()
 	if ok := pool.AppendCertsFromPEM(ca); !ok {
-		discovererMetrics.GenericMetricError(clusterName, "AuthError")
 		log.Fatalf("Failed to add certificate authority to CA pool. Verify certificate is a valid, PEM-encoded certificate.")
 	}
 	// Use default transport with CA
