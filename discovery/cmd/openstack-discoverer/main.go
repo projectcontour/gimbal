@@ -14,6 +14,7 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"flag"
@@ -158,13 +159,14 @@ func main() {
 		http.Handle("/metrics", promhttp.Handler())
 		srv := &http.Server{Addr: fmt.Sprintf(":%d", prometheusListenAddress)}
 		log.Info("Listening for Prometheus metrics on port: ", prometheusListenAddress)
-		err := srv.ListenAndServe()
-		if err != nil {
+		if err := srv.ListenAndServe(); err != nil {
 			log.Fatal(err)
 		}
 		<-stopCh
 		log.Info("Shutting down Prometheus server...")
-		if err := srv.Shutdown(nil); err != nil {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := srv.Shutdown(ctx); err != nil {
 			log.Fatal(err)
 		}
 	}()
