@@ -33,16 +33,16 @@ import (
 )
 
 var (
-	printVersion            bool
-	gimbalKubeCfgFile       string
-	discovererKubeCfgFile   string
-	numProcessThreads       int
-	workingNamespace        string
-	clusterName             string
-	resyncInterval          time.Duration
-	debug                   bool
-	prometheusListenAddress int
-	discovererMetrics       localmetrics.DiscovererMetrics
+	printVersion          bool
+	gimbalKubeCfgFile     string
+	discovererKubeCfgFile string
+	numProcessThreads     int
+	workingNamespace      string
+	clusterName           string
+	resyncInterval        time.Duration
+	debug                 bool
+	prometheusListenPort  int
+	discovererMetrics     localmetrics.DiscovererMetrics
 )
 
 func init() {
@@ -53,7 +53,7 @@ func init() {
 	flag.StringVar(&clusterName, "cluster-name", "", "Name of cluster")
 	flag.DurationVar(&resyncInterval, "resync-interval", time.Minute*30, "Default resync period for watcher to refresh")
 	flag.BoolVar(&debug, "debug", false, "Enable debug logging.")
-	flag.IntVar(&prometheusListenAddress, "prometheus-listen-address", 8080, "The address to listen on for Prometheus HTTP requests")
+	flag.IntVar(&prometheusListenPort, "prometheus-listen-address", 8080, "The address to listen on for Prometheus HTTP requests")
 	flag.Parse()
 }
 
@@ -119,8 +119,8 @@ func main() {
 	go func() {
 		// Expose the registered metrics via HTTP.
 		http.Handle("/metrics", promhttp.Handler())
-		srv := &http.Server{Addr: fmt.Sprintf(":%d", prometheusListenAddress)}
-		log.Info("Listening for Prometheus metrics on port: ", prometheusListenAddress)
+		srv := &http.Server{Addr: fmt.Sprintf(":%d", prometheusListenPort)}
+		log.Info("Listening for Prometheus metrics on port: ", prometheusListenPort)
 		if err := srv.ListenAndServe(); err != nil {
 			log.Fatal(err)
 		}

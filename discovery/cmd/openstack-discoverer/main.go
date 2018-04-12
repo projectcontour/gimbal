@@ -47,7 +47,7 @@ var (
 	reconciliationPeriod              time.Duration
 	httpClientTimeout                 time.Duration
 	openstackCertificateAuthorityFile string
-	prometheusListenAddress           int
+	prometheusListenPort              int
 	discovererMetrics                 localmetrics.DiscovererMetrics
 )
 
@@ -60,7 +60,7 @@ func init() {
 	flag.DurationVar(&reconciliationPeriod, "reconciliation-period", 30*time.Second, "The interval of time between reconciliation loop runs.")
 	flag.DurationVar(&httpClientTimeout, "http-client-timeout", 5*time.Second, "The HTTP client request timeout.")
 	flag.StringVar(&openstackCertificateAuthorityFile, "openstack-certificate-authority", "", "Path to cert file of the OpenStack API certificate authority.")
-	flag.IntVar(&prometheusListenAddress, "prometheus-listen-address", 8080, "The address to listen on for Prometheus HTTP requests")
+	flag.IntVar(&prometheusListenPort, "prometheus-listen-address", 8080, "The address to listen on for Prometheus HTTP requests")
 	flag.Parse()
 }
 
@@ -157,8 +157,8 @@ func main() {
 	go func() {
 		// Expose the registered metrics via HTTP.
 		http.Handle("/metrics", promhttp.Handler())
-		srv := &http.Server{Addr: fmt.Sprintf(":%d", prometheusListenAddress)}
-		log.Info("Listening for Prometheus metrics on port: ", prometheusListenAddress)
+		srv := &http.Server{Addr: fmt.Sprintf(":%d", prometheusListenPort)}
+		log.Info("Listening for Prometheus metrics on port: ", prometheusListenPort)
 		if err := srv.ListenAndServe(); err != nil {
 			log.Fatal(err)
 		}
