@@ -108,7 +108,7 @@ func (r *Reconciler) reconcile() {
 	// Get all the openstack tenants that must be synced
 	projects, err := r.ProjectLister.ListProjects()
 	if err != nil {
-		r.Metrics.GenericMetricError(r.ClusterName, "Reconciler")
+		r.Metrics.GenericMetricError(r.ClusterName, "ListProjects")
 		log.Errorf("error listing OpenStack projects: %v", err)
 		return
 	}
@@ -118,7 +118,7 @@ func (r *Reconciler) reconcile() {
 		// Get load balancers that are defined in the project
 		loadbalancers, err := r.ListLoadBalancers(project.ID)
 		if err != nil {
-			r.Metrics.GenericMetricError(r.ClusterName, "Reconciler")
+			r.Metrics.GenericMetricError(r.ClusterName, "ListLoadBalancers")
 			log.Errorf("error reconciling project %q: %v", projectName, err)
 			continue
 		}
@@ -126,7 +126,7 @@ func (r *Reconciler) reconcile() {
 		// Get all pools defined in the project
 		pools, err := r.ListPools(project.ID)
 		if err != nil {
-			r.Metrics.GenericMetricError(r.ClusterName, "Reconciler")
+			r.Metrics.GenericMetricError(r.ClusterName, "ListPools")
 			log.Errorf("error reconciling project %q: %v", projectName, err)
 			continue
 		}
@@ -136,14 +136,14 @@ func (r *Reconciler) reconcile() {
 		clusterLabelSelector := fmt.Sprintf("%s=%s", translator.GimbalLabelCluster, r.ClusterName)
 		currentServices, err := r.GimbalKubeClient.CoreV1().Services(projectName).List(metav1.ListOptions{LabelSelector: clusterLabelSelector})
 		if err != nil {
-			r.Metrics.GenericMetricError(r.ClusterName, "Reconciler")
+			r.Metrics.GenericMetricError(r.ClusterName, "ListServicesInNamespace")
 			log.Errorf("error listing services in namespace %q: %v", projectName, err)
 			continue
 		}
 
 		currentEndpoints, err := r.GimbalKubeClient.CoreV1().Endpoints(projectName).List(metav1.ListOptions{LabelSelector: clusterLabelSelector})
 		if err != nil {
-			r.Metrics.GenericMetricError(r.ClusterName, "Reconciler")
+			r.Metrics.GenericMetricError(r.ClusterName, "ListEndpointsInNamespace")
 			log.Errorf("error listing endpoints in namespace:%q: %v", projectName, err)
 			continue
 		}
