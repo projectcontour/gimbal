@@ -86,7 +86,7 @@ func TestServiceActions(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			client := fake.NewSimpleClientset(&tc.existingService)
 			a := serviceAction{kind: tc.actionKind, service: &tc.service}
-			err := a.Sync(client, localmetrics.NewMetrics())
+			err := a.Sync(client, localmetrics.NewMetrics(), "testnode")
 
 			if !tc.expectErr {
 				require.NoError(t, err)
@@ -136,7 +136,7 @@ func TestUpdateService(t *testing.T) {
 		},
 	}
 	expectedPatch := `{"spec":{"$setElementOrder/ports":[{"port":8080}],"ports":[{"port":8080,"targetPort":0},{"$patch":"delete","port":80}]}}`
-	err := updateService(client, &newService, localmetrics.NewMetrics())
+	err := updateService(client, &newService, localmetrics.NewMetrics(), "testnode")
 	require.NoError(t, err)
 	assert.Equal(t, expectedPatch, string(gotPatchBytes))
 }

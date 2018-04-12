@@ -31,9 +31,6 @@ const (
 	actionDelete = "delete"
 )
 
-// ClusterName is the name of the cluster to discover
-var ClusterName string
-
 // Queue syncs resources with the Gimbal cluster by working through a queue of
 // actions that must be performed against services and endpoints.
 type Queue struct {
@@ -42,11 +39,12 @@ type Queue struct {
 	Workqueue   workqueue.RateLimitingInterface
 	Threadiness int
 	Metrics     localmetrics.DiscovererMetrics
+	ClusterName string
 }
 
 // Action that is added to the queue for processing
 type Action interface {
-	Sync(kubernetes.Interface, localmetrics.DiscovererMetrics) error
+	Sync(kube kubernetes.Interface, lm localmetrics.DiscovererMetrics, clusterName string) error
 }
 
 // Enqueue adds a new resource action to the worker queue
@@ -102,7 +100,7 @@ func (sq *Queue) processNextWorkItem() bool {
 			return fmt.Errorf("ignoring unknown item of type %T in queue", obj)
 		}
 
-		err := action.Sync(sq.KubeClient, sq.Metrics)
+		err := action.Sync(sq.KubeClient, sq.Metrics, sq.ClusterName)
 		if err != nil {
 			return err
 		}

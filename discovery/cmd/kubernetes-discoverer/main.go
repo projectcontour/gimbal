@@ -25,7 +25,6 @@ import (
 	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
 	"github.com/heptio/gimbal/discovery/pkg/signals"
 	"github.com/heptio/gimbal/discovery/pkg/util"
-	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 	_ "k8s.io/api/core/v1"
@@ -73,11 +72,7 @@ func main() {
 
 	// Init prometheus metrics
 	discovererMetrics = localmetrics.NewMetrics()
-
-	// Register with Prometheus's default registry
-	for _, v := range discovererMetrics.Metrics {
-		prometheus.MustRegister(v)
-	}
+	discovererMetrics.RegisterPrometheus()
 
 	if debug {
 		log.Level = logrus.DebugLevel
@@ -91,21 +86,18 @@ func main() {
 
 	// Discovered cluster is passed
 	if discovererKubeCfgFile == "" {
-		discovererMetrics.GenericMetricError(clusterName, "InvalidDiscoverKubecfgFile")
 		log.Fatalf("`discover-kubecfg-file` arg is required!")
 	}
 
 	// Init
 	gimbalKubeClient, err := k8s.NewClient(gimbalKubeCfgFile, log)
 	if err != nil {
-		discovererMetrics.GenericMetricError(clusterName, "InvalidK8SGimbalClient")
-		log.Error("Could not init k8sclient! ", err)
+		log.Fatal("Could not init k8sclient! ", err)
 	}
 
 	k8sDiscovererClient, err := k8s.NewClient(discovererKubeCfgFile, log)
 	if err != nil {
-		discovererMetrics.GenericMetricError(clusterName, "InvalidK8SDiscovererClient")
-		log.Error("Could not init k8s discoverer client! ", err)
+		log.Fatal("Could not init k8s discoverer client! ", err)
 	}
 
 	log.Info("Starting shared informer, resync interval is: ", resyncInterval)
@@ -126,13 +118,21 @@ func main() {
 	go func() {
 		// Expose the registered metrics via HTTP.
 		http.Handle("/metrics", promhttp.Handler())
+		srv := &http.Server{Addr: fmt.Sprintf(":%d", prometheusListenAddress)}
 		log.Info("Listening for Prometheus metrics on port: ", prometheusListenAddress)
-		log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", prometheusListenAddress), nil))
+		err := srv.ListenAndServe()
+		if err != nil {
+			log.Fatal(err)
+		}
+		<-stopCh
+		log.Info("Shutting down Prometheus server...")
+		if err := srv.Shutdown(nil); err != nil {
+			log.Fatal(err)
+		}
 	}()
 
 	// Kick it off
 	if err = c.Run(stopCh); err != nil {
-		discovererMetrics.GenericMetricError(clusterName, "ControllerError")
 		log.Fatalf("Error running controller: %s", err.Error())
 	}
 }

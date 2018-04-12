@@ -38,8 +38,7 @@ type Controller struct {
 	servicesSynced  cache.InformerSynced
 	endpointsSynced cache.InformerSynced
 
-	clusterName      string
-	workingNamespace string
+	clusterName string
 }
 
 // NewController returns a new NewController
@@ -58,6 +57,7 @@ func NewController(log *logrus.Logger, gimbalKubeClient kubernetes.Interface, ku
 			Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
 			Threadiness: threadiness,
 			Metrics:     metrics,
+			ClusterName: clusterName,
 		},
 		servicesSynced:  serviceInformer.Informer().HasSynced,
 		endpointsSynced: endpointsInformer.Informer().HasSynced,

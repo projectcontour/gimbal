@@ -19,7 +19,7 @@ import (
 
 // DiscovererMetrics provide Prometheus metrics for the app
 type DiscovererMetrics struct {
-	Metrics map[string]prometheus.Collector
+	metrics map[string]prometheus.Collector
 }
 
 const (
@@ -27,7 +27,7 @@ const (
 	EndpointsEventTimestampGauge   = "gimbal_endpoints_event_timestamp"
 	ServiceErrorTotalCounter       = "gimbal_service_error_total"
 	EndpointsErrorTotalCounter     = "gimbal_endpoints_error_total"
-	QuesizeGauge                   = "gimbal_queuesize"
+	QueueSizeGauge                 = "gimbal_queuesize"
 	DiscovererAPILatencyMSGauge    = "gimbal_discoverer_api_latency_ms"
 	DiscovererCycleDurationMSGauge = "gimbal_discoverer_cycle_duration_ms"
 	DiscovererErrorTotal           = "gimbal_discoverer_error_total"
@@ -69,9 +69,9 @@ func NewMetrics() DiscovererMetrics {
 		[]string{"namespace", "clustername", "name", "errortype"},
 	)
 
-	metrics[QuesizeGauge] = prometheus.NewGaugeVec(
+	metrics[QueueSizeGauge] = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: QuesizeGauge,
+			Name: QueueSizeGauge,
 			Help: "Number of items in process queue",
 		},
 		[]string{"namespace", "clustername", "clustertype"},
@@ -102,13 +102,22 @@ func NewMetrics() DiscovererMetrics {
 	)
 
 	return DiscovererMetrics{
-		Metrics: metrics,
+		metrics: metrics,
+	}
+}
+
+// RegisterPrometheus registers the metrics
+func (d *DiscovererMetrics) RegisterPrometheus() {
+	// Register with Prometheus's default registry
+	for _, v := range d.metrics {
+
+		prometheus.MustRegister(v)
 	}
 }
 
 // ServiceMetricError formats a service prometheus metric and increments
 func (d *DiscovererMetrics) ServiceMetricError(namespace, clusterName, serviceName, errtype string) {
-	m, ok := d.Metrics[ServiceErrorTotalCounter].(*prometheus.CounterVec)
+	m, ok := d.metrics[ServiceErrorTotalCounter].(*prometheus.CounterVec)
 	if ok {
 		m.WithLabelValues(namespace, clusterName, serviceName, errtype).Inc()
 	}
@@ -116,7 +125,7 @@ func (d *DiscovererMetrics) ServiceMetricError(namespace, clusterName, serviceNa
 
 // EndpointsMetricError formats an endpoint prometheus metric and increments
 func (d *DiscovererMetrics) EndpointsMetricError(namespace, clusterName, endpointsName, errtype string) {
-	m, ok := d.Metrics[EndpointsErrorTotalCounter].(*prometheus.CounterVec)
+	m, ok := d.metrics[EndpointsErrorTotalCounter].(*prometheus.CounterVec)
 	if ok {
 		m.WithLabelValues(namespace, clusterName, endpointsName, errtype).Inc()
 	}
@@ -124,7 +133,7 @@ func (d *DiscovererMetrics) EndpointsMetricError(namespace, clusterName, endpoin
 
 // GenericMetricError formats a generic prometheus metric and increments
 func (d *DiscovererMetrics) GenericMetricError(clusterName, errtype string) {
-	m, ok := d.Metrics[DiscovererErrorTotal].(*prometheus.CounterVec)
+	m, ok := d.metrics[DiscovererErrorTotal].(*prometheus.CounterVec)
 	if ok {
 		m.WithLabelValues(clusterName, errtype).Inc()
 	}
@@ -132,7 +141,7 @@ func (d *DiscovererMetrics) GenericMetricError(clusterName, errtype string) {
 
 // ServiceEventTimestampMetric formats a Service event timestamp prometheus metric
 func (d *DiscovererMetrics) ServiceEventTimestampMetric(namespace, clusterName, name string, timestamp int64) {
-	m, ok := d.Metrics[ServiceEventTimestampGauge].(*prometheus.GaugeVec)
+	m, ok := d.metrics[ServiceEventTimestampGauge].(*prometheus.GaugeVec)
 	if ok {
 		m.WithLabelValues(namespace, clusterName, name).Set(float64(timestamp))
 	}
@@ -140,7 +149,7 @@ func (d *DiscovererMetrics) ServiceEventTimestampMetric(namespace, clusterName, 
 
 // EndpointsEventTimestampMetric formats a Endpoint event timestamp prometheus metric
 func (d *DiscovererMetrics) EndpointsEventTimestampMetric(namespace, clusterName, name string, timestamp int64) {
-	m, ok := d.Metrics[EndpointsEventTimestampGauge].(*prometheus.GaugeVec)
+	m, ok := d.metrics[EndpointsEventTimestampGauge].(*prometheus.GaugeVec)
 	if ok {
 		m.WithLabelValues(namespace, clusterName, name).Set(float64(timestamp))
 	}
