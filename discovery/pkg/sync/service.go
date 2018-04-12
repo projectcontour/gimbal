@@ -16,7 +16,9 @@ package sync
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
+	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -47,20 +49,22 @@ type serviceAction struct {
 }
 
 // Sync performs the action on the given service
-func (action serviceAction) Sync(kubeClient kubernetes.Interface) error {
+func (action serviceAction) Sync(kubeClient kubernetes.Interface, metrics localmetrics.DiscovererMetrics, clusterName string) error {
 
 	var err error
 	switch action.kind {
 	case actionAdd:
-		err = addService(kubeClient, action.service)
+		err = addService(kubeClient, action.service, metrics, clusterName)
 	case actionUpdate:
-		err = updateService(kubeClient, action.service)
+		err = updateService(kubeClient, action.service, metrics, clusterName)
 	case actionDelete:
-		err = deleteService(kubeClient, action.service)
+		err = deleteService(kubeClient, action.service, metrics, clusterName)
 	}
 	if err != nil {
 		return fmt.Errorf("error handling %s: %v", action, err)
 	}
+
+	metrics.ServiceEventTimestampMetric(action.service.GetNamespace(), clusterName, action.service.GetName(), time.Now().Unix())
 	return nil
 }
 
@@ -68,25 +72,41 @@ func (action serviceAction) String() string {
 	return fmt.Sprintf(`%s service "%s/%s"`, action.kind, action.service.Namespace, action.service.Name)
 }
 
-func addService(kubeClient kubernetes.Interface, service *v1.Service) error {
+func addService(kubeClient kubernetes.Interface, service *v1.Service, lm localmetrics.DiscovererMetrics, clusterName string) error {
 	_, err := kubeClient.CoreV1().Services(service.Namespace).Create(service)
 	if errors.IsAlreadyExists(err) {
-		err = updateService(kubeClient, service)
+		err = updateService(kubeClient, service, lm, clusterName)
+		if err != nil {
+			lm.ServiceMetricError(service.GetNamespace(), clusterName, service.GetName(), "UPDATE")
+		}
+	} else {
+		if err != nil {
+			lm.ServiceMetricError(service.GetNamespace(), clusterName, service.GetName(), "ADD")
+		}
 	}
 	return err
 }
 
-func deleteService(kubeClient kubernetes.Interface, service *v1.Service) error {
-	return kubeClient.CoreV1().Services(service.Namespace).Delete(service.Name, &metav1.DeleteOptions{})
+func deleteService(kubeClient kubernetes.Interface, service *v1.Service, lm localmetrics.DiscovererMetrics, clusterName string) error {
+	err := kubeClient.CoreV1().Services(service.Namespace).Delete(service.Name, &metav1.DeleteOptions{})
+
+	if err != nil {
+		lm.ServiceMetricError(service.GetNamespace(), clusterName, service.GetName(), "DELETE")
+	}
+	return err
 }
 
-func updateService(kubeClient kubernetes.Interface, service *v1.Service) error {
+func updateService(kubeClient kubernetes.Interface, service *v1.Service, lm localmetrics.DiscovererMetrics, clusterName string) error {
 	client := kubeClient.CoreV1().Services(service.Namespace)
 	existing, err := client.Get(service.Name, metav1.GetOptions{})
 
 	if err != nil {
 		if errors.IsNotFound(err) {
-			return addService(kubeClient, service)
+			err = addService(kubeClient, service, lm, clusterName)
+			if err != nil {
+				lm.ServiceMetricError(service.GetNamespace(), clusterName, service.GetName(), "ADD")
+			}
+			return err
 		}
 		return err
 	}
@@ -108,6 +128,10 @@ func updateService(kubeClient kubernetes.Interface, service *v1.Service) error {
 		return err
 	}
 	_, err = client.Patch(service.Name, types.StrategicMergePatchType, patchBytes)
+
+	if err != nil {
+		lm.ServiceMetricError(service.GetNamespace(), clusterName, service.GetName(), "UPDATE")
+	}
 
 	return err
 }

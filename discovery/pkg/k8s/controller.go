@@ -18,6 +18,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
 	"github.com/heptio/gimbal/discovery/pkg/sync"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/runtime"
@@ -37,13 +38,12 @@ type Controller struct {
 	servicesSynced  cache.InformerSynced
 	endpointsSynced cache.InformerSynced
 
-	clusterName      string
-	workingNamespace string
+	clusterName string
 }
 
 // NewController returns a new NewController
 func NewController(log *logrus.Logger, gimbalKubeClient kubernetes.Interface, kubeInformerFactory kubeinformers.SharedInformerFactory,
-	clusterName string, threadiness int) *Controller {
+	clusterName string, threadiness int, metrics localmetrics.DiscovererMetrics) *Controller {
 
 	// obtain references to shared index informers for the services types.
 	serviceInformer := kubeInformerFactory.Core().V1().Services()
@@ -56,6 +56,8 @@ func NewController(log *logrus.Logger, gimbalKubeClient kubernetes.Interface, ku
 			Logger:      log,
 			Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
 			Threadiness: threadiness,
+			Metrics:     metrics,
+			ClusterName: clusterName,
 		},
 		servicesSynced:  serviceInformer.Informer().HasSynced,
 		endpointsSynced: endpointsInformer.Informer().HasSynced,

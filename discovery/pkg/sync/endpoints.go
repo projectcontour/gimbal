@@ -16,7 +16,9 @@ package sync
 import (
 	"encoding/json"
 	"fmt"
+	"time"
 
+	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -47,20 +49,22 @@ type endpointsAction struct {
 }
 
 // Sync performs the action on the given Endpoints resource
-func (action endpointsAction) Sync(kubeClient kubernetes.Interface) error {
+func (action endpointsAction) Sync(kubeClient kubernetes.Interface, metrics localmetrics.DiscovererMetrics, clusterName string) error {
 
 	var err error
 	switch action.kind {
 	case actionAdd:
-		err = addEndpoints(kubeClient, action.endpoints)
+		err = addEndpoints(kubeClient, action.endpoints, metrics, clusterName)
 	case actionUpdate:
-		err = updateEndpoints(kubeClient, action.endpoints)
+		err = updateEndpoints(kubeClient, action.endpoints, metrics, clusterName)
 	case actionDelete:
-		err = deleteEndpoints(kubeClient, action.endpoints)
+		err = deleteEndpoints(kubeClient, action.endpoints, metrics, clusterName)
 	}
 	if err != nil {
 		return fmt.Errorf("error handling %s: %v", action, err)
 	}
+
+	metrics.EndpointsEventTimestampMetric(action.endpoints.GetNamespace(), clusterName, action.endpoints.GetName(), time.Now().Unix())
 	return nil
 }
 
@@ -68,25 +72,41 @@ func (action endpointsAction) String() string {
 	return fmt.Sprintf(`%s endpoints "%s/%s"`, action.kind, action.endpoints.Namespace, action.endpoints.Name)
 }
 
-func addEndpoints(kubeClient kubernetes.Interface, endpoints *v1.Endpoints) error {
+func addEndpoints(kubeClient kubernetes.Interface, endpoints *v1.Endpoints, lm localmetrics.DiscovererMetrics, clusterName string) error {
 	_, err := kubeClient.CoreV1().Endpoints(endpoints.Namespace).Create(endpoints)
 	if errors.IsAlreadyExists(err) {
-		return updateEndpoints(kubeClient, endpoints)
+		err = updateEndpoints(kubeClient, endpoints, lm, clusterName)
+		if err != nil {
+			lm.EndpointsMetricError(endpoints.GetNamespace(), clusterName, endpoints.GetName(), "UPDATE")
+		}
+	} else {
+		if err != nil {
+			lm.EndpointsMetricError(endpoints.GetNamespace(), clusterName, endpoints.GetName(), "ADD")
+		}
 	}
 	return err
 }
 
-func deleteEndpoints(kubeClient kubernetes.Interface, endpoints *v1.Endpoints) error {
-	return kubeClient.CoreV1().Endpoints(endpoints.Namespace).Delete(endpoints.Name, &metav1.DeleteOptions{})
+func deleteEndpoints(kubeClient kubernetes.Interface, endpoints *v1.Endpoints, lm localmetrics.DiscovererMetrics, clusterName string) error {
+	err := kubeClient.CoreV1().Endpoints(endpoints.Namespace).Delete(endpoints.Name, &metav1.DeleteOptions{})
+
+	if err != nil {
+		lm.EndpointsMetricError(endpoints.GetNamespace(), clusterName, endpoints.GetName(), "DELETE")
+	}
+
+	return err
 }
 
-func updateEndpoints(kubeClient kubernetes.Interface, endpoints *v1.Endpoints) error {
+func updateEndpoints(kubeClient kubernetes.Interface, endpoints *v1.Endpoints, lm localmetrics.DiscovererMetrics, clusterName string) error {
 	client := kubeClient.CoreV1().Endpoints(endpoints.Namespace)
 	existing, err := client.Get(endpoints.Name, metav1.GetOptions{})
 
 	if err != nil {
 		if errors.IsNotFound(err) {
-			return addEndpoints(kubeClient, endpoints)
+			err = addEndpoints(kubeClient, endpoints, lm, clusterName)
+			if err != nil {
+				lm.EndpointsMetricError(endpoints.GetNamespace(), clusterName, endpoints.GetName(), "ADD")
+			}
 		}
 		return err
 	}
@@ -108,5 +128,10 @@ func updateEndpoints(kubeClient kubernetes.Interface, endpoints *v1.Endpoints) e
 		return err
 	}
 	_, err = client.Patch(endpoints.Name, types.MergePatchType, patchBytes)
+
+	if err != nil {
+		lm.EndpointsMetricError(endpoints.GetNamespace(), clusterName, endpoints.GetName(), "UPDATE")
+	}
+
 	return err
 }

@@ -5,6 +5,9 @@ metadata:
     app: openstack-discoverer
     cluster: origin
   name: openstack-discoverer
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8080"
   namespace:  gimbal-discoverer
 spec:
   selector:

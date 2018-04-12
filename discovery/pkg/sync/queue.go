@@ -17,6 +17,7 @@ import (
 	"fmt"
 	"time"
 
+	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -37,11 +38,13 @@ type Queue struct {
 	KubeClient  kubernetes.Interface
 	Workqueue   workqueue.RateLimitingInterface
 	Threadiness int
+	Metrics     localmetrics.DiscovererMetrics
+	ClusterName string
 }
 
 // Action that is added to the queue for processing
 type Action interface {
-	Sync(kubernetes.Interface) error
+	Sync(kube kubernetes.Interface, lm localmetrics.DiscovererMetrics, clusterName string) error
 }
 
 // Enqueue adds a new resource action to the worker queue
@@ -97,7 +100,7 @@ func (sq *Queue) processNextWorkItem() bool {
 			return fmt.Errorf("ignoring unknown item of type %T in queue", obj)
 		}
 
-		err := action.Sync(sq.KubeClient)
+		err := action.Sync(sq.KubeClient, sq.Metrics, sq.ClusterName)
 		if err != nil {
 			return err
 		}

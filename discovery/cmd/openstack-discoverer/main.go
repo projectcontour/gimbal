@@ -14,6 +14,7 @@
 package main
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"flag"
@@ -28,9 +29,11 @@ import (
 	gopheropenstack "github.com/gophercloud/gophercloud/openstack"
 	"github.com/heptio/gimbal/discovery/pkg/buildinfo"
 	"github.com/heptio/gimbal/discovery/pkg/k8s"
+	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
 	"github.com/heptio/gimbal/discovery/pkg/openstack"
 	"github.com/heptio/gimbal/discovery/pkg/signals"
 	"github.com/heptio/gimbal/discovery/pkg/util"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
 )
 
@@ -44,6 +47,8 @@ var (
 	reconciliationPeriod              time.Duration
 	httpClientTimeout                 time.Duration
 	openstackCertificateAuthorityFile string
+	prometheusListenPort              int
+	discovererMetrics                 localmetrics.DiscovererMetrics
 )
 
 func init() {
@@ -55,6 +60,7 @@ func init() {
 	flag.DurationVar(&reconciliationPeriod, "reconciliation-period", 30*time.Second, "The interval of time between reconciliation loop runs.")
 	flag.DurationVar(&httpClientTimeout, "http-client-timeout", 5*time.Second, "The HTTP client request timeout.")
 	flag.StringVar(&openstackCertificateAuthorityFile, "openstack-certificate-authority", "", "Path to cert file of the OpenStack API certificate authority.")
+	flag.IntVar(&prometheusListenPort, "prometheus-listen-address", 8080, "The address to listen on for Prometheus HTTP requests")
 	flag.Parse()
 }
 
@@ -72,6 +78,12 @@ func main() {
 	if debug {
 		log.Level = logrus.DebugLevel
 	}
+
+	log.Info("Gimbal Discoverer Starting up...")
+
+	// Init prometheus metrics
+	discovererMetrics = localmetrics.NewMetrics()
+	discovererMetrics.RegisterPrometheus()
 
 	if clusterName == "" {
 		log.Fatal("The OpenStack cluster name must be provided using the --cluster-name flag")
@@ -138,8 +150,26 @@ func main() {
 		identity,
 		log,
 		numProcessThreads,
+		discovererMetrics,
 	)
 	stopCh := signals.SetupSignalHandler()
+
+	go func() {
+		// Expose the registered metrics via HTTP.
+		http.Handle("/metrics", promhttp.Handler())
+		srv := &http.Server{Addr: fmt.Sprintf(":%d", prometheusListenPort)}
+		log.Info("Listening for Prometheus metrics on port: ", prometheusListenPort)
+		if err := srv.ListenAndServe(); err != nil {
+			log.Fatal(err)
+		}
+		<-stopCh
+		log.Info("Shutting down Prometheus server...")
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err := srv.Shutdown(ctx); err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	go reconciler.Run(stopCh)
 

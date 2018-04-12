@@ -20,6 +20,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -85,7 +86,7 @@ func TestServiceActions(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			client := fake.NewSimpleClientset(&tc.existingService)
 			a := serviceAction{kind: tc.actionKind, service: &tc.service}
-			err := a.Sync(client)
+			err := a.Sync(client, localmetrics.NewMetrics(), "testnode")
 
 			if !tc.expectErr {
 				require.NoError(t, err)
@@ -135,7 +136,7 @@ func TestUpdateService(t *testing.T) {
 		},
 	}
 	expectedPatch := `{"spec":{"$setElementOrder/ports":[{"port":8080}],"ports":[{"port":8080,"targetPort":0},{"$patch":"delete","port":80}]}}`
-	err := updateService(client, &newService)
+	err := updateService(client, &newService, localmetrics.NewMetrics(), "testnode")
 	require.NoError(t, err)
 	assert.Equal(t, expectedPatch, string(gotPatchBytes))
 }

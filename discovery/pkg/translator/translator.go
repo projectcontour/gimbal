@@ -27,12 +27,6 @@ const (
 	maxNameLength = 63
 )
 
-// QueueItem represents and item in the queue
-type QueueItem interface {
-	Handle() (interface{}, error)
-	IsSystem() bool
-}
-
 // AddGimbalLabels returns a new set of labels that includes the incoming set of
 // labels, plus gimbal-specific ones.
 func AddGimbalLabels(clustername, namespace, name string, existingLabels map[string]string) map[string]string {

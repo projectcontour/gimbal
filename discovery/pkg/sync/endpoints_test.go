@@ -17,6 +17,7 @@ import (
 	"fmt"
 	"testing"
 
+	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -85,7 +86,7 @@ func TestEndpointsAction(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			client := fake.NewSimpleClientset(&tc.existingEndpoints)
 			a := endpointsAction{kind: tc.actionKind, endpoints: &tc.endpoints}
-			err := a.Sync(client)
+			err := a.Sync(client, localmetrics.NewMetrics(), "testnode")
 
 			if !tc.expectErr {
 				require.NoError(t, err)
@@ -137,7 +138,7 @@ func TestUpdateEndpoints(t *testing.T) {
 		},
 	}
 	expectedPatch := `{"subsets":[{"addresses":[{"ip":"192.168.0.2"}],"ports":[{"port":8080}]},{"addresses":[{"ip":"192.168.0.3"}],"ports":[{"port":80}]}]}`
-	err := updateEndpoints(client, &newEndpoints)
+	err := updateEndpoints(client, &newEndpoints, localmetrics.NewMetrics(), "testnode")
 	require.NoError(t, err)
 	assert.Equal(t, expectedPatch, string(gotPatchBytes))
 }
