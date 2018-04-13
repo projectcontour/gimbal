@@ -43,18 +43,34 @@ spec:
           volumeMounts:
             - name: config-volume
               mountPath: /etc/grafana
-            - name: dashboard-volume
+            - name: dashboards-volume
               mountPath: /var/lib/grafana/dashboards
             - name: storage-volume
               mountPath: /var/lib/grafana
+            - name: dashboard-provider
+              mountPath: /etc/grafana/provisioning/dashboards
+            - name: datasources-provider
+              mountPath: /etc/grafana/provisioning/datasources
       terminationGracePeriodSeconds: 300
       volumes:
         - name: config-volume
           configMap:
             name: grafana-config
-        - name: dashboard-volume
+        - name: dashboards-volume
           configMap:
             name: grafana-dashs
         - name: storage-volume
           emptyDir: {}
+        - name: dashboard-provider
+          configMap:
+            name: grafana-dash-provider
+            items:
+              - key: providers.yaml
+                path: providers.yaml
+        - name: datasources-provider
+          configMap:
+            name: grafana-datasources-provider
+            items:
+              - key: providers.yaml
+                path: providers.yaml
 ---
