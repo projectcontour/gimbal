@@ -1,7 +1,7 @@
 <!-- TOC -->
 
 - [Deployment](#deployment)
-    - [Setup / Requirements](#setup-requirements)
+    - [Setup / Requirements](#setup--requirements)
     - [Contour](#contour)
     - [Discoverers](#discoverers)
         - [Kubernetes](#kubernetes)
@@ -70,7 +70,7 @@ The Kubernetes Discoverer is responsible for looking at all services and endpoin
 
 ```
 # Kubernetes secret
-$ kubectl create secret generic remote-discover-kubecfg --from-file=./config --from-literal=cluster-name=node02 -n gimbal-discoverer
+$ kubectl create secret generic remote-discover-kubecfg --from-file=./config --from-literal=cluster-name=node02 -n gimbal-discovery
 
 # Deploy Discoverer
 $ kubectl apply -f gimbal-discoverer/02-kubernetes-discoverer.yaml
@@ -204,7 +204,7 @@ These commands should be run on the Gimbal cluster to verify it's components:
 
 ```sh
 # Verify Discoverer Components
-$ kubectl get po -n gimbal-discoverer
+$ kubectl get po -n gimbal-discovery
 NAME                                         READY     STATUS    RESTARTS   AGE
 k8s-kubernetes-discoverer-55899dcb66-lgvnk   1/1       Running   0          5m
 

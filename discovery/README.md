@@ -46,7 +46,7 @@ _NOTE: Best practice would be to to create a service account user in the remote 
 $ kubectl apply -f deployment/kubernetes-discoverer
 
 # Create secret for remote k8s cluster:
-$ kubectl create secret generic remote-discover-kubecfg --from-file=./config -n gimbal-discoverer
+$ kubectl create secret generic remote-discover-kubecfg --from-file=./config -n gimbal-discovery
 ```
 
 ### Openstack
@@ -55,7 +55,7 @@ $ kubectl create secret generic remote-discover-kubecfg --from-file=./config -n 
 $ kubectl apply -f deployment/openstack-discoverer
 
 # Create secret for remote openstack cluster:
-$ kubectl create secret generic remote-discover-openstack --from-literal=keystoneUrl=http://openstack001:5000/v3/ --from-literal=neutronUrl=http://openstack001:9696/ --from-literal=username=someUser --from-literal=password=secretPassword --from-literal=userDomain=default --from-file=./cert.pem -n gimbal-discoverer
+$ kubectl create secret generic remote-discover-openstack --from-literal=keystoneUrl=http://openstack001:5000/v3/ --from-literal=neutronUrl=http://openstack001:9696/ --from-literal=username=someUser --from-literal=password=secretPassword --from-literal=userDomain=default --from-file=./cert.pem -n gimbal-discovery
 ```
 
 ## Development
