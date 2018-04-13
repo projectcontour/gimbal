@@ -1,7 +1,7 @@
 <!-- TOC -->
 
 - [Deployment](#deployment)
-    - [Setup / Requirements](#setup--requirements)
+    - [Setup / Requirements](#setup-requirements)
     - [Contour](#contour)
     - [Discoverers](#discoverers)
         - [Kubernetes](#kubernetes)
@@ -209,7 +209,7 @@ NAME                                         READY     STATUS    RESTARTS   AGE
 k8s-kubernetes-discoverer-55899dcb66-lgvnk   1/1       Running   0          5m
 
 # Verify Contour
-$ kubectl get po -n heptio-contour
+$ kubectl get po -n gimbal-contour
 NAME            READY     STATUS    RESTARTS   AGE
 contour-lq6mm   2/2       Running   0          5h
 
@@ -223,7 +223,7 @@ kuard-node02        ClusterIP   None         <none>        80/TCP    17m
 $ kubectl apply -f example-workload/ingress.yaml
 
 # Port forward to the Contour pod
-$ kubectl port-forward $(kubectl get pods -n heptio-contour -l app=contour -o jsonpath='{.items[0].metadata.name}') 9000:80 -n heptio-contour
+$ kubectl port-forward $(kubectl get pods -n gimbal-contour -l app=contour -o jsonpath='{.items[0].metadata.name}') 9000:80 -n gimbal-contour
 
 # Make a request to Gimbal cluster which will proxy traffic to the secondary cluster
 $ curl -i -H "Host: kuard.local" localhost:9000
