@@ -163,9 +163,11 @@ Grafana requires some configuration after it's deployed, use the following steps
 5. Click `Save & Test`
 6. Look for the message box in green stating `Data source is working`
 
-#### Add Dashboard
+#### Dashboards
 
-##### Sample Kubernetes Dashboard
+Dashboards for Envoy and the Discovery components are included as part of the sample Grafana deployment.
+
+##### Add Sample Kubernetes Dashboard
 
 Add sample dashboard to validate data source is collecting data:
 
@@ -173,17 +175,6 @@ Add sample dashboard to validate data source is collecting data:
 2. Enter `1621` in the first box
 3. Under the `prometheus` section choose the data source created in previous section
 4. Click `Import`
-
-##### Sample Envoy Dashboard
-
-The `dashboards/` directory contains sample dashboards for monitoring Envoy metrics with Grafana. The dashboards are
-JSON-encoded, and can be imported into Grafana as follows:
-
-1. From main page, click on `plus` icon and choose `Import dashboard`
-2. Click on `Upload .json File`
-3. Navigate to the `dashboards/` directory and select the `envoy-metrics.json` file
-4. Select Prometheus as the datasource
-5. Click `Import`
 
 ## Validation
 
