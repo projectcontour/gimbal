@@ -5,7 +5,7 @@ metadata:
     app: kubernetes-discoverer
     cluster: k8s
   name: k8s-kubernetes-discoverer
-  namespace:  gimbal-discoverer
+  namespace: gimbal-discovery
 spec:
   selector:
     matchLabels:

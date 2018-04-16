@@ -8,7 +8,7 @@ metadata:
   annotations:
     prometheus.io/scrape: "true"
     prometheus.io/port: "8080"
-  namespace:  gimbal-discoverer
+  namespace: gimbal-discovery
 spec:
   selector:
     matchLabels:

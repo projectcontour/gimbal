@@ -29,11 +29,11 @@ Arguments are available to customize the discoverer, most have defaults but othe
 
 A valid [Kubernetes config file](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/) is required to access the remote cluster. This config file is stored as a Kubernetes secret in the Gimbal cluster. 
 
-The following example creates a secret from a file locally and places it in the namespace `gimbal-discoverer`. **_NOTE: Path to `config file` as well as `cluster-name` will need to be customized._**
+The following example creates a secret from a file locally and places it in the namespace `gimbal-discovery`. **_NOTE: Path to `config file` as well as `cluster-name` will need to be customized._**
 
 ```
 # Sample secret creation
-$ kubectl create secret generic remote-discover-kubecfg --from-file=./config --from-literal=cluster-name=nodek8s -n gimbal-discoverer
+$ kubectl create secret generic remote-discover-kubecfg --from-file=./config --from-literal=cluster-name=nodek8s -n gimbal-discovery
 ```
 
 #### Sample Kubernetes config file

@@ -9,7 +9,7 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: contour
-  namespace: heptio-contour
+  namespace: gimbal-contour
 ---
 apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
