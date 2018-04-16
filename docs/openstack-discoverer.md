@@ -32,7 +32,8 @@ Arguments are available to customize the discoverer, most have defaults but othe
 The discoverer requires a username/password, auth URL, as well as the TenantName of the Openstack cluster to be discovered:
 
 Credentials required:
-- Username: User with access to api
+
+- Username: User with access to the API
 - Password: Password for User
 - AuthURL: Openstack API Url
 - TenantName: Tenant used to discover services
@@ -48,6 +49,12 @@ Following example creates a Kubernetes secret which the Openstack discoverer wil
 ```sh
 $ kubectl create secret generic remote-discover-openstack --from-file=certificate-authority-data=./ca.pem --from-literal=cluster-name=openstack --from-literal=username=admin --from-literal=password=abc123 --from-literal=auth-url=https://api.openstack:5000/ --from-literal=tenant-name=heptio
 ```
+
+### Updating Credentials
+
+Credentials to the backend OpenStack cluster can be updated at any time by updating the secret, or by deleting the existing secret and creating a new one.
+
+Once the secret has been updated, the existing discoverer pod must be recycled by deleting it, and letting the cluster start a new one.
 
 ### Data flow
 

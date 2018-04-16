@@ -12,18 +12,14 @@ Gimbal is tested with Kubernetes clusters running version 1.9 and later.
 
 ## Get started
 
-Deployment of Gimbal is outlined in the [deployment section](deployment/README.md). 
+Deployment of Gimbal is outlined in the [deployment section](deployment/README.md).
 
 ## Documentation
 
-Guides on how the Discoverers work can be found here: 
+Guides on how the Discoverers work can be found here:
 
-- [Kubernetes](docs/discoverer/kubernetes/README.md)
-- [Openstack](docs/discoverer/openstack/README.md)
-
-Guides on how to setup metrics/monitoring can be found here:
-- [Prometheus](deployment/prometheus/README.md)
-- [Grafana](deployment/grafana/README.md)
+- [Kubernetes](docs/kubernetes-discoverer.md)
+- [Openstack](docs/openstack-discoverer.md)
 
 ## Troubleshooting
 
@@ -34,8 +30,10 @@ If you encounter any problems that the documentation does not address, please [f
 Thanks for taking the time to join our community and start contributing!
 
 ### Before you start
+
 - Please familiarize yourself with the [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
 - See [CONTRIBUTING.md](CONTRIBUTING.md) for instructions on the developer certificate of origin that we require.
 
 ### Pull Requests
+
 - We welcome pull requests. Fee free to dig through the [issues](https://github.com/heptio/gimbal/issues) and jump in.
