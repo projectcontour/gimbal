@@ -270,7 +270,7 @@ data:
               "hide": false,
               "interval": "",
               "intervalFactor": 1,
-              "legendFormat": "Service errors: {{clustername}}",
+              "legendFormat": "Endpoints errors: {{clustername}}",
               "refId": "B"
             }
           ],
