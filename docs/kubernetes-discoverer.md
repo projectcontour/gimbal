@@ -6,7 +6,7 @@ The Kubernetes discoverer provides service discovery for a Kubernetes cluster. I
 
 The Discoverer will leverage the watch feature of the Kubernetes API to receive changes dynamically, rather than having to poll the API. All available services & endpoints will be synchronized to the the same namespace matching the source system.
 
-The discoverer will only be responsible for monitoring a single cluster at a time. If multiple clusters are required to be watched, then multiple discoverer controllers will need to be deployed.
+The discoverer will only be responsible for monitoring a single cluster at a time. If multiple clusters are required to be watched, then multiple discoverers will need to be deployed.
 
 ## Technical Details
 
@@ -64,9 +64,13 @@ users:
 
 ### Updating Credentials
 
-Credentials to the backend Kubernetes cluster can be updated at any time by updating the secret, or by deleting the existing secret and creating a new one.
+Credentials to the backend Kubernetes cluster can be updated at any time if necessary. To do so, we recommend taking advantage of the Kubernetes deployment's update features:
 
-Once the secret has been updated, the existing discoverer pod must be recycled by deleting it, and letting the cluster start a new one.
+1. Create a new secret with the new credentials.
+2. Update the deployment to reference the new secret.
+3. Wait until the discoverer pod is rolled over.
+4. Verify the discoverer is up and running.
+5. Delete the old secret, or rollback the deployment if the discoverer failed to start.
 
 ### Data flow
 

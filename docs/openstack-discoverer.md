@@ -6,7 +6,7 @@ The Openstack discoverer provides service discovery for an Openstack cluster. It
 
 The Discoverer will poll the Openstack API on a customizable interval and update the Gimbal cluster accordingly.
 
-The discoverer will only be responsible for monitoring a single cluster at a time. If multiple clusters are required to be watched, then multiple discoverer controllers will need to be deployed. 
+The discoverer will only be responsible for monitoring a single cluster at a time. If multiple clusters are required to be watched, then multiple discoverers will need to be deployed.
 
 ## Technical Details
 
@@ -52,9 +52,13 @@ $ kubectl create secret generic remote-discover-openstack --from-file=certificat
 
 ### Updating Credentials
 
-Credentials to the backend OpenStack cluster can be updated at any time by updating the secret, or by deleting the existing secret and creating a new one.
+Credentials to the backend OpenStack cluster can be updated at any time if necessary. To do so, we recommend taking advantage of the Kubernetes deployment's update features:
 
-Once the secret has been updated, the existing discoverer pod must be recycled by deleting it, and letting the cluster start a new one.
+1. Create a new secret with the new credentials.
+2. Update the deployment to reference the new secret.
+3. Wait until the discoverer pod is rolled over.
+4. Verify the discoverer is up and running.
+5. Delete the old secret, or rollback the deployment if the discoverer failed to start.
 
 ### Data flow
 

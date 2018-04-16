@@ -57,7 +57,7 @@ _NOTE: The current configuration exposes the Envoy Admin UI so that Prometheus c
 
 Service discovery is enabled via the Discoverers which have both Kubernetes and Openstack implementations.
 
-```
+```sh
 # Create gimbal-discoverer namespace
 kubectl create -f gimbal-discoverer/01-common.yaml
 ```
@@ -66,11 +66,13 @@ kubectl create -f gimbal-discoverer/01-common.yaml
 
 The Kubernetes Discoverer is responsible for looking at all services and endpoints in a Kubernetes cluster and synchronizing them to the host cluster. 
 
-[Credentials](../docs/kubernetes-discoverer.md#credentials) to the remote cluster are required to be created as a secret. 
+[Credentials](../docs/kubernetes-discoverer.md#credentials) to the remote cluster are required to be created as a secret.
 
-```
+```sh
 # Kubernetes secret
-$ kubectl create secret generic remote-discover-kubecfg --from-file=./config --from-literal=cluster-name=node02 -n gimbal-discovery
+$ kubectl -n gimbal-discovery create secret generic remote-discover-kubecfg \
+    --from-file=./config \
+    --from-literal=cluster-name=node02
 
 # Deploy Discoverer
 $ kubectl apply -f gimbal-discoverer/02-kubernetes-discoverer.yaml
@@ -82,11 +84,17 @@ Technical details on how the Kubernetes Discoverer works can be found in the [do
 
 The Openstack Discoverer is responsible for looking at all LBaSS and members in an Openstack cluster and synchronizing them to the host cluster. 
  
-[Credentials](../docs/openstack-discoverer.md#credentials) to the remote cluster are required to be created as a secret. 
+[Credentials](../docs/openstack-discoverer.md#credentials) to the remote cluster are required to be created as a secret.
 
-```
+```sh
 # Openstack secret
-$ kubectl create secret generic remote-discover-openstack --from-file=certificate-authority-data=./ca.pem --from-literal=cluster-name=openstack --from-literal=username=admin --from-literal=password=abc123 --from-literal=auth-url=https://api.openstack:5000/ --from-literal=tenant-name=heptio
+$ kubectl -n gimbal-discovery create secret generic remote-discover-openstack \
+    --from-file=certificate-authority-data=./ca.pem \
+    --from-literal=cluster-name=openstack \
+    --from-literal=username=admin \
+    --from-literal=password=abc123 \
+    --from-literal=auth-url=https://api.openstack:5000/ \
+    --from-literal=tenant-name=heptio
 
 # Deploy Discoverer
 $ kubectl apply -f gimbal-discoverer/02-openstack-discoverer.yaml

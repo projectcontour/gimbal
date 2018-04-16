@@ -13,7 +13,7 @@ In order to route traffic to a new backend, you must deploy a new discoverer ins
     BACKEND_NAME=new-k8s
     SECRET_NAME=${BACKEND_NAME}-discover-kubecfg
     kubectl -n gimbal-discovery create secret generic ${SECRET_NAME} \
-        --from-file=./kubeconfig \
+        --from-file=config=./config \
         --from-literal=cluster-name=${BACKEND_NAME}
     ```
 
@@ -23,7 +23,8 @@ In order to route traffic to a new backend, you must deploy a new discoverer ins
     ```sh
     kubectl -n gimbal-discovery apply -f new-k8s-discoverer.yaml
     ```
-Your new backend Kubernetes cluster is now part of the Gimbal cluster.
+
+5. Verify the discoverer is running by checking the number of Available replicas in the new deployment, and by verifying the logs of the new pod.
 
 ### OpenStack
 
@@ -34,12 +35,12 @@ Your new backend Kubernetes cluster is now part of the Gimbal cluster.
     BACKEND_NAME=new-openstack
     SECRET_NAME=${BACKEND_NAME}-discover-openstack
     kubectl -n gimbal-discovery create secret generic ${SECRET_NAME} \
-        --from-file=certificate-authority-data=./ca.pem \
+        --from-file=certificate-authority-data=${CA_DATA_FILE} \
         --from-literal=cluster-name=${BACKEND_NAME} \
-        --from-literal=username=admin \
-        --from-literal=password=abc123 \
-        --from-literal=auth-url=https://api.openstack:5000/ \
-        --from-literal=tenant-name=heptio
+        --from-literal=username=${OS_USERNAME} \
+        --from-literal=password=${OS_PASSWORD} \
+        --from-literal=auth-url=${OS_AUTH_URL} \
+        --from-literal=tenant-name=${OS_TENANT_NAME}
     ```
 
 3. Update the [deployment manifest](../deployment/gimbal-discoverer/02-openstack-discoverer.yaml). Set the deployment name to the name of the new backend, and update the secret name to the one created in the previous step.
@@ -49,7 +50,7 @@ Your new backend Kubernetes cluster is now part of the Gimbal cluster.
     kubectl -n gimbal-discovery apply -f new-openstack-discoverer.yaml
     ```
 
-Your new backend OpenStack cluster is now part of the Gimbal cluster.
+5. Verify the discoverer is running by checking the number of Available replicas in the new deployment, and by verifying the logs of the new pod.
 
 ## Remove a backend
 
@@ -60,13 +61,20 @@ To remove a backend from the Gimbal cluster, the discoverer and the discovered s
 1. Find the discoverer instance responsable of the backend:
 
     ```sh
-    kubectl -n gimbal-discovery get deployments
+    # Assuming a Kubernetes backend
+    kubectl -n gimbal-discovery get deployments -l app=kubernetes-discoverer
     ```
 
 2. Delete the discoverer instance responsable of the backend:
 
     ```sh
     kubectl -n gimbal-discovery delete deployment ${DISCOVERER_NAME}
+    ```
+
+3. Delete the secret that belongs to the backend cluster
+
+    ```sh
+    kubectl -n gimbal-discovery delete secret ${DISCOVERER_SECRET_NAME}
     ```
 
 ### Delete all services/endpoints that were discovered
