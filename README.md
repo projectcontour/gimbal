@@ -4,9 +4,7 @@ Maintainers: [Heptio](https://github.com/heptio)
 
 ## Overview
 
-Gimbal is a software defined service discovery and load balancing platform built on Kubernetes and Contour. It provides a scalable, multi-tenant, API-driven ingress tier that routes traffic to multiple endpoints.
-
-This guide will outline how to use Contour, the Kubernetes & Openstack Discoverers, and the Route [CRD (Custom Resource Definition)](https://kubernetes.io/docs/concepts/api-extension/custom-resources/) resource to define ingress routes that send traffic to discovered services. The Contour cluster functions as a Layer-7 software load balancer that can route traffic to multiple backend Kubernetes and Openstack clusters based upon the configuration defined in each Route CRD.
+Gimbal is a software defined service discovery and load balancing platform built on Kubernetes and Contour. It provides a scalable, multi-tenant, API-driven ingress tier that routes traffic to multiple endpoints. Contour functions as a Layer-7 software load balancer that can route traffic to backend Kubernetes and Openstack clusters based upon the configuration defined via Kubernetes Ingress resources. Services and endpoints within backend clusters are discovered via the Openstack & Kubernetes Discoverer components. 
 
 ## Prerequisites
 
