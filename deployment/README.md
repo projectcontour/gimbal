@@ -66,7 +66,7 @@ kubectl create -f gimbal-discoverer/01-common.yaml
 
 The Kubernetes Discoverer is responsible for looking at all services and endpoints in a Kubernetes cluster and synchronizing them to the host cluster. 
 
-[Credentials](../docs/discoverer/kubernetes/README.md#credentials) to the remote cluster are required to be created as a secret. 
+[Credentials](../docs/kubernetes-discoverer.md#credentials) to the remote cluster are required to be created as a secret. 
 
 ```
 # Kubernetes secret
@@ -76,13 +76,13 @@ $ kubectl create secret generic remote-discover-kubecfg --from-file=./config --f
 $ kubectl apply -f gimbal-discoverer/02-kubernetes-discoverer.yaml
 ```
 
-Technical details on how the Kubernetes Discoverer works can be found in the [docs section](../docs/discoverer/kubernetes/README.md).
+Technical details on how the Kubernetes Discoverer works can be found in the [docs section](../docs/kubernetes-discoverer.md).
 
 ### Openstack
 
 The Openstack Discoverer is responsible for looking at all LBaSS and members in an Openstack cluster and synchronizing them to the host cluster. 
  
-[Credentials](../docs/discoverer/openstack/README.md#credentials) to the remote cluster are required to be created as a secret. 
+[Credentials](../docs/openstack-discoverer.md#credentials) to the remote cluster are required to be created as a secret. 
 
 ```
 # Openstack secret
@@ -92,7 +92,7 @@ $ kubectl create secret generic remote-discover-openstack --from-file=certificat
 $ kubectl apply -f gimbal-discoverer/02-openstack-discoverer.yaml
 ```
 
-Technical details on how the Openstack Discoverer works can be found in the [docs section](../docs/discoverer/openstack/README.md).
+Technical details on how the Openstack Discoverer works can be found in the [docs section](../docs/openstack-discoverer.md).
 
 ## Prometheus
 
