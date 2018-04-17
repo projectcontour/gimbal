@@ -19,7 +19,11 @@ pipeline {
                 script {
 
                     sh "echo ---------------- STEVE" 
-                    sh(returnStdout: true, script: "git tag --contains").trim()
+                    if (sh(returnStdout: true, script: "git tag --contains").trim() == "true") {
+                        sh "echo NO TAGS FOUND!"
+                    } else {
+                        sh "echo TAGS FOUND!"
+                    }
 
                     if (env.BRANCH_NAME == "master") {
                         imageRepo = env.REGISTRY
