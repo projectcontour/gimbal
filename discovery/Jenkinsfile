@@ -19,7 +19,7 @@ pipeline {
                 script {
 
                     sh "echo ---------------- STEVE" 
-                    sh(returnStdout: true, script: "git tag --sort version:refname | tail -1").trim()
+                    sh(returnStdout: true, script: "git tag --contains").trim()
 
                     if (env.BRANCH_NAME == "master") {
                         imageRepo = env.REGISTRY
