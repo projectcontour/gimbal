@@ -19,10 +19,10 @@ pipeline {
                 script {
 
                     sh "echo ---------------- STEVE" 
-                    if (sh(returnStdout: true, script: "git tag --contains").trim() == "true") {
-                        sh "echo NO TAGS FOUND!"
-                    } else {
+                    if (sh(returnStdout: true, script: "git tag --contains").trim()) {
                         sh "echo TAGS FOUND!"
+                    } else {
+                        sh "echo NO TAGS FOUND!"
                     }
 
                     if (env.BRANCH_NAME == "master") {
