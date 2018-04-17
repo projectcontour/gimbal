@@ -16,6 +16,13 @@ pipeline {
     stages {
         stage('Determine version') {
             steps {
+                def TAG_NAME = binding.variables.get("TAG_NAME")
+                if (TAG_NAME != null) {
+                  sh "echo $TAG_NAME"
+                } else {
+                  sh "echo Non-tag build"
+                }
+
                 script {
                     if (env.BRANCH_NAME == "master") {
                         imageRepo = env.REGISTRY
