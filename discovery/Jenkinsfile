@@ -19,7 +19,7 @@ pipeline {
                 script {
 
                     sh "echo ---------------- STEVE" 
-                    sh "echo $env.BRANCH_NAME"
+                    sh "echo $env.TAG_NAME"
 
                     if (env.BRANCH_NAME == "master") {
                         imageRepo = env.REGISTRY
