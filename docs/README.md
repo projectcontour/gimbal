@@ -19,3 +19,8 @@ Guides on how to setup / deploy Gimbal can be found in the [deployment guide](..
 - [List Discovered Services](list-discovered-services.md)
 - [Update Kubernetes Discoverer Credentials](kubernetes-discoverer.md#updating-credentials)
 - [Update OpenStack Discoverer Credentials](openstack-discoverer.md#updating-credentials)
+
+## User Topics
+
+- [Route Specification](route.md)
+- [Dashboards / Monitoring / Alerting](monitoring.md)

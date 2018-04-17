@@ -16,10 +16,7 @@ Deployment of Gimbal is outlined in the [deployment section](deployment/README.m
 
 ## Documentation
 
-Guides on how the Discoverers work can be found here:
-
-- [Kubernetes](docs/kubernetes-discoverer.md)
-- [Openstack](docs/openstack-discoverer.md)
+Documentation can be found on the [docs page](docs/README.md).
 
 ## Troubleshooting
 
