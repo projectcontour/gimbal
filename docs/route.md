@@ -1,0 +1,28 @@
+# Route Specification
+
+The core of Gimbal is Routes, which allow traffic into one or more applications. This section will discuss how to utilize Kubernetes `Ingress` objects to create these routes. 
+
+Before beginning is to understand how service discovery functions within Gimbal. The Discoverer components should be deployed per upstream cluster. Once synchronized, services will show up in your team namespace with the cluster name appended.
+
+## Basic Route
+
+Following is a basic route which routes any request to `foo.bar.com` and proxies to a service named `s1` on the remote cluster `node02` over port `80`. 
+
+```sh
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: test
+spec:
+  rules:
+  - host: foo.bar.com
+    http:
+      paths:
+      - backend:
+          serviceName: s1-node02
+          servicePort: 80
+```
+
+## Additional Information
+
+More information regarding Ingress can be found here: [https://kubernetes.io/docs/concepts/services-networking/ingress/](https://kubernetes.io/docs/concepts/services-networking/ingress/)
