@@ -66,7 +66,7 @@ Detailed documentation on stats within Envoy are available on their site: https:
 
 ### Gimbal Discoverer
 
-The Gimbal Discoverer currently has two different systems it can monitor, Kubernetes and Openstack. The purpose of the Discoverers are to perform service discovery for remote clusters by finding remote endpoints and synchronizing them to a central Kubernetes cluster as Services & Endpoints.
+The Gimbal Discoverer currently has two different systems it can monitor, Kubernetes and Openstack. The purpose of the Discoverers are to perform service discovery for remote clusters by finding remote endpoints and synchronizing them to the Gimbal cluster as Services & Endpoints.
 
 - Metrics
   - **gimbal_service_event_timestamp (gauge):** Timestamp last service event was processed with following labels:
@@ -77,12 +77,12 @@ The Gimbal Discoverer currently has two different systems it can monitor, Kubern
     - namespace
     - clustername
     - name
-  - **gimbal_service_error_total (counter):** Number errors encountered with the following labels:
+  - **gimbal_service_error_total (counter):** Number of errors encountered while processing services, with the following labels:
     - namespace
     - clustername
     - name
     - errortype: type of error encountered
-  - **gimbal_endpoints_error_total (counter):** Number of items which had errors with the following labels:
+  - **gimbal_endpoints_error_total (counter):** Number of errors encountered while processing endpoints, with the following labels:
     - namespace
     - clustername
     - name
@@ -97,7 +97,7 @@ The Gimbal Discoverer currently has two different systems it can monitor, Kubern
   - **gimbal_discoverer_cycle_duration_ms (gauge):** The milliseconds it takes for all objects to be synced from a remote discoverer api (e.g. Openstack)
     - clustername
     - clustertype
-  - **gimbal_discoverer_api_error_total (counter):** Number of errors that have occurred when accessing with the openstack API
+  - **gimbal_discoverer_api_error_total (counter):** Number of errors that have occurred when accessing   the openstack API
     - clustername
     - errortype: type of error encountered
     - clustertype

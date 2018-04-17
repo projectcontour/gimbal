@@ -2,7 +2,9 @@
 
 The core of Gimbal is Routes, which allow traffic into one or more applications. This section will discuss how to utilize Kubernetes `Ingress` objects to create these routes. 
 
-Before beginning is to understand how service discovery functions within Gimbal. The Discoverer components should be deployed per upstream cluster. Once synchronized, services will show up in your team namespace with the cluster name appended.
+Before beginning it is important to understand how service discovery functions within Gimbal. The Discoverer components should be deployed per upstream cluster. Once synchronized, services will show up in your team namespace with the cluster name appended.
+
+For example, if a Kubernetes cluster is being discovered and there was a service named `s1` which existed in the namespace `team1`, in the cluster `node02`, once synchronized the service in the Gimbal cluster would be named `s1-node02`. 
 
 ## Basic Route
 

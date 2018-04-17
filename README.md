@@ -16,7 +16,7 @@ Deployment of Gimbal is outlined in the [deployment section](deployment/README.m
 
 ## Documentation
 
-Documentation can be find [here](docs/README.md) on the docs page.
+Documentation can be found on the [docs page](docs/README.md).
 
 ## Troubleshooting
 
