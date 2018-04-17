@@ -1,12 +1,12 @@
 # Kubernetes Discoverer
 
-## Overview 
+## Overview
 
-The Kubernetes discoverer provides service discovery for a Kubernetes cluster. It does this by monitoring available Services and Endpoints for a single Kubernetes cluster and synchronizing them into the host Gimbal cluster. 
+The Kubernetes discoverer provides service discovery for a Kubernetes cluster. It does this by monitoring available Services and Endpoints for a single Kubernetes cluster and synchronizing them into the host Gimbal cluster.
 
 The Discoverer will leverage the watch feature of the Kubernetes API to receive changes dynamically, rather than having to poll the API. All available services & endpoints will be synchronized to the the same namespace matching the source system.
 
-The discoverer will only be responsible for monitoring a single cluster at a time. If multiple clusters are required to be watched, then multiple discoverer controllers will need to be deployed. 
+The discoverer will only be responsible for monitoring a single cluster at a time. If multiple clusters are required to be watched, then multiple discoverers will need to be deployed.
 
 ## Technical Details
 
@@ -31,7 +31,7 @@ A valid [Kubernetes config file](https://kubernetes.io/docs/tasks/access-applica
 
 The following example creates a secret from a file locally and places it in the namespace `gimbal-discovery`. **_NOTE: Path to `config file` as well as `cluster-name` will need to be customized._**
 
-```
+```bash
 # Sample secret creation
 $ kubectl create secret generic remote-discover-kubecfg --from-file=./config --from-literal=cluster-name=nodek8s -n gimbal-discovery
 ```
@@ -40,7 +40,7 @@ $ kubectl create secret generic remote-discover-kubecfg --from-file=./config --f
 
 Sample configuration file for a Kubernetes cluster:
 
-```
+```yaml
 apiVersion: v1
 clusters:
 - cluster:
@@ -62,6 +62,16 @@ users:
     client-key-data: <base64>
 ```
 
+### Updating Credentials
+
+Credentials to the backend Kubernetes cluster can be updated at any time if necessary. To do so, we recommend taking advantage of the Kubernetes deployment's update features:
+
+1. Create a new secret with the new credentials.
+2. Update the deployment to reference the new secret.
+3. Wait until the discoverer pod is rolled over.
+4. Verify the discoverer is up and running.
+5. Delete the old secret, or rollback the deployment if the discoverer failed to start.
+
 ### Data flow
 
 Data flows from the remote cluster into the Gimbal cluster. The steps on how they replicate are as follows:
@@ -72,7 +82,7 @@ Data flows from the remote cluster into the Gimbal cluster. The steps on how the
 
 ### Labels
 
-All synchronized services & endpoints will contain the same properties as the source system (e.g. annotations, labels, etc), but additional labels are added to assist in understanding where the object was sourced from. 
+All synchronized services & endpoints will contain the same properties as the source system (e.g. annotations, labels, etc), but additional labels are added to assist in understanding where the object was sourced from.
 
 Labels added to service and endpoints:
 ```

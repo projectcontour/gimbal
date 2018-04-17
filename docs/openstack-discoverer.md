@@ -6,7 +6,7 @@ The Openstack discoverer provides service discovery for an Openstack cluster. It
 
 The Discoverer will poll the Openstack API on a customizable interval and update the Gimbal cluster accordingly.
 
-The discoverer will only be responsible for monitoring a single cluster at a time. If multiple clusters are required to be watched, then multiple discoverer controllers will need to be deployed. 
+The discoverer will only be responsible for monitoring a single cluster at a time. If multiple clusters are required to be watched, then multiple discoverers will need to be deployed.
 
 ## Technical Details
 
@@ -32,7 +32,8 @@ Arguments are available to customize the discoverer, most have defaults but othe
 The discoverer requires a username/password, auth URL, as well as the TenantName of the Openstack cluster to be discovered:
 
 Credentials required:
-- Username: User with access to api
+
+- Username: User with access to the API
 - Password: Password for User
 - AuthURL: Openstack API Url
 - TenantName: Tenant used to discover services
@@ -48,6 +49,16 @@ Following example creates a Kubernetes secret which the Openstack discoverer wil
 ```sh
 $ kubectl create secret generic remote-discover-openstack --from-file=certificate-authority-data=./ca.pem --from-literal=cluster-name=openstack --from-literal=username=admin --from-literal=password=abc123 --from-literal=auth-url=https://api.openstack:5000/ --from-literal=tenant-name=heptio
 ```
+
+### Updating Credentials
+
+Credentials to the backend OpenStack cluster can be updated at any time if necessary. To do so, we recommend taking advantage of the Kubernetes deployment's update features:
+
+1. Create a new secret with the new credentials.
+2. Update the deployment to reference the new secret.
+3. Wait until the discoverer pod is rolled over.
+4. Verify the discoverer is up and running.
+5. Delete the old secret, or rollback the deployment if the discoverer failed to start.
 
 ### Data flow
 
