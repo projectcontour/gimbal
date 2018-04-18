@@ -17,15 +17,17 @@ At launch, Gimbal can discover services from Kubernetes and OpenStack clusters, 
 * Organizations that want to enable their development teams to safely self-manage their routing configuration
 * Organizations with bare metal or on-premises infrastructure that want cloud-like load balancing capabilities
 
+![OverviewDiagram](docs/images/overview.png)
+
 ## Prerequisites
 
-Gimbal is designed to run on Kubernetes clusters running version 1.9 and later.
+Gimbal is tested with Kubernetes clusters running version 1.9 and later but should work with any cluster starting at version 1.7.
 
 Gimbal's service discovery is currently tested with Kubernetes 1.7+ and OpenStack Mitaka.
 
 ## Get started
 
-Deployment of Gimbal is outlined in the [deployment section](deployment/README.md).
+Deployment of Gimbal is outlined in the [deployment section](deployment/README.md) and also includes quick start applications.
 
 ## Documentation
 
@@ -41,6 +43,7 @@ Documentation can be found in the [docs directory](docs/README.md).
   * Anyone can modify route rules for a domain
   * More complex load balancing features like weighting and strategy are not supported
   * Gimbal & Contour will solve this with a [new IngressRoute CRD](https://github.com/heptio/contour/blob/master/design/ingressroute-design.md)
+
 
 ## Troubleshooting
 

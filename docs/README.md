@@ -1,6 +1,8 @@
-# Gimbal
+# Documentation
 
 Heptio Gimbal is a layer-7 load balancing platform built on Kubernetes, Envoy, and Contour.  It provides a scalable, multi-team, and API-driven ingress tier capable of routing internet traffic to multiple upstream Kubernetes clusters and traditional infrastructure technologies including OpenStack.
+
+![Data Flow](images/data-flow.png)
 
 ## Overview Guides
 
