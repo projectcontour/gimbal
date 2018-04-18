@@ -1,17 +1,22 @@
 # Documentation
 
-Gimbal is an overarching set of projects that includes Contour.  Gimbal builds on and expands to look at Load Balancing through more complicated environments.
+Heptio Gimbal is a layer-7 load balancing platform built on Kubernetes, Envoy, and Contour. It provides a scalable, multi-team, and API-driven ingress tier capable of routing internet traffic to multiple upstream Kubernetes clusters and traditional infrastructure technologies including OpenStack.
 
-Contour is concentrating on providing a solution for a single cluster.  Gimbal expands on this goal to solve scenarios that involve multiple clusters, and load balancing to non-Kubernetes resources.
+## Data Flow
 
 ![Data Flow](images/data-flow.png)
+
+## Architecture Overview
+
+![Arch Overview](images/overview.png)
+
+You can read more about the [Gimbal Architecture](gimbal-architecture.md).
 
 ## Overview Guides
 
 The following guides will describe how components of Gimbal function and interact with other systems:
-
 - [Kubernetes Discoverer](kubernetes-discoverer.md)
-- [Openstack](openstack-discoverer.md)
+- [Openstack Discoverer](openstack-discoverer.md)
 
 Guides on how to setup / deploy Gimbal can be found in the [deployment guide](../deployment/README.md). 
 
