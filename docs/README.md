@@ -1,8 +1,10 @@
-# Gimbal
+# Documentation
 
 Gimbal is an overarching set of projects that includes Contour.  Gimbal builds on and expands to look at Load Balancing through more complicated environments.
 
 Contour is concentrating on providing a solution for a single cluster.  Gimbal expands on this goal to solve scenarios that involve multiple clusters, and load balancing to non-Kubernetes resources.
+
+![Data Flow](images/data-flow.png)
 
 ## Overview Guides
 

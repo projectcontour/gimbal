@@ -6,17 +6,19 @@ Maintainers: [Heptio](https://github.com/heptio)
 
 Gimbal is a software defined service discovery and load balancing platform built on Kubernetes and Contour. It provides a scalable, multi-tenant, API-driven ingress tier that routes traffic to multiple endpoints. Contour functions as a Layer-7 software load balancer that can route traffic to backend Kubernetes and Openstack clusters based upon the configuration defined via Kubernetes Ingress resources. Services and endpoints within backend clusters are discovered via the Openstack & Kubernetes Discoverer components. 
 
+![OverviewDiagram](docs/images/overview.png)
+
 ## Prerequisites
 
-Gimbal is tested with Kubernetes clusters running version 1.9 and later.
+Gimbal is tested with Kubernetes clusters running version 1.9 and later but should work with any cluster starting at version 1.7.
 
 ## Get started
 
-Deployment of Gimbal is outlined in the [deployment section](deployment/README.md).
+Deployment of Gimbal is outlined in the [deployment section](deployment/README.md) and also includes quick start applications.
 
 ## Documentation
 
-Documentation can be found on the [docs page](docs/README.md).
+Documentation on all the Gimbal components can be found on the [docs page](docs/README.md).
 
 ## Troubleshooting
 
