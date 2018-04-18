@@ -4,14 +4,21 @@ Gimbal is an overarching set of projects that includes Contour.  Gimbal builds o
 
 Contour is concentrating on providing a solution for a single cluster.  Gimbal expands on this goal to solve scenarios that involve multiple clusters, and load balancing to non-Kubernetes resources.
 
+## Data Flow
+
 ![Data Flow](images/data-flow.png)
+
+## Architecture Overview
+
+![Arch Overview](images/overview.png)
 
 ## Overview Guides
 
 The following guides will describe how components of Gimbal function and interact with other systems:
 
+- [Gimbal Architecture](gimbal-architecture.md)
 - [Kubernetes Discoverer](kubernetes-discoverer.md)
-- [Openstack](openstack-discoverer.md)
+- [Openstack Discover](openstack-discoverer.md)
 
 Guides on how to setup / deploy Gimbal can be found in the [deployment guide](../deployment/README.md). 
 
