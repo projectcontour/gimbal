@@ -16,7 +16,7 @@ You can read more about the [Gimbal Architecture](gimbal-architecture.md).
 
 The following guides will describe how components of Gimbal function and interact with other systems:
 - [Kubernetes Discoverer](kubernetes-discoverer.md)
-- [Openstack Discover](openstack-discoverer.md)
+- [Openstack Discoverer](openstack-discoverer.md)
 
 Guides on how to setup / deploy Gimbal can be found in the [deployment guide](../deployment/README.md). 
 
