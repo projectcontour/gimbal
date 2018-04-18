@@ -10,11 +10,11 @@ Heptio Gimbal is a layer-7 load balancing platform built on Kubernetes, Envoy, a
 
 ![Arch Overview](images/overview.png)
 
+You can read more about the [Gimbal Architecture](gimbal-architecture.md).
+
 ## Overview Guides
 
 The following guides will describe how components of Gimbal function and interact with other systems:
-
-- [Gimbal Architecture](gimbal-architecture.md)
 - [Kubernetes Discoverer](kubernetes-discoverer.md)
 - [Openstack Discover](openstack-discoverer.md)
 
