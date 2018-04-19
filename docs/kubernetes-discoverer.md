@@ -80,6 +80,12 @@ Data flows from the remote cluster into the Gimbal cluster. The steps on how the
 2. Those objects are then synchronized to the Gimbal cluster in the same namespace as the remote cluster. For example, if a service named `testsvc01` exists in the namespace `team1` then the same service will be written to the Gimbal cluster in the `team1` namespace. Labels will also be added during the synchronization (See the [labels](#labels) section for more details).
 3. Once the initial list of objects is synchronized, any further updates will happen automatically when a service or endpoint is `created`, `updated`, or `deleted`.
 
+#### Ignored Objects
+
+An exception to the flow outlined previously are objects that are ignored when synchronizing. The following rules determine if an object is ignored during sync:
+- Any service or endpoint in the `kube-system` namespace
+- Any service or endpoint named `kubernetes` in the `default` namespace
+
 ### Labels
 
 All synchronized services & endpoints will contain the same properties as the source system (e.g. annotations, labels, etc), but additional labels are added to assist in understanding where the object was sourced from.
