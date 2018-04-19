@@ -13,11 +13,25 @@ limitations under the License.
 
 package util
 
-import "github.com/sirupsen/logrus"
+import (
+	"log"
+	"regexp"
+
+	"github.com/sirupsen/logrus"
+)
 
 // GetFormatter returns a textformatter to customize logs
 func GetFormatter() *logrus.TextFormatter {
 	return &logrus.TextFormatter{
 		FullTimestamp: true,
 	}
+}
+
+// SanitizeClusterName removes special characters
+func SanitizeClusterName(clustername string) string {
+	reg, err := regexp.Compile("[^a-zA-Z0-9-_]+")
+	if err != nil {
+		log.Fatal(err)
+	}
+	return reg.ReplaceAllString(clustername, "")
 }
