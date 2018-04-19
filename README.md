@@ -6,7 +6,7 @@ Maintainers: [Heptio](https://github.com/heptio)
 
 Heptio Gimbal is a layer-7 load balancing platform built on Kubernetes, Envoy, and Contour. It provides a scalable, multi-team, and API-driven ingress tier capable of routing internet traffic to multiple upstream Kubernetes clusters and traditional infrastructure technologies including OpenStack.
 
-Gimbal was developed out of a joint effort between Heptio and Yahoo! Japan Company’s subsidiary, Actapio, to modernize Yahoo! Japan’s infrastructure with Kubernetes without impacting legacy investments in OpenStack.
+Gimbal was developed out of a joint effort between Heptio and Yahoo Japan Corporation's subsidiary, Actapio, to modernize Yahoo! Japan’s infrastructure with Kubernetes without impacting legacy investments in OpenStack.
 
 At launch, Gimbal can discover services from Kubernetes and OpenStack clusters, but we expect to support additional platforms in the future.
 
