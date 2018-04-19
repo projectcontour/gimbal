@@ -27,11 +27,11 @@ func GetFormatter() *logrus.TextFormatter {
 	}
 }
 
-// SanitizeClusterName removes special characters
-func SanitizeClusterName(clustername string) string {
-	reg, err := regexp.Compile("[^a-zA-Z0-9-_]+")
+// IsInvalidClusterName returns true if valid cluster name
+func IsInvalidClusterName(clustername string) bool {
+	matched, err := regexp.MatchString("^[a-zA-Z0-9-_]+$", clustername)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return reg.ReplaceAllString(clustername, "")
+	return !matched
 }

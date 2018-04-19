@@ -86,9 +86,8 @@ func main() {
 	discovererMetrics.RegisterPrometheus()
 
 	// Verify cluster name is passed
-	clusterName = util.SanitizeClusterName(clusterName)
-	if clusterName == "" {
-		log.Fatalf("The Kubernetes cluster name must be provided using the `--cluster-name` flag")
+	if util.IsInvalidClusterName(clusterName) {
+		log.Fatalf("The Kubernetes cluster name must be provided using the `--cluster-name` flag or the one passed is invalid")
 	}
 	log.Infof("ClusterName is: %s", clusterName)
 
