@@ -79,6 +79,22 @@ var serviceTests = []struct {
 		},
 		expected: 0,
 	},
+	{
+		name: "kubernetes service diff namespace",
+		service: &v1.Service{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "kubernetes", Namespace: "foo"},
+			Spec: v1.ServiceSpec{
+				Ports: []v1.ServicePort{
+					{
+						Name: "http",
+						Port: 80,
+					},
+				},
+			},
+		},
+		expected: 1,
+	},
 }
 
 var endpointTests = []struct {
@@ -129,6 +145,20 @@ var endpointTests = []struct {
 		},
 		expected: 0,
 	},
+	{
+		name: "kubernetes endpoint diff namespace",
+		endpoint: &v1.Endpoints{
+			ObjectMeta: metav1.ObjectMeta{
+				Name: "kubernetes", Namespace: "foo"},
+			Subsets: []v1.EndpointSubset{
+				{
+					Addresses: []v1.EndpointAddress{{IP: "192.168.0.1"}},
+					Ports:     []v1.EndpointPort{{Port: 80}},
+				},
+			},
+		},
+		expected: 1,
+	},
 }
 
 func TestAddServiceQueue(t *testing.T) {
@@ -146,7 +176,7 @@ func TestAddServiceQueue(t *testing.T) {
 			}
 
 			c.addService(tc.service)
-			time.Sleep(1 * time.Second) // Give queue time to process (huh?)
+			time.Sleep(100 * time.Millisecond) // Give queue time to process (huh?)
 			got := c.syncqueue.Workqueue.Len()
 			assert.Equal(t, tc.expected, got)
 		})
@@ -167,7 +197,7 @@ func TestUpdateServiceQueue(t *testing.T) {
 			}
 
 			c.updateService(tc.service)
-			time.Sleep(1 * time.Second) // Give queue time to process (huh?)
+			time.Sleep(100 * time.Millisecond) // Give queue time to process (huh?)
 			got := c.syncqueue.Workqueue.Len()
 			assert.Equal(t, tc.expected, got)
 		})
@@ -188,7 +218,7 @@ func TestDeleteServiceQueue(t *testing.T) {
 			}
 
 			c.deleteService(tc.service)
-			time.Sleep(1 * time.Second) // Give queue time to process (huh?)
+			time.Sleep(100 * time.Millisecond) // Give queue time to process (huh?)
 			got := c.syncqueue.Workqueue.Len()
 			assert.Equal(t, tc.expected, got)
 		})
@@ -209,7 +239,7 @@ func TestAddEndpointsQueue(t *testing.T) {
 			}
 
 			c.addEndpoints(tc.endpoint)
-			time.Sleep(1 * time.Second) // Give queue time to process (huh?)
+			time.Sleep(100 * time.Millisecond) // Give queue time to process (huh?)
 			got := c.syncqueue.Workqueue.Len()
 			assert.Equal(t, tc.expected, got)
 		})
@@ -230,7 +260,7 @@ func TestUpdateEndpointsQueue(t *testing.T) {
 			}
 
 			c.updateEndpoints(tc.endpoint)
-			time.Sleep(1 * time.Second) // Give queue time to process (huh?)
+			time.Sleep(100 * time.Millisecond) // Give queue time to process (huh?)
 			got := c.syncqueue.Workqueue.Len()
 			assert.Equal(t, tc.expected, got)
 		})
@@ -251,7 +281,7 @@ func TestDeleteEndpointsQueue(t *testing.T) {
 			}
 
 			c.deleteEndpoints(tc.endpoint)
-			time.Sleep(1 * time.Second) // Give queue time to process (huh?)
+			time.Sleep(100 * time.Millisecond) // Give queue time to process (huh?)
 			got := c.syncqueue.Workqueue.Len()
 			assert.Equal(t, tc.expected, got)
 		})

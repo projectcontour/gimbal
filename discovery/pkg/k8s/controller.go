@@ -140,7 +140,7 @@ func (c *Controller) deleteEndpoints(endpoints *v1.Endpoints) {
 
 // skipProcessing determines if this should be processed or not
 func skipProcessing(name, namespace string) bool {
-	if namespace == kubesystemNamespace || name == kubesystemService {
+	if namespace == kubesystemNamespace || (name == kubesystemService && namespace == "default") {
 		return true
 	}
 	return false
