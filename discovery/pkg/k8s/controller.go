@@ -28,7 +28,10 @@ import (
 	"k8s.io/client-go/util/workqueue"
 )
 
-const kubesystemNamespace = "kube-system"
+const (
+	kubesystemNamespace = "kube-system"
+	kubesystemService   = "kubernetes"
+)
 
 // Controller receives notifications from the Kubernetes API and translates those
 // objects into additions and removals entries of services / endpoints
@@ -67,57 +70,80 @@ func NewController(log *logrus.Logger, gimbalKubeClient kubernetes.Interface, ku
 	// Set up an event handler for when Service resources change.
 	serviceInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
-			svc := translateService(obj.(*v1.Service), c.clusterName)
-			if svc.Namespace == kubesystemNamespace {
-				return
-			}
-			c.syncqueue.Enqueue(sync.AddServiceAction(svc))
+			c.addService(obj.(*v1.Service))
 		},
 		UpdateFunc: func(old, new interface{}) {
-			newSvc := new.(*v1.Service)
-			if newSvc.Namespace == kubesystemNamespace {
-				return
-			}
-
-			svc := translateService(newSvc, c.clusterName)
-			c.syncqueue.Enqueue(sync.UpdateServiceAction(svc))
+			c.updateService(new.(*v1.Service))
 		},
 		DeleteFunc: func(obj interface{}) {
-			svc := translateService(obj.(*v1.Service), c.clusterName)
-			if svc.Namespace == kubesystemNamespace {
-				return
-			}
-			c.syncqueue.Enqueue(sync.DeleteServiceAction(svc))
+			c.deleteService(obj.(*v1.Service))
 		},
 	})
 
 	// Set up an event handler for when Endpoint resources change.
 	endpointsInformer.Informer().AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
-			endpoints := translateEndpoints(obj.(*v1.Endpoints), clusterName)
-			if endpoints.Namespace == kubesystemNamespace {
-				return
-			}
-			c.syncqueue.Enqueue(sync.AddEndpointsAction(endpoints))
+			c.addEndpoints(obj.(*v1.Endpoints))
 		},
 		UpdateFunc: func(old, new interface{}) {
-			newEndpoints := new.(*v1.Endpoints)
-			if newEndpoints.Namespace == kubesystemNamespace {
-				return
-			}
-			endpoints := translateEndpoints(newEndpoints, clusterName)
-			c.syncqueue.Enqueue(sync.UpdateEndpointsAction(endpoints))
+			c.updateEndpoints(new.(*v1.Endpoints))
 		},
 		DeleteFunc: func(obj interface{}) {
-			endpoints := translateEndpoints(obj.(*v1.Endpoints), clusterName)
-			if endpoints.Namespace == kubesystemNamespace {
-				return
-			}
-			c.syncqueue.Enqueue(sync.DeleteEndpointsAction(endpoints))
+			c.deleteEndpoints(obj.(*v1.Endpoints))
 		},
 	})
 
 	return c
+}
+
+func (c *Controller) addService(service *v1.Service) {
+	if !skipProcessing(service.GetName(), service.GetNamespace()) {
+		svc := translateService(service, c.clusterName)
+		c.syncqueue.Enqueue(sync.AddServiceAction(svc))
+	}
+}
+
+func (c *Controller) updateService(service *v1.Service) {
+	if !skipProcessing(service.GetName(), service.GetNamespace()) {
+		svc := translateService(service, c.clusterName)
+		c.syncqueue.Enqueue(sync.UpdateServiceAction(svc))
+	}
+}
+
+func (c *Controller) deleteService(service *v1.Service) {
+	if !skipProcessing(service.GetName(), service.GetNamespace()) {
+		svc := translateService(service, c.clusterName)
+		c.syncqueue.Enqueue(sync.DeleteServiceAction(svc))
+	}
+}
+
+func (c *Controller) addEndpoints(endpoints *v1.Endpoints) {
+	if !skipProcessing(endpoints.GetName(), endpoints.GetNamespace()) {
+		svc := translateEndpoints(endpoints, c.clusterName)
+		c.syncqueue.Enqueue(sync.AddEndpointsAction(svc))
+	}
+}
+
+func (c *Controller) updateEndpoints(endpoints *v1.Endpoints) {
+	if !skipProcessing(endpoints.GetName(), endpoints.GetNamespace()) {
+		svc := translateEndpoints(endpoints, c.clusterName)
+		c.syncqueue.Enqueue(sync.UpdateEndpointsAction(svc))
+	}
+}
+
+func (c *Controller) deleteEndpoints(endpoints *v1.Endpoints) {
+	if !skipProcessing(endpoints.GetName(), endpoints.GetNamespace()) {
+		svc := translateEndpoints(endpoints, c.clusterName)
+		c.syncqueue.Enqueue(sync.DeleteEndpointsAction(svc))
+	}
+}
+
+// skipProcessing determines if this should be processed or not
+func skipProcessing(name, namespace string) bool {
+	if namespace == kubesystemNamespace || name == kubesystemService {
+		return true
+	}
+	return false
 }
 
 // Run gets the party started

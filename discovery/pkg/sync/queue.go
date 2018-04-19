@@ -58,7 +58,7 @@ func (sq *Queue) Run(stopCh <-chan struct{}) {
 	defer sq.Workqueue.ShutDown()
 
 	sq.Logger.Infof("Starting queue workers")
-	// Launch two workers to process Foo resources
+	// Launch workers to process Action resources
 	for i := 0; i < sq.Threadiness; i++ {
 		go wait.Until(sq.runWorker, time.Second, stopCh)
 	}
