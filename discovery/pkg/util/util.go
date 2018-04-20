@@ -29,7 +29,7 @@ func GetFormatter() *logrus.TextFormatter {
 
 // IsInvalidClusterName returns true if valid cluster name
 func IsInvalidClusterName(clustername string) bool {
-	matched, err := regexp.MatchString("^[a-zA-Z0-9]+[a-zA-Z0-9-]*[a-zA-Z0-9]+$", clustername)
+	matched, err := regexp.MatchString("^[a-z]([-a-z0-9]*[a-z0-9])?$", clustername)
 	if err != nil {
 		log.Fatal(err)
 	}
