@@ -1,46 +1,42 @@
+# Deployment
 <!-- TOC -->
 
-- [Deployment](#deployment)
-    - [Setup / Requirements](#setup--requirements)
-    - [Contour](#contour)
-    - [Discoverers](#discoverers)
-        - [Kubernetes](#kubernetes)
-        - [Openstack](#openstack)
-    - [Prometheus](#prometheus)
-        - [Quick start](#quick-start)
-        - [Access the Prometheus Web UI](#access-the-prometheus-web-ui)
-        - [Access the Alert Manager Web UI](#access-the-alert-manager-web-ui)
-    - [Grafana](#grafana)
-        - [Quick Start](#quick-start)
-        - [Accessing Grafana UI](#accessing-grafana-ui)
-        - [Configure Grafana](#configure-grafana)
-            - [Configure Datasource](#configure-datasource)
-            - [Dashboards](#dashboards)
-                - [Add Sample Kubernetes Dashboard](#add-sample-kubernetes-dashboard)
-    - [Validation](#validation)
-        - [Discovery Cluster](#discovery-cluster)
-        - [Gimbal Cluster](#gimbal-cluster)
+- [Prerequisites](#prerequisites)
+- [Deploy Contour](#deploy-contour)
+- [Deploy Discoverers](#discoverers)
+    - [Kubernetes](#kubernetes)
+    - [Openstack](#openstack)
+- [Deploy Prometheus](#deploy-prometheus)
+    - [Quick start](#quick-start)
+    - [Access the Prometheus web UI](#access-the-prometheus-web-ui)
+    - [Access the Alertmanager web UI](#access-the-alertmanager-web-ui)
+- [Deploy Grafana](#deploy-grafana)
+    - [Quick start](#quick-start)
+    - [Access Grafana UI](#access-grafana-ui)
+    - [Configure Grafana](#configure-grafana)
+      - [Configure datasource](#configure-datasource)
+      - [Dashboards](#dashboards)
+        - [Add Sample Kubernetes Dashboard](#add-sample-kubernetes-dashboard)
+- [Validation](#validation)
+    - [Discovery cluster](#discovery-cluster)
+    - [Gimbal cluster](#gimbal-cluster)
 
 <!-- /TOC -->
-# Deployment
 
-Following are instructions to get all the components up and running. 
+## Prerequisites
 
-## Setup / Requirements
+- A copy of this repository. Download, or clone: 
 
-A copy of this repo locally which is easily accomplished by cloning or downloading a copy: 
+  ```sh
+  $ git clone git@github.com:heptio/gimbal.git
+  ```
 
-```sh
-$ git clone git@github.com:heptio/gimbal.git
-```
+- A single Kubernetes cluster to deploy Gimbal
+- Kubernetes or Openstack clusters with flat networking. That is, each Pod has a route-able IP address on the network.
 
-Additionally, this guide will assume a single Kubernetes cluster to deploy Gimbal, as well as Kubernetes or Openstack clusters with `flat` networking, meaning, pods get route-able IP address on the network.
+## Deploy Contour
 
-## Contour
-
-Contour is the system which handles the Ingress traffic. It utilizes Envoy which is an L7 proxy and communication bus designed for large modern service oriented architectures. 
-
-Envoy is the data component of Contour and handles the network traffic, Contour drives the configuration of Envoy based upon the Kubernetes cluster configuration.
+For information about Contour, see [the Gimbal architecture doc](../docs/gimbal-architecture.md).
 
 ```sh
 # Navigate to deployment directory
@@ -50,11 +46,11 @@ $ cd deployment
 $ kubectl create -f contour/
 ```
 
-_NOTE: The current configuration exposes the Envoy Admin UI so that Prometheus can scrape for metrics!_
+**NOTE**: The current configuration exposes the Envoy Admin UI so that Prometheus can scrape for metrics.
 
-## Discoverers
+## Deploy Discoverers
 
-Service discovery is enabled via the Discoverers which have both Kubernetes and Openstack implementations.
+Service discovery is enabled with the Discoverers, which have both Kubernetes and Openstack implementations.
 
 ```sh
 # Create gimbal-discoverer namespace
@@ -65,7 +61,7 @@ kubectl create -f gimbal-discoverer/01-common.yaml
 
 The Kubernetes Discoverer is responsible for looking at all services and endpoints in a Kubernetes cluster and synchronizing them to the host cluster. 
 
-[Credentials](../docs/kubernetes-discoverer.md#credentials) to the remote cluster are required to be created as a secret.
+[Credentials](../docs/kubernetes-discoverer.md#credentials) to the remote cluster must be created as a Secret.
 
 ```sh
 # Kubernetes secret
@@ -77,13 +73,13 @@ $ kubectl -n gimbal-discovery create secret generic remote-discover-kubecfg \
 $ kubectl apply -f gimbal-discoverer/02-kubernetes-discoverer.yaml
 ```
 
-Technical details on how the Kubernetes Discoverer works can be found in the [docs section](../docs/kubernetes-discoverer.md).
+For more information, see [the Kubenetes Discoverer doc](../docs/kubernetes-discoverer.md).
 
 ### Openstack
 
 The Openstack Discoverer is responsible for looking at all LBaSS and members in an Openstack cluster and synchronizing them to the host cluster. 
  
-[Credentials](../docs/openstack-discoverer.md#credentials) to the remote cluster are required to be created as a secret.
+[Credentials](../docs/openstack-discoverer.md#credentials) to the remote cluster must be created as a secret.
 
 ```sh
 # Openstack secret
@@ -99,11 +95,11 @@ $ kubectl -n gimbal-discovery create secret generic remote-discover-openstack \
 $ kubectl apply -f gimbal-discoverer/02-openstack-discoverer.yaml
 ```
 
-Technical details on how the Openstack Discoverer works can be found in the [docs section](../docs/openstack-discoverer.md).
+For more information, see [the OpenStack Discoverer doc](../docs/openstack-discoverer.md).
 
 ## Prometheus
 
-This directory contains a sample development deployment of Prometheus and Alert Manager using temporary storage (e.g. emptyDir space).
+Sample development deployment of Prometheus and Alertmanager using temporary storage.
 
 ### Quick start
 
@@ -117,7 +113,7 @@ $ cd kube-state-metrics
 $ kubectl apply -f kubernetes/
 ```
 
-### Access the Prometheus Web UI
+### Access the Prometheus web UI
 
 ```sh
 $ kubectl -n gimbal-monitoring port-forward $(kubectl -n gimbal-monitoring get pods -l app=prometheus -l component=server -o jsonpath='{.items[0].metadata.name}') 9090:9090
@@ -125,7 +121,7 @@ $ kubectl -n gimbal-monitoring port-forward $(kubectl -n gimbal-monitoring get p
 
 then go to [http://localhost:9090](http://localhost:9090) in your browser
 
-### Access the Alert Manager Web UI
+### Access the Alertmanager web UI
 
 ```sh
 $ kubectl -n gimbal-monitoring port-forward $(kubectl -n gimbal-monitoring get pods -l app=prometheus -l component=alertmanager -o jsonpath='{.items[0].metadata.name}') 9093:9093
@@ -137,7 +133,7 @@ then go to [http://localhost:9093](http://localhost:9093) in your browser
 
 Sample development deployment of Grafana using temporary storage.
 
-### Quick Start
+### Quick start
 
 ```sh
 # Deploy
@@ -149,26 +145,26 @@ $ kubectl create secret generic grafana -n gimbal-monitoring \
     --from-literal=grafana-admin-user=admin 
 ```
 
-### Accessing Grafana UI
+### Access the Grafana UI
 
 ```sh
 $ kubectl port-forward $(kubectl get pods -l app=grafana -n gimbal-monitoring -o jsonpath='{.items[0].metadata.name}') 3000 -n gimbal-monitoring
 ```
 
-Access Grafana at http://localhost:3000 in your browser. Use `admin` as the username.
+then go to [http://localhost:3000](http://localhost:3000) in your browser, with `admin` as the username.
 
 ### Configure Grafana
 
-Grafana requires some configuration after it's deployed, use the following steps to configure a datasource and import a dashboard to validate the connection. 
+Grafana requires some configuration after it's deployed. These steps configure a datasource and import a dashboard to validate the connection. 
 
-#### Configure Datasource
+#### Configure datasource
 
-1. From main Grafana page, click on `Add Datasource`
-2. For `Name` enter `prometheus`
-3. Choose `Prometheus` under `Type` selector
-4. In the next section, enter `http://prometheus:9090` for the `URL`
-5. Click `Save & Test`
-6. Look for the message box in green stating `Data source is working`
+1. On the main Grafana page, click **Add Datasource**
+2. For **Name** enter _prometheus_
+3. In `Type` selector, choose _Prometheus_ 
+4. For the URL, enter `http://prometheus:9090`
+5. Click **Save & Test**
+6. Look for the message box in green stating _Data source is working_
 
 #### Dashboards
 
@@ -176,29 +172,29 @@ Dashboards for Envoy and the Discovery components are included as part of the sa
 
 ##### Add Sample Kubernetes Dashboard
 
-Add sample dashboard to validate data source is collecting data:
+Add sample dashboard to validate that the data source is collecting data:
 
-1. From main page, click on `plus` icon and choose `Import dashboard`
-2. Enter `1621` in the first box
-3. Under the `prometheus` section choose the data source created in previous section
-4. Click `Import`
+1. On the main page, click the plus icon and choose **Import dashboard**
+2. Enter _1621_ in the first box
+3. In the **prometheus** section, choose the datasource that you just created
+4. Click **Import**
 
 ## Validation
 
-Once the components are deployed, the deployment can be verified with the following steps:
+Now you can verify the deployment:
 
-### Discovery Cluster
+### Discovery cluster
 
-This example utilizes a Kubernetes cluster as the discovered cluster which was configured [previously](#kubernetes). We will deploy a few sample applications into the `default` namespace:
+This example deploys a sample application into the default namespace of [the discovered Kubernetes cluster that you created](#kubernetes).
 
 ```sh
 # Deploy sample apps
 $ kubectl apply -f example-workload/deployment.yaml
 ```
 
-### Gimbal Cluster
+### Gimbal cluster
 
-These commands should be run on the Gimbal cluster to verify it's components:
+Run the following commands on the Gimbal cluster to verify its components:
 
 ```sh
 # Verify Discoverer Components
