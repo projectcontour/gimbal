@@ -85,9 +85,11 @@ func main() {
 	discovererMetrics = localmetrics.NewMetrics()
 	discovererMetrics.RegisterPrometheus()
 
-	if clusterName == "" {
-		log.Fatal("The OpenStack cluster name must be provided using the --cluster-name flag")
+	// Verify cluster name is passed
+	if util.IsInvalidClusterName(clusterName) {
+		log.Fatalf("The Kubernetes cluster name must be provided using the `--cluster-name` flag or the one passed is invalid")
 	}
+	log.Infof("ClusterName is: %s", clusterName)
 
 	gimbalKubeClient, err := k8s.NewClient(gimbalKubeCfgFile, log)
 	if err != nil {

@@ -13,11 +13,25 @@ limitations under the License.
 
 package util
 
-import "github.com/sirupsen/logrus"
+import (
+	"log"
+	"regexp"
+
+	"github.com/sirupsen/logrus"
+)
 
 // GetFormatter returns a textformatter to customize logs
 func GetFormatter() *logrus.TextFormatter {
 	return &logrus.TextFormatter{
 		FullTimestamp: true,
 	}
+}
+
+// IsInvalidClusterName returns true if valid cluster name
+func IsInvalidClusterName(clustername string) bool {
+	matched, err := regexp.MatchString("^[a-z]([-a-z0-9]*[a-z0-9])?$", clustername)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return !matched
 }

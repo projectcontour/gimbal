@@ -22,7 +22,7 @@ Arguments are available to customize the discoverer, most have defaults but othe
 | num-threads  | 2  |  Specify number of threads to use when processing queue items
 | gimbal-kubecfg-file  | ""  | Location of kubecfg file for access to Kubernetes cluster hosting Gimbal
 | discover-kubecfg-file | ""  | Location of kubecfg file for access to remote Kubernetes cluster to watch for services / endpoints 
-| cluster-name  | ""  |   Name of cluster scraping for services & endpoints 
+| cluster-name  | ""  |   Name of cluster scraping for services & endpoints (Cannot start or end with a hyphen and must be lowercase alpha-numeric)
 | debug | false | Enable debug logging 
 
 ### Credentials

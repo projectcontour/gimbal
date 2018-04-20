@@ -80,9 +80,10 @@ func main() {
 	}
 
 	// Verify cluster name is passed
-	if clusterName == "" {
-		log.Fatalf("The Kubernetes cluster name must be provided using the `--cluster-name` flag")
+	if util.IsInvalidClusterName(clusterName) {
+		log.Fatalf("The Kubernetes cluster name must be provided using the `--cluster-name` flag or the one passed is invalid")
 	}
+	log.Infof("ClusterName is: %s", clusterName)
 
 	// Discovered cluster is passed
 	if discovererKubeCfgFile == "" {
