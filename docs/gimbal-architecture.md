@@ -22,7 +22,7 @@ After they are deployed, the Service Discoverers continuously collect informatio
 
 For example, let's assume a namespace in Kubernetes Cluster A called `app-team-1`. Any Services and Endpoints that are discovered in Cluster A are replicated in the Gimbal cluster in the `app-team-1` namespace.  Labels associated with the Services are also replicated.
 
-The OpenStack Discoverer provides similar behavior by monitoring all load balancers and their members. (You can think of this as LBaaS). The OpenStack load balancers are translated into Services, and the pool members are translated into Endpoints. The OpenStack tenant name becomes the cluster namespace.
+The OpenStack Discoverer provides similar behavior by monitoring all load balancers and their members, using LBaaS. The OpenStack load balancers are translated into Services, and the pool members are translated into Endpoints. The OpenStack tenant name becomes the cluster namespace.
 
 ![Arch 02](images/arch-01-service.png)
 
