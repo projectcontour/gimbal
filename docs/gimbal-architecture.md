@@ -6,7 +6,7 @@ Gimbal is designed to be deployed to one or more Kubernetes clusters that will a
 
 ![Gimbal Architecture](images/gimbal-arch.png)
 
-## Gimbal load balancing Deployment 
+## Gimbal Deployment 
 
 Cluster administrators deploy Gimbal and its dependencies to the appropriate namespaces.
 
