@@ -1,25 +1,25 @@
 # Deployment
 <!-- TOC -->
 
-- [Setup / Requirements](#setup--requirements)
-- [Contour](#contour)
-- [Discoverers](#discoverers)
+- [Prerequisites](#prerequisites)
+- [Deploy Contour](#deploy-contour)
+- [Deploy Discoverers](#discoverers)
     - [Kubernetes](#kubernetes)
     - [Openstack](#openstack)
     - [Prometheus](#prometheus)
         - [Quick start](#quick-start)
-        - [Access the Prometheus Web UI](#access-the-prometheus-web-ui)
-        - [Access the Alert Manager Web UI](#access-the-alert-manager-web-ui)
+        - [Access the Prometheus web UI](#access-the-prometheus-web-ui)
+        - [Access the Alertmanager web UI](#access-the-alertmanager-web-ui)
     - [Grafana](#grafana)
         - [Quick Start](#quick-start)
-        - [Accessing Grafana UI](#accessing-grafana-ui)
+        - [Access Grafana UI](#access-grafana-ui)
         - [Configure Grafana](#configure-grafana)
-            - [Configure Datasource](#configure-datasource)
+            - [Configure datasource](#configure-datasource)
             - [Dashboards](#dashboards)
                 - [Add Sample Kubernetes Dashboard](#add-sample-kubernetes-dashboard)
     - [Validation](#validation)
-        - [Discovery Cluster](#discovery-cluster)
-        - [Gimbal Cluster](#gimbal-cluster)
+        - [Discovery cluster](#discovery-cluster)
+        - [Gimbal cluster](#gimbal-cluster)
 
 <!-- /TOC -->
 
@@ -27,12 +27,12 @@
 
 - A copy of this repository. Download, or clone: 
 
-```sh
-$ git clone git@github.com:heptio/gimbal.git
-```
+  ```sh
+  $ git clone git@github.com:heptio/gimbal.git
+  ```
 
 - A single Kubernetes cluster to deploy Gimbal
-- Kubernetes or Openstack clusters with `flat` networking. That is, each Pod has a route-able IP address on the network.
+- Kubernetes or Openstack clusters with flat networking. That is, each Pod has a route-able IP address on the network.
 
 ## Deploy Contour
 

@@ -1,24 +1,15 @@
 # Documentation
 
-Heptio Gimbal is a layer-7 load balancing platform built on Kubernetes, Envoy, and Contour. It provides a scalable, multi-team, and API-driven ingress tier capable of routing internet traffic to multiple upstream Kubernetes clusters and traditional infrastructure technologies including OpenStack.
+See the root-level README for an introduction, and the [deployment directory](../deployment/README.md) to get started with setting up and and deploying Gimbal.
 
-## Data Flow
-
-![Data Flow](images/data-flow.png)
-
-## Architecture Overview
-
-![Arch Overview](images/overview.png)
-
-You can read more about the [Gimbal Architecture](gimbal-architecture.md).
+Here you can dig into the details of how Gimbal works, and explore more advanced topics for operators and users.
 
 ## Overview Guides
 
-The following guides will describe how components of Gimbal function and interact with other systems:
+These guides describe how the components of Gimbal function and how they interact with other systems:
+
 - [Kubernetes Discoverer](kubernetes-discoverer.md)
 - [Openstack Discoverer](openstack-discoverer.md)
-
-Guides on how to setup / deploy Gimbal can be found in the [deployment guide](../deployment/README.md). 
 
 ## Operator Topics
 
@@ -31,3 +22,13 @@ Guides on how to setup / deploy Gimbal can be found in the [deployment guide](..
 
 - [Route Specification](route.md)
 - [Dashboards / Monitoring / Alerting](monitoring.md)
+
+## Data Flow
+
+![Data Flow](images/data-flow.png)
+
+## Architecture Overview
+
+![Arch Overview](images/overview.png)
+
+More about the [Gimbal Architecture](gimbal-architecture.md).
