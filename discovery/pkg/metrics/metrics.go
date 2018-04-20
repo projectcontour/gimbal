@@ -110,7 +110,6 @@ func NewMetrics() DiscovererMetrics {
 func (d *DiscovererMetrics) RegisterPrometheus() {
 	// Register with Prometheus's default registry
 	for _, v := range d.metrics {
-
 		prometheus.MustRegister(v)
 	}
 }
@@ -152,5 +151,13 @@ func (d *DiscovererMetrics) EndpointsEventTimestampMetric(namespace, clusterName
 	m, ok := d.metrics[EndpointsEventTimestampGauge].(*prometheus.GaugeVec)
 	if ok {
 		m.WithLabelValues(namespace, clusterName, name).Set(float64(timestamp))
+	}
+}
+
+// QueueSizeGaugeMetric records the queue size prometheus metric
+func (d *DiscovererMetrics) QueueSizeGaugeMetric(namespace, clusterName, clusterType string, size int) {
+	m, ok := d.metrics[QueueSizeGauge].(*prometheus.GaugeVec)
+	if ok {
+		m.WithLabelValues(namespace, clusterName, clusterType).Set(float64(size))
 	}
 }

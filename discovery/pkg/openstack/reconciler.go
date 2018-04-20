@@ -60,7 +60,7 @@ type Reconciler struct {
 
 // NewReconciler returns an OpenStack reconciler
 func NewReconciler(clusterName string, gimbalKubeClient kubernetes.Interface, syncPeriod time.Duration, lbLister LoadBalancerLister,
-	projectLister ProjectLister, log *logrus.Logger, queueWorkers int, metrics localmetrics.DiscovererMetrics) Reconciler {
+	projectLister ProjectLister, log *logrus.Logger, queueWorkers int, metrics localmetrics.DiscovererMetrics, clusterType string) Reconciler {
 	return Reconciler{
 		ClusterName:        clusterName,
 		GimbalKubeClient:   gimbalKubeClient,
@@ -69,7 +69,7 @@ func NewReconciler(clusterName string, gimbalKubeClient kubernetes.Interface, sy
 		ProjectLister:      projectLister,
 		Logger:             log,
 		Metrics:            metrics,
-		syncqueue:          sync.NewQueue(log, clusterName, gimbalKubeClient, queueWorkers, metrics),
+		syncqueue:          sync.NewQueue(log, clusterName, clusterType, gimbalKubeClient, queueWorkers, metrics),
 	}
 }
 

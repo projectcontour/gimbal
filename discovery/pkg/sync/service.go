@@ -48,6 +48,11 @@ type serviceAction struct {
 	service *v1.Service
 }
 
+// ObjectMeta returns the objectMeta piece of the Action interface object
+func (action serviceAction) ObjectMeta() *metav1.ObjectMeta {
+	return &action.service.ObjectMeta
+}
+
 // Sync performs the action on the given service
 func (action serviceAction) Sync(kubeClient kubernetes.Interface, metrics localmetrics.DiscovererMetrics, clusterName string) error {
 

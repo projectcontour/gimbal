@@ -45,6 +45,8 @@ var (
 	discovererMetrics     localmetrics.DiscovererMetrics
 )
 
+const clusterType = "kubernetes"
+
 func init() {
 	flag.BoolVar(&printVersion, "version", false, "Show version and quit")
 	flag.IntVar(&numProcessThreads, "num-threads", 2, "Specify number of threads to use when processing queue items.")
@@ -105,7 +107,7 @@ func main() {
 
 	kubeInformerFactory := kubeinformers.NewSharedInformerFactory(k8sDiscovererClient, resyncInterval)
 
-	c := k8s.NewController(log, gimbalKubeClient, kubeInformerFactory, clusterName, numProcessThreads, discovererMetrics)
+	c := k8s.NewController(log, gimbalKubeClient, kubeInformerFactory, clusterName, clusterType, numProcessThreads, discovererMetrics)
 	if err != nil {
 		log.Fatal("Could not init Controller! ", err)
 	}

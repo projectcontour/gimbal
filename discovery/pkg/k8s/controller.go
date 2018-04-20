@@ -45,7 +45,7 @@ type Controller struct {
 
 // NewController returns a new NewController
 func NewController(log *logrus.Logger, gimbalKubeClient kubernetes.Interface, kubeInformerFactory kubeinformers.SharedInformerFactory,
-	clusterName string, threadiness int, metrics localmetrics.DiscovererMetrics) *Controller {
+	clusterName, clusterType string, threadiness int, metrics localmetrics.DiscovererMetrics) *Controller {
 
 	// obtain references to shared index informers for the services types.
 	serviceInformer := kubeInformerFactory.Core().V1().Services()
@@ -53,7 +53,7 @@ func NewController(log *logrus.Logger, gimbalKubeClient kubernetes.Interface, ku
 
 	c := &Controller{
 		Logger:          log,
-		syncqueue:       sync.NewQueue(log, clusterName, gimbalKubeClient, threadiness, metrics),
+		syncqueue:       sync.NewQueue(log, clusterName, clusterType, gimbalKubeClient, threadiness, metrics),
 		servicesSynced:  serviceInformer.Informer().HasSynced,
 		endpointsSynced: endpointsInformer.Informer().HasSynced,
 		clusterName:     clusterName,

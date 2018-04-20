@@ -51,6 +51,8 @@ var (
 	discovererMetrics                 localmetrics.DiscovererMetrics
 )
 
+const clusterType = "openstack"
+
 func init() {
 	flag.BoolVar(&printVersion, "version", false, "Show version and quit")
 	flag.StringVar(&gimbalKubeCfgFile, "gimbal-kubecfg-file", "", "Location of kubecfg file for access to gimbal system kubernetes api, defaults to service account tokens")
@@ -153,6 +155,7 @@ func main() {
 		log,
 		numProcessThreads,
 		discovererMetrics,
+		clusterType,
 	)
 	stopCh := signals.SetupSignalHandler()
 
