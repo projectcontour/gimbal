@@ -77,7 +77,7 @@ For more information, see [the Kubenetes Discoverer doc](../docs/kubernetes-disc
 
 ### Openstack
 
-The Openstack Discoverer is responsible for looking at all LBaSS and members in an Openstack cluster and synchronizing them to the host cluster. 
+The Openstack Discoverer is responsible for looking at all LBaaS and members in an Openstack cluster and synchronizing them to the host cluster. 
  
 [Credentials](../docs/openstack-discoverer.md#credentials) to the remote cluster must be created as a secret.
 
