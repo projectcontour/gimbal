@@ -6,48 +6,48 @@ Gimbal is designed to be deployed to one or more Kubernetes clusters that will a
 
 ![Gimbal Architecture](images/gimbal-arch.png)
 
-## Gimbal Load Balancing Deployment 
+## Gimbal load balancing Deployment 
 
 Cluster administrators deploy Gimbal and its dependencies to the appropriate namespaces.
 
-* Gimbal service discovery agents (one per upstream cluster) run in the `gimbal-discovery` namespace
+* Gimbal Service discovery agents (one per upstream cluster) run in the `gimbal-discovery` namespace
 * Contour and Envoy run in the `gimbal-contour` namespace
 * The optional monitoring suite runs in the `gimbal-monitoring` namespace.
 
 ![Arch 01](images/overview.png)
 
-## Gimbal Service Discovery
+## Gimbal Service discovery
 
-Once deployed, the service discoverers continuously collect information about upstream applications running in the Kubernetes or OpenStack clusters and create corresponding `Service` and `Endpoint` objects in the appropriate team namespaces.
+After they are deployed, the Service Discoverers continuously collect information about upstream applications running in the Kubernetes or OpenStack clusters and create corresponding Service and Endpoint objects in the appropriate team namespaces.
 
-For example, assuming there is namespace in `Kubernetes Cluster A` called `app-team-1`, any Services and Endpoints discovered will be replicated in the Gimbal cluster within the `app-team-1` namespace.  Labels associated with the services are replicated as well.
+For example, assuming there is namespace in Kubernetes Cluster A called `app-team-1`, any Services and Endpoints discovered are replicated in the Gimbal cluster in the `app-team-1` namespace.  Labels associated with the Services are replicated as well.
 
-The OpenStack discoverer provides similar behavior by monitoring all Load Balancers as a Service (LBaaS) configured as well as the corresponding Members. They are synchronized to the team's namespace as Services and Endpoints, with the namespace being configured as the TenantName in OpenStack.
+The OpenStack Discoverer provides similar behavior by monitoring all load balancers as a Service (LBaaS) configured as well as the corresponding Members. They are synchronized to the team's namespace as Services and Endpoints, with the namespace configured as the TenantName in OpenStack.
 
 ![Arch 02](images/arch-01-service.png)
 
-## Multi-team Route Configuration
+## Multi-team route configuration
 
-Development teams can see which Services are available to them by using standard Kubernetes tools like `kubectl`.  Services discovered by Gimbal are augmented with additional labels including the name of the cluster they were discovered which enables querying using selectors.
+Development teams can see which Services are available to them by using standard Kubernetes tools like kubectl.  Services discovered by Gimbal are augmented with additional labels including the name of the cluster they were discovered which enables querying using selectors.
 
-Developers create Kubernetes Ingress objects which define where inbound traffic (e.g. myapp.company.com) is routed.
+Developers create Kubernetes Ingress objects that define where inbound traffic (e.g. myapp.company.com) is routed.
 
 ![Arch 03](images/arch-02-route.png)
 
 ## Contour
 
-Contour is a Kubernetes Ingress Controller for Envoy that continuously monitors Ingress, Service, and Endpoint objects in the team namespaces.
+Contour is a Kubernetes Ingress controller for the Envoy proxy that continuously monitors Ingress, Service, and Endpoint objects in the team namespaces.
 
 ![Arch 04](images/arch-03-contour.png)
 
-Contour provides an Envoy API compatible GRPC endpoint which will dynamically modify the Envoy route configuration.
+Contour provides an Envoy API compatible gRPC endpoint which will dynamically modify the Envoy route configuration.
 
 ![Arch 04](images/arch-04-envoy.png)
 
-Envoy, deployed using the HostNetwork, provides the data plane for Gimbal.  Envoy is a high-performance load balancing proxy that physically routes ingress traffic to the upstream Kubernetes and OpenStack clusters.
+Envoy, deployed using the HostNetwork, provides the data plane for Gimbal. Envoy is a high-performance load balancing proxy that physically routes ingress traffic to the upstream Kubernetes and OpenStack clusters.
 
 ## Monitoring
 
-Gimbal includes an optional monitoring add-on that includes Prometheus, AlertManager, and Grafana.
+Gimbal includes an optional monitoring addon that includes Prometheus, AlertManager, and Grafana.
 
 Each Gimbal system component exposes a Prometheus-compatible metrics endpoint with health status and essential metrics that are aggregated by Prometheus and can be visualized using Grafana.
