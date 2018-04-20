@@ -43,7 +43,22 @@ func TestTranslateService(t *testing.T) {
 		{
 			name:        "underscore",
 			clusterName: "my_cluster",
+			expected:    true,
+		},
+		{
+			name:        "multiple underscores",
+			clusterName: "my----cluster",
 			expected:    false,
+		},
+		{
+			name:        "can't start with underscores",
+			clusterName: "-mycluster",
+			expected:    true,
+		},
+		{
+			name:        "can't end with underscores",
+			clusterName: "mycluster-",
+			expected:    true,
 		},
 		{
 			name:        "special chars",
