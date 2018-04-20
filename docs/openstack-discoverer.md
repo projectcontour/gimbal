@@ -21,7 +21,7 @@ Arguments are available to customize the discoverer, most have defaults but othe
 | version  |  false | Show version, build information and quit  
 | num-threads  | 2  |  Specify number of threads to use when processing queue items
 | gimbal-kubecfg-file  | ""  | Location of kubecfg file for access to Kubernetes cluster hosting Gimbal
-| cluster-name  | ""  |   Name of cluster scraping for services & endpoints 
+| cluster-name  | ""  |   Name of cluster scraping for services & endpoints (Cannot start or end with a hyphen and must be alpha-numeric)
 | debug | false | Enable debug logging 
 | reconciliation-period | 30s | The interval of time between reconciliation loop runs 
 | http-client-timeout | 5s | The HTTP client request timeout
