@@ -48,6 +48,11 @@ type endpointsAction struct {
 	endpoints *v1.Endpoints
 }
 
+// ObjectMeta returns the objectMeta piece of the Action interface object
+func (action endpointsAction) ObjectMeta() *metav1.ObjectMeta {
+	return &action.endpoints.ObjectMeta
+}
+
 // Sync performs the action on the given Endpoints resource
 func (action endpointsAction) Sync(kubeClient kubernetes.Interface, metrics localmetrics.DiscovererMetrics, clusterName string) error {
 

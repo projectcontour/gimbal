@@ -30,6 +30,7 @@ import (
 const (
 	kubesystemNamespace = "kube-system"
 	kubesystemService   = "kubernetes"
+	clusterType         = "kubernetes"
 )
 
 // Controller receives notifications from the Kubernetes API and translates those
@@ -53,7 +54,7 @@ func NewController(log *logrus.Logger, gimbalKubeClient kubernetes.Interface, ku
 
 	c := &Controller{
 		Logger:          log,
-		syncqueue:       sync.NewQueue(log, clusterName, gimbalKubeClient, threadiness, metrics),
+		syncqueue:       sync.NewQueue(log, clusterName, clusterType, gimbalKubeClient, threadiness, metrics),
 		servicesSynced:  serviceInformer.Informer().HasSynced,
 		endpointsSynced: endpointsInformer.Informer().HasSynced,
 		clusterName:     clusterName,
