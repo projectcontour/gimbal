@@ -161,3 +161,11 @@ func (d *DiscovererMetrics) QueueSizeGaugeMetric(namespace, clusterName, cluster
 		m.WithLabelValues(namespace, clusterName, clusterType).Set(float64(size))
 	}
 }
+
+// CycleDurationMetric formats a cycle duration gauge prometheus metric
+func (d *DiscovererMetrics) CycleDurationMetric(clusterName, clusterType string, durationMS float64) {
+	m, ok := d.metrics[DiscovererCycleDurationMSGauge].(*prometheus.GaugeVec)
+	if ok {
+		m.WithLabelValues(clusterName, clusterType).Set(durationMS)
+	}
+}
