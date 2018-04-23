@@ -27,7 +27,6 @@ import (
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/util/workqueue"
 )
 
 type ProjectLister interface {
@@ -70,13 +69,7 @@ func NewReconciler(clusterName string, gimbalKubeClient kubernetes.Interface, sy
 		ProjectLister:      projectLister,
 		Logger:             log,
 		Metrics:            metrics,
-		syncqueue: sync.Queue{
-			KubeClient:  gimbalKubeClient,
-			Logger:      log,
-			Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
-			Threadiness: queueWorkers,
-			Metrics:     metrics,
-		},
+		syncqueue:          sync.NewQueue(log, clusterName, gimbalKubeClient, queueWorkers, metrics),
 	}
 }
 
