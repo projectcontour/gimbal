@@ -14,6 +14,9 @@
 package metrics
 
 import (
+	"math"
+	"time"
+
 	"github.com/prometheus/client_golang/prometheus"
 )
 
@@ -159,5 +162,13 @@ func (d *DiscovererMetrics) QueueSizeGaugeMetric(namespace, clusterName, cluster
 	m, ok := d.metrics[QueueSizeGauge].(*prometheus.GaugeVec)
 	if ok {
 		m.WithLabelValues(namespace, clusterName, clusterType).Set(float64(size))
+	}
+}
+
+// CycleDurationMetric formats a cycle duration gauge prometheus metric
+func (d *DiscovererMetrics) CycleDurationMetric(clusterName, clusterType string, duration time.Duration) {
+	m, ok := d.metrics[DiscovererCycleDurationMSGauge].(*prometheus.GaugeVec)
+	if ok {
+		m.WithLabelValues(clusterName, clusterType).Set(math.Floor(duration.Seconds() * 1e3))
 	}
 }
