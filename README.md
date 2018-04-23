@@ -47,7 +47,7 @@ Documentation for all the Gimbal components can be found in the [docs directory]
 
 ## Troubleshooting
 
-If you encounter any problems that the documentation does not address, please [file an issue](https://github.com/heptio/gimbal/issues) or talk to us on the Kubernetes Slack team channel #gimbal.
+If you encounter any problems that the documentation does not address, please [file an issue](https://github.com/heptio/gimbal/issues) or talk to us on the Kubernetes Slack team channel [#gimbal](https://kubernetes.slack.com/messages/gimbal)
 
 ## Contributing
 
