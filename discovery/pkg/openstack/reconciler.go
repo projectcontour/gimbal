@@ -29,6 +29,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
+const clusterType = "openstack"
+
 type ProjectLister interface {
 	ListProjects() ([]projects.Project, error)
 }
@@ -60,7 +62,7 @@ type Reconciler struct {
 
 // NewReconciler returns an OpenStack reconciler
 func NewReconciler(clusterName string, gimbalKubeClient kubernetes.Interface, syncPeriod time.Duration, lbLister LoadBalancerLister,
-	projectLister ProjectLister, log *logrus.Logger, queueWorkers int, metrics localmetrics.DiscovererMetrics, clusterType string) Reconciler {
+	projectLister ProjectLister, log *logrus.Logger, queueWorkers int, metrics localmetrics.DiscovererMetrics) Reconciler {
 	return Reconciler{
 		ClusterName:        clusterName,
 		GimbalKubeClient:   gimbalKubeClient,
