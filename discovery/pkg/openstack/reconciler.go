@@ -15,6 +15,7 @@ package openstack
 
 import (
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
@@ -98,6 +99,9 @@ func (r *Reconciler) Run(stop <-chan struct{}) {
 }
 
 func (r *Reconciler) reconcile() {
+	// Calculate cycle time
+	start := time.Now()
+
 	log := r.Logger
 	log.Debugln("reconciling openstack load balancers")
 	// Get all the openstack tenants that must be synced
@@ -150,6 +154,9 @@ func (r *Reconciler) reconcile() {
 		desiredEndpoints := kubeEndpoints(r.ClusterName, projectName, loadbalancers, pools)
 		r.reconcileEndpoints(desiredEndpoints, currentEndpoints.Items)
 	}
+
+	// Log to Prometheus the cycle duration
+	r.Metrics.CycleDurationMetric(r.ClusterName, clusterType, math.Floor(time.Now().Sub(start).Seconds()*1e3))
 }
 
 func (r *Reconciler) reconcileSvcs(desiredSvcs, currentSvcs []v1.Service) {
