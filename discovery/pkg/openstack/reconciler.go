@@ -15,7 +15,6 @@ package openstack
 
 import (
 	"fmt"
-	"math"
 	"time"
 
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
@@ -156,7 +155,7 @@ func (r *Reconciler) reconcile() {
 	}
 
 	// Log to Prometheus the cycle duration
-	r.Metrics.CycleDurationMetric(r.ClusterName, clusterType, math.Floor(time.Now().Sub(start).Seconds()*1e3))
+	r.Metrics.CycleDurationMetric(r.ClusterName, clusterType, time.Now().Sub(start))
 }
 
 func (r *Reconciler) reconcileSvcs(desiredSvcs, currentSvcs []v1.Service) {
