@@ -25,7 +25,6 @@ import (
 	kubeinformers "k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
-	"k8s.io/client-go/util/workqueue"
 )
 
 const (
@@ -53,15 +52,8 @@ func NewController(log *logrus.Logger, gimbalKubeClient kubernetes.Interface, ku
 	endpointsInformer := kubeInformerFactory.Core().V1().Endpoints()
 
 	c := &Controller{
-		Logger: log,
-		syncqueue: sync.Queue{
-			KubeClient:  gimbalKubeClient,
-			Logger:      log,
-			Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
-			Threadiness: threadiness,
-			Metrics:     metrics,
-			ClusterName: clusterName,
-		},
+		Logger:          log,
+		syncqueue:       sync.NewQueue(log, clusterName, gimbalKubeClient, threadiness, metrics),
 		servicesSynced:  serviceInformer.Informer().HasSynced,
 		endpointsSynced: endpointsInformer.Informer().HasSynced,
 		clusterName:     clusterName,

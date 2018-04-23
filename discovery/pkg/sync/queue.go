@@ -42,6 +42,19 @@ type Queue struct {
 	ClusterName string
 }
 
+// NewQueue returns an initialized sync.Queue for syncing resources with a Gimbal cluster.
+func NewQueue(logger *logrus.Logger, clusterName string, kubeClient kubernetes.Interface,
+	threadiness int, metrics localmetrics.DiscovererMetrics) Queue {
+	return Queue{
+		KubeClient:  kubeClient,
+		Logger:      logger,
+		Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
+		Threadiness: threadiness,
+		Metrics:     metrics,
+		ClusterName: clusterName,
+	}
+}
+
 // Action that is added to the queue for processing
 type Action interface {
 	Sync(kube kubernetes.Interface, lm localmetrics.DiscovererMetrics, clusterName string) error
