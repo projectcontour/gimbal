@@ -74,7 +74,7 @@ func (action endpointsAction) Sync(kubeClient kubernetes.Interface, metrics loca
 }
 
 func (action endpointsAction) String() string {
-	return fmt.Sprintf(`%s endpoints "%s/%s"`, action.kind, action.endpoints.Namespace, action.endpoints.Name)
+	return fmt.Sprintf(`%s endpoints '%s/%s'`, action.kind, action.endpoints.Namespace, action.endpoints.Name)
 }
 
 func addEndpoints(kubeClient kubernetes.Interface, endpoints *v1.Endpoints, lm localmetrics.DiscovererMetrics, clusterName string) error {
