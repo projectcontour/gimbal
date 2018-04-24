@@ -29,25 +29,33 @@ Arguments are available to customize the discoverer, most have defaults but othe
 
 ### Credentials
 
-The discoverer requires a username/password, auth URL, as well as the TenantName of the Openstack cluster to be discovered:
+The discoverer requires the following credentials to access the backend OpenStack cluster.
+Similar to the OpenStack CLI, the credentials can be provided using environment variables:
 
-Credentials required:
+| Credential         | Environment Variable  | Description                                       |
+|--------------------|-----------------------|---------------------------------------------------|
+| Username           | `OS_USERNAME`         | The OpenStack username                            |
+| Password           | `OS_PASSWORD`         | The password of the OpenStack user                |
+| Authentication URL | `OS_AUTH_URL`         | The URL of the endpoint to use for authentication |
+| Tenant Name        | `OS_TENANT_NAME`      | The OpenStack user's tenant name                  |
+| User Domain Name   | `OS_USER_DOMAIN_NAME` | The OpenStack user's domain name                  |
 
-- Username: User with access to the API
-- Password: Password for User
-- AuthURL: Openstack API Url
-- TenantName: Tenant used to discover services
-- Cluster Name: Unique name of cluster to identify
-- Certificate Authority Data: CA Certificate (if required)
-
-_NOTE: These are exposed to the deployment via environment variables._
+If you need to provide a CA certificate to establish a secure connection with the
+authentication endpoint, you may use the `--openstack-certificate-authority` flag to
+provide the path to a CA certificate.
 
 #### Example
 
-Following example creates a Kubernetes secret which the Openstack discoverer will consume and get credentials & other information to be able to discover services & endpoints: 
+Following example creates a Kubernetes secret which the Openstack discoverer will consume to get credentials & other information to be able to discover services & endpoints:
 
 ```sh
-$ kubectl create secret generic remote-discover-openstack --from-file=certificate-authority-data=./ca.pem --from-literal=cluster-name=openstack --from-literal=username=admin --from-literal=password=abc123 --from-literal=auth-url=https://api.openstack:5000/ --from-literal=tenant-name=heptio
+kubectl create secret generic remote-discover-openstack \
+    --from-file=certificate-authority-data=./ca.pem \
+    --from-literal=cluster-name=openstack \
+    --from-literal=username=admin \
+    --from-literal=password=abc123 \
+    --from-literal=auth-url=https://api.openstack:5000/ \
+    --from-literal=tenant-name=heptio
 ```
 
 ### Updating Credentials
