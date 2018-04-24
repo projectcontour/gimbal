@@ -52,6 +52,8 @@ var (
 	log                               *logrus.Logger
 )
 
+const clusterType = "openstack"
+
 func init() {
 	flag.BoolVar(&printVersion, "version", false, "Show version and quit")
 	flag.StringVar(&gimbalKubeCfgFile, "gimbal-kubecfg-file", "", "Location of kubecfg file for access to gimbal system kubernetes api, defaults to service account tokens")
@@ -119,12 +121,24 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to create OpenStack client: %v", err)
 	}
-	osClient.HTTPClient.Timeout = httpClientTimeout
-	if openstackCertificateAuthorityFile != "" {
-		osClient.HTTPClient.Transport = httpTransportWithCA(log, openstackCertificateAuthorityFile)
+
+	dClient := http.Client{
+		Transport: &openstack.LogRoundTripper{
+			RoundTripper: http.DefaultTransport,
+			Log:          log,
+			ClusterName:  clusterName,
+			ClusterType:  clusterType,
+			Metrics:      &discovererMetrics,
+		},
+		Timeout: httpClientTimeout,
 	}
 
-	osClient.HTTPClient = newHTTPClient()
+	if openstackCertificateAuthorityFile != "" {
+		dClient.Transport = httpTransportWithCA(log, openstackCertificateAuthorityFile)
+	}
+
+	// Pass http client
+	osClient.HTTPClient = dClient
 
 	osAuthOptions := gophercloud.AuthOptions{
 		IdentityEndpoint: identityEndpoint,

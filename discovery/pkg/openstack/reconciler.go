@@ -29,8 +29,6 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-const clusterType = "openstack"
-
 type ProjectLister interface {
 	ListProjects() ([]projects.Project, error)
 }
@@ -50,6 +48,7 @@ type Reconciler struct {
 
 	// ClusterName is the name of the OpenStack cluster
 	ClusterName string
+	ClusterType string
 	// GimbalKubeClient is the client of the Kubernetes cluster where Gimbal is running
 	GimbalKubeClient kubernetes.Interface
 	// Interval between reconciliation loops
@@ -61,10 +60,11 @@ type Reconciler struct {
 }
 
 // NewReconciler returns an OpenStack reconciler
-func NewReconciler(clusterName string, gimbalKubeClient kubernetes.Interface, syncPeriod time.Duration, lbLister LoadBalancerLister,
+func NewReconciler(clusterName, clusterType string, gimbalKubeClient kubernetes.Interface, syncPeriod time.Duration, lbLister LoadBalancerLister,
 	projectLister ProjectLister, log *logrus.Logger, queueWorkers int, metrics localmetrics.DiscovererMetrics) Reconciler {
 	return Reconciler{
 		ClusterName:        clusterName,
+		ClusterType:        clusterType,
 		GimbalKubeClient:   gimbalKubeClient,
 		SyncPeriod:         syncPeriod,
 		LoadBalancerLister: lbLister,
