@@ -164,6 +164,7 @@ func main() {
 
 	reconciler := openstack.NewReconciler(
 		clusterName,
+		clusterType,
 		gimbalKubeClient,
 		reconciliationPeriod,
 		lbv2,

@@ -155,7 +155,7 @@ func (r *Reconciler) reconcile() {
 	}
 
 	// Log to Prometheus the cycle duration
-	r.Metrics.CycleDurationMetric(r.ClusterName, clusterType, time.Now().Sub(start))
+	r.Metrics.CycleDurationMetric(r.ClusterName, r.ClusterType, time.Now().Sub(start))
 }
 
 func (r *Reconciler) reconcileSvcs(desiredSvcs, currentSvcs []v1.Service) {
