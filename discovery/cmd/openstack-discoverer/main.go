@@ -122,23 +122,22 @@ func main() {
 		log.Fatalf("Failed to create OpenStack client: %v", err)
 	}
 
-	dClient := http.Client{
-		Transport: &openstack.LogRoundTripper{
-			RoundTripper: http.DefaultTransport,
-			Log:          log,
-			ClusterName:  clusterName,
-			ClusterType:  clusterType,
-			Metrics:      &discovererMetrics,
-		},
-		Timeout: httpClientTimeout,
+	transport := &openstack.LogRoundTripper{
+		RoundTripper: http.DefaultTransport,
+		Log:          log,
+		ClusterName:  clusterName,
+		ClusterType:  clusterType,
+		Metrics:      &discovererMetrics,
 	}
 
 	if openstackCertificateAuthorityFile != "" {
-		dClient.Transport = httpTransportWithCA(log, openstackCertificateAuthorityFile)
+		transport.RoundTripper = httpTransportWithCA(log, openstackCertificateAuthorityFile)
 	}
 
-	// Pass http client
-	osClient.HTTPClient = dClient
+	osClient.HTTPClient = http.Client{
+		Transport: transport,
+		Timeout:   httpClientTimeout,
+	}
 
 	osAuthOptions := gophercloud.AuthOptions{
 		IdentityEndpoint: identityEndpoint,
