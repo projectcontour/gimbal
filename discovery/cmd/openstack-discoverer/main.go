@@ -52,7 +52,10 @@ var (
 	log                               *logrus.Logger
 )
 
-const clusterType = "openstack"
+const (
+	clusterType           = "openstack"
+	defaultUserDomainName = "Default"
+)
 
 func init() {
 	flag.BoolVar(&printVersion, "version", false, "Show version and quit")
@@ -82,13 +85,13 @@ func main() {
 		log.Level = logrus.DebugLevel
 	}
 
-	log.Info("Gimbal Discoverer Starting up...")
+	log.Info("Gimbal OpenStack Discoverer Starting up...")
 
 	// Init prometheus metrics
 	discovererMetrics = localmetrics.NewMetrics()
 	discovererMetrics.RegisterPrometheus()
 
-	// Verify cluster name is passed
+	// Validate cluster name
 	if util.IsInvalidClusterName(clusterName) {
 		log.Fatalf("The Kubernetes cluster name must be provided using the `--cluster-name` flag or the one passed is invalid")
 	}
@@ -114,6 +117,11 @@ func main() {
 	tenantName := os.Getenv("OS_TENANT_NAME")
 	if tenantName == "" {
 		log.Fatal("The OpenStack tenant name must be provided using the OS_TENANT_NAME environment variable")
+	}
+	userDomainName := os.Getenv("OS_USER_DOMAIN_NAME")
+	if userDomainName == "" {
+		log.Warnf("The OS_USER_DOMAIN_NAME environment variable was not set. Using %q as the OpenStack user domain name.", defaultUserDomainName)
+		userDomainName = defaultUserDomainName
 	}
 
 	// Create and configure client
@@ -143,7 +151,7 @@ func main() {
 		IdentityEndpoint: identityEndpoint,
 		Username:         username,
 		Password:         password,
-		DomainName:       "Default",
+		DomainName:       userDomainName,
 		TenantName:       tenantName,
 	}
 
@@ -191,6 +199,7 @@ func main() {
 		}
 	}()
 
+	log.Info("Starting reconciler")
 	go reconciler.Run(stopCh)
 
 	<-stopCh
