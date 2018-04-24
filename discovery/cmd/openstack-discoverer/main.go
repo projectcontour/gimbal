@@ -224,17 +224,3 @@ func httpTransportWithCA(log *logrus.Logger, caFile string) http.RoundTripper {
 		},
 	}
 }
-
-// newHTTPClient return a custom HTTP client that allows for logging relevant
-// information before and after the HTTP request.
-func newHTTPClient() http.Client {
-	return http.Client{
-		Transport: &openstack.LogRoundTripper{
-			RoundTripper: http.DefaultTransport,
-			Log:          log,
-			ClusterName:  clusterName,
-			ClusterType:  "openstack",
-			Metrics:      &discovererMetrics,
-		},
-	}
-}
