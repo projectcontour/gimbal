@@ -94,6 +94,7 @@ The Gimbal Discoverer currently has two different systems it can monitor, Kubern
   - **gimbal_discoverer_api_latency_ms (gauge):** The milliseconds it takes for requests to return from a remote discoverer api (e.g. Openstack)
     - clustername
     - clustertype
+    - path: API request path
   - **gimbal_discoverer_cycle_duration_ms (gauge):** The milliseconds it takes for all objects to be synced from a remote discoverer api (e.g. Openstack)
     - clustername
     - clustertype
