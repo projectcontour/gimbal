@@ -85,7 +85,7 @@ func NewMetrics() DiscovererMetrics {
 			Name: DiscovererAPILatencyMSGauge,
 			Help: "The milliseconds it takes for requests to return from a remote discoverer api",
 		},
-		[]string{"clustername", "clustertype"},
+		[]string{"clustername", "clustertype", "path"},
 	)
 
 	metrics[DiscovererCycleDurationMSGauge] = prometheus.NewGaugeVec(
@@ -170,5 +170,13 @@ func (d *DiscovererMetrics) CycleDurationMetric(clusterName, clusterType string,
 	m, ok := d.metrics[DiscovererCycleDurationMSGauge].(*prometheus.GaugeVec)
 	if ok {
 		m.WithLabelValues(clusterName, clusterType).Set(math.Floor(duration.Seconds() * 1e3))
+	}
+}
+
+// APILatencyMetric formats a cycle duration gauge prometheus metric
+func (d *DiscovererMetrics) APILatencyMetric(clusterName, clusterType, path string, duration time.Duration) {
+	m, ok := d.metrics[DiscovererAPILatencyMSGauge].(*prometheus.GaugeVec)
+	if ok {
+		m.WithLabelValues(clusterName, clusterType, path).Set(math.Floor(duration.Seconds() * 1e3))
 	}
 }

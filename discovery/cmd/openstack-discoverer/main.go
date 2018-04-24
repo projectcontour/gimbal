@@ -49,7 +49,10 @@ var (
 	openstackCertificateAuthorityFile string
 	prometheusListenPort              int
 	discovererMetrics                 localmetrics.DiscovererMetrics
+	log                               *logrus.Logger
 )
+
+const clusterType = "openstack"
 
 func init() {
 	flag.BoolVar(&printVersion, "version", false, "Show version and quit")
@@ -73,7 +76,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	var log = logrus.New()
+	log = logrus.New()
 	log.Formatter = util.GetFormatter()
 	if debug {
 		log.Level = logrus.DebugLevel
@@ -118,9 +121,22 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to create OpenStack client: %v", err)
 	}
-	osClient.HTTPClient.Timeout = httpClientTimeout
+
+	transport := &openstack.LogRoundTripper{
+		RoundTripper: http.DefaultTransport,
+		Log:          log,
+		ClusterName:  clusterName,
+		ClusterType:  clusterType,
+		Metrics:      &discovererMetrics,
+	}
+
 	if openstackCertificateAuthorityFile != "" {
-		osClient.HTTPClient.Transport = httpTransportWithCA(log, openstackCertificateAuthorityFile)
+		transport.RoundTripper = httpTransportWithCA(log, openstackCertificateAuthorityFile)
+	}
+
+	osClient.HTTPClient = http.Client{
+		Transport: transport,
+		Timeout:   httpClientTimeout,
 	}
 
 	osAuthOptions := gophercloud.AuthOptions{
@@ -130,6 +146,7 @@ func main() {
 		DomainName:       "Default",
 		TenantName:       tenantName,
 	}
+
 	if err := gopheropenstack.Authenticate(osClient, osAuthOptions); err != nil {
 		log.Fatalf("Failed to authenticate with OpenStack: %v", err)
 	}
@@ -146,6 +163,7 @@ func main() {
 
 	reconciler := openstack.NewReconciler(
 		clusterName,
+		clusterType,
 		gimbalKubeClient,
 		reconciliationPeriod,
 		lbv2,
