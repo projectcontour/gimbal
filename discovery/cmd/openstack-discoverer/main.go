@@ -49,6 +49,7 @@ var (
 	openstackCertificateAuthorityFile string
 	prometheusListenPort              int
 	discovererMetrics                 localmetrics.DiscovererMetrics
+	log                               *logrus.Logger
 )
 
 func init() {
@@ -73,7 +74,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	var log = logrus.New()
+	log = logrus.New()
 	log.Formatter = util.GetFormatter()
 	if debug {
 		log.Level = logrus.DebugLevel
@@ -123,6 +124,8 @@ func main() {
 		osClient.HTTPClient.Transport = httpTransportWithCA(log, openstackCertificateAuthorityFile)
 	}
 
+	osClient.HTTPClient = newHTTPClient()
+
 	osAuthOptions := gophercloud.AuthOptions{
 		IdentityEndpoint: identityEndpoint,
 		Username:         username,
@@ -130,6 +133,7 @@ func main() {
 		DomainName:       "Default",
 		TenantName:       tenantName,
 	}
+
 	if err := gopheropenstack.Authenticate(osClient, osAuthOptions); err != nil {
 		log.Fatalf("Failed to authenticate with OpenStack: %v", err)
 	}
@@ -203,6 +207,20 @@ func httpTransportWithCA(log *logrus.Logger, caFile string) http.RoundTripper {
 		ExpectContinueTimeout: 1 * time.Second,
 		TLSClientConfig: &tls.Config{
 			RootCAs: pool,
+		},
+	}
+}
+
+// newHTTPClient return a custom HTTP client that allows for logging relevant
+// information before and after the HTTP request.
+func newHTTPClient() http.Client {
+	return http.Client{
+		Transport: &openstack.LogRoundTripper{
+			RoundTripper: http.DefaultTransport,
+			Log:          log,
+			ClusterName:  clusterName,
+			ClusterType:  "openstack",
+			Metrics:      &discovererMetrics,
 		},
 	}
 }
