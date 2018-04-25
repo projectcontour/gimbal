@@ -74,7 +74,7 @@ func (action serviceAction) Sync(kubeClient kubernetes.Interface, metrics localm
 }
 
 func (action serviceAction) String() string {
-	return fmt.Sprintf(`%s service "%s/%s"`, action.kind, action.service.Namespace, action.service.Name)
+	return fmt.Sprintf(`%s service '%s/%s'`, action.kind, action.service.Namespace, action.service.Name)
 }
 
 func addService(kubeClient kubernetes.Interface, service *v1.Service, lm localmetrics.DiscovererMetrics, clusterName string) error {
