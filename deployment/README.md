@@ -3,7 +3,7 @@
 
 - [Prerequisites](#prerequisites)
 - [Deploy Contour](#deploy-contour)
-- [Deploy Discoverers](#discoverers)
+- [Deploy Discoverers](#deploy-discoverers)
     - [Kubernetes](#kubernetes)
     - [Openstack](#openstack)
 - [Deploy Prometheus](#deploy-prometheus)
@@ -11,12 +11,12 @@
     - [Access the Prometheus web UI](#access-the-prometheus-web-ui)
     - [Access the Alertmanager web UI](#access-the-alertmanager-web-ui)
 - [Deploy Grafana](#deploy-grafana)
-    - [Quick start](#quick-start)
-    - [Access Grafana UI](#access-grafana-ui)
+    - [Quick start](#quick-start-1)
+    - [Access the Grafana UI](#access-the-grafana-ui)
     - [Configure Grafana](#configure-grafana)
-      - [Configure datasource](#configure-datasource)
-      - [Dashboards](#dashboards)
-        - [Add Sample Kubernetes Dashboard](#add-sample-kubernetes-dashboard)
+        - [Configure datasource](#configure-datasource)
+        - [Dashboards](#dashboards)
+            - [Add Sample Kubernetes Dashboard](#add-sample-kubernetes-dashboard)
 - [Validation](#validation)
     - [Discovery cluster](#discovery-cluster)
     - [Gimbal cluster](#gimbal-cluster)
@@ -97,7 +97,7 @@ $ kubectl apply -f gimbal-discoverer/02-openstack-discoverer.yaml
 
 For more information, see [the OpenStack Discoverer doc](../docs/openstack-discoverer.md).
 
-## Prometheus
+## Deploy Prometheus
 
 Sample development deployment of Prometheus and Alertmanager using temporary storage.
 
@@ -129,7 +129,7 @@ $ kubectl -n gimbal-monitoring port-forward $(kubectl -n gimbal-monitoring get p
 
 then go to [http://localhost:9093](http://localhost:9093) in your browser
 
-## Grafana
+## Deploy Grafana
 
 Sample development deployment of Grafana using temporary storage.
 
