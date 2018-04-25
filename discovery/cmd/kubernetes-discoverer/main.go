@@ -69,7 +69,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	log.Info("Gimbal Discoverer Starting up...")
+	log.Info("Gimbal Kubernetes Discoverer Starting up...")
 
 	// Init prometheus metrics
 	discovererMetrics = localmetrics.NewMetrics()
