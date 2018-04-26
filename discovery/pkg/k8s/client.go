@@ -36,7 +36,7 @@ func buildConfig(kubeCfgFile string, logger *logrus.Logger) (*rest.Config, error
 		logger.Infof("Using OutOfCluster k8s config with kubeConfigFile: %s", kubeCfgFile)
 		config, err := clientcmd.BuildConfigFromFlags("", kubeCfgFile)
 		if err != nil {
-			panic(err.Error())
+			return nil, err
 		}
 
 		return config, nil
