@@ -25,8 +25,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-const maxServiceName = 63
-
 // returns a kubernetes service for each load balancer in the slice
 func kubeServices(clusterName, tenantName string, lbs []loadbalancers.LoadBalancer) []v1.Service {
 	var svcs []v1.Service
