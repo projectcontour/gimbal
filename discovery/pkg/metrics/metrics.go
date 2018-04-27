@@ -38,74 +38,65 @@ const (
 
 // NewMetrics returns a map of Prometheus metrics
 func NewMetrics() DiscovererMetrics {
-
-	metrics := make(map[string]prometheus.Collector)
-	metrics[ServiceEventTimestampGauge] = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: ServiceEventTimestampGauge,
-			Help: "Timestamp last service event was processed",
-		},
-		[]string{"namespace", "clustername", "name"},
-	)
-
-	metrics[EndpointsEventTimestampGauge] = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: EndpointsEventTimestampGauge,
-			Help: "Timestamp last endpoints event was processed",
-		},
-		[]string{"namespace", "clustername", "name"},
-	)
-
-	metrics[ServiceErrorTotalCounter] = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: ServiceErrorTotalCounter,
-			Help: "Number of service errors encountered",
-		},
-		[]string{"namespace", "clustername", "name", "errortype"},
-	)
-
-	metrics[EndpointsErrorTotalCounter] = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: EndpointsErrorTotalCounter,
-			Help: "Number of endpoints errors encountered",
-		},
-		[]string{"namespace", "clustername", "name", "errortype"},
-	)
-
-	metrics[QueueSizeGauge] = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: QueueSizeGauge,
-			Help: "Number of items in process queue",
-		},
-		[]string{"namespace", "clustername", "clustertype"},
-	)
-
-	metrics[DiscovererAPILatencyMSGauge] = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: DiscovererAPILatencyMSGauge,
-			Help: "The milliseconds it takes for requests to return from a remote discoverer api",
-		},
-		[]string{"clustername", "clustertype", "path"},
-	)
-
-	metrics[DiscovererCycleDurationMSGauge] = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
-			Name: DiscovererCycleDurationMSGauge,
-			Help: "The milliseconds it takes for all objects to be synced from a remote discoverer api",
-		},
-		[]string{"clustername", "clustertype"},
-	)
-
-	metrics[DiscovererErrorTotal] = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name: DiscovererErrorTotal,
-			Help: "Number of errors that have occurred in the Discoverer",
-		},
-		[]string{"clustername", "errortype"},
-	)
-
 	return DiscovererMetrics{
-		metrics: metrics,
+		metrics: map[string]prometheus.Collector{
+			ServiceEventTimestampGauge: prometheus.NewGaugeVec(
+				prometheus.GaugeOpts{
+					Name: ServiceEventTimestampGauge,
+					Help: "Timestamp last service event was processed",
+				},
+				[]string{"namespace", "clustername", "name"},
+			),
+			EndpointsEventTimestampGauge: prometheus.NewGaugeVec(
+				prometheus.GaugeOpts{
+					Name: EndpointsEventTimestampGauge,
+					Help: "Timestamp last endpoints event was processed",
+				},
+				[]string{"namespace", "clustername", "name"},
+			),
+			ServiceErrorTotalCounter: prometheus.NewCounterVec(
+				prometheus.CounterOpts{
+					Name: ServiceErrorTotalCounter,
+					Help: "Number of service errors encountered",
+				},
+				[]string{"namespace", "clustername", "name", "errortype"},
+			),
+			EndpointsErrorTotalCounter: prometheus.NewCounterVec(
+				prometheus.CounterOpts{
+					Name: EndpointsErrorTotalCounter,
+					Help: "Number of endpoints errors encountered",
+				},
+				[]string{"namespace", "clustername", "name", "errortype"},
+			),
+			QueueSizeGauge: prometheus.NewGaugeVec(
+				prometheus.GaugeOpts{
+					Name: QueueSizeGauge,
+					Help: "Number of items in process queue",
+				},
+				[]string{"namespace", "clustername", "clustertype"},
+			),
+			DiscovererAPILatencyMSGauge: prometheus.NewGaugeVec(
+				prometheus.GaugeOpts{
+					Name: DiscovererAPILatencyMSGauge,
+					Help: "The milliseconds it takes for requests to return from a remote discoverer api",
+				},
+				[]string{"clustername", "clustertype", "path"},
+			),
+			DiscovererCycleDurationMSGauge: prometheus.NewGaugeVec(
+				prometheus.GaugeOpts{
+					Name: DiscovererCycleDurationMSGauge,
+					Help: "The milliseconds it takes for all objects to be synced from a remote discoverer api",
+				},
+				[]string{"clustername", "clustertype"},
+			),
+			DiscovererErrorTotal: prometheus.NewCounterVec(
+				prometheus.CounterOpts{
+					Name: DiscovererErrorTotal,
+					Help: "Number of errors that have occurred in the Discoverer",
+				},
+				[]string{"clustername", "errortype"},
+			),
+		},
 	}
 }
 
