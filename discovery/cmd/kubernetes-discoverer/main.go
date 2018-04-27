@@ -37,7 +37,6 @@ var (
 	gimbalKubeCfgFile     string
 	discovererKubeCfgFile string
 	numProcessThreads     int
-	workingNamespace      string
 	clusterName           string
 	resyncInterval        time.Duration
 	debug                 bool
