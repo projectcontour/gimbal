@@ -46,7 +46,7 @@ func AddGimbalLabels(clustername, namespace, name string, existingLabels map[str
 
 // GetFormattedName take the names of a service and formats to truncate if needed
 func GetFormattedName(name, cluster string) string {
-	return hashname(maxNameLength, name, cluster)
+	return hashname(name, cluster)
 }
 
 // hashname takes a lenth l and a varargs of strings s and returns a string whose length
@@ -55,25 +55,25 @@ func GetFormattedName(name, cluster string) string {
 // end using a hash derived from the contents of s (not the current element). This process
 // continues until the length of s does not exceed l, or all elements have been truncated.
 // In which case, the entire string is replaced with a hash not exceeding the length of l.
-func hashname(l int, s ...string) string {
+func hashname(s ...string) string {
 	const shorthash = 6 // the length of the shorthash
 
 	r := strings.Join(s, "-")
-	if l > len(r) {
+	if maxNameLength > len(r) {
 		// we're under the limit, nothing to do
 		return r
 	}
 	hash := fmt.Sprintf("%x", sha256.Sum256([]byte(r)))
 	for n := len(s) - 1; n >= 0; n-- {
-		s[n] = truncate(l/len(s), s[n], hash[:shorthash])
+		s[n] = truncate(maxNameLength/len(s), s[n], hash[:shorthash])
 		r = strings.Join(s, "-")
-		if l > len(r) {
+		if maxNameLength > len(r) {
 			return r
 		}
 	}
 	// truncated everything, but we're still too long
 	// just return the hash truncated to l.
-	return hash[:min(len(hash), l)]
+	return hash[:min(len(hash), maxNameLength)]
 }
 
 // truncate truncates s to l length by replacing the
