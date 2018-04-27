@@ -38,7 +38,7 @@ func NewIdentityV3(provider *gophercloud.ProviderClient) (*IdentityV3Client, err
 	return &IdentityV3Client{c}, nil
 }
 
-// ListProjects returns the list of projects that are availble to the user
+// ListProjects returns the list of projects that are available to the user
 func (c *IdentityV3Client) ListProjects() ([]projects.Project, error) {
 	page, err := projects.List(c.client, projects.ListOpts{}).AllPages()
 	if err != nil {
