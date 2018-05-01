@@ -34,14 +34,11 @@ func AddGimbalLabels(clustername, namespace, name string, existingLabels map[str
 		GimbalLabelCluster: clustername,
 		gimbalLabelService: name,
 	}
-	if existingLabels == nil {
-		return gimbalLabels
-	}
 	// Set gimbal labels on the existing labels map
-	for k, v := range gimbalLabels {
-		existingLabels[k] = v
+	for k, v := range existingLabels {
+		gimbalLabels[k] = v
 	}
-	return existingLabels
+	return gimbalLabels
 }
 
 // GetFormattedName take the names of a service and formats to truncate if needed
