@@ -17,6 +17,7 @@ These guides describe how the components of Gimbal function and how they interac
 - [List Discovered Services](list-discovered-services.md)
 - [Update Kubernetes Discoverer Credentials](kubernetes-discoverer.md#updating-credentials)
 - [Update OpenStack Discoverer Credentials](openstack-discoverer.md#updating-credentials)
+- [Teams with Gimbal](teams.md)
 
 ## User Topics
 
