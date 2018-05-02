@@ -30,5 +30,5 @@ func GetFormatter() *logrus.TextFormatter {
 
 // IsInvalidClusterName returns true if valid cluster name
 func IsInvalidClusterName(clustername string) bool {
-	return !clusterNameRegex.Copy().MatchString(clustername)
+	return !clusterNameRegex.MatchString(clustername)
 }
