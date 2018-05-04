@@ -1,0 +1,46 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    app: contour
+  name: contour
+  namespace: gimbal-contour
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: contour
+  template:
+    metadata:
+      labels:
+        app: contour
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app: contour
+              topologyKey: kubernetes.io/hostname
+            weight: 100
+      containers:
+      - args:
+        - serve
+        - --incluster
+        - --xds-address
+        - 0.0.0.0
+        - --xds-port
+        - $(CONTOUR_SERVICE_PORT)
+        - --envoy-http-port
+        - "80"
+        command: ["contour"]
+        image: gcr.io/heptio-images/contour:v0.5.0
+        imagePullPolicy: Always
+        name: contour
+        ports:
+        - containerPort: 8001
+          name: xds
+          protocol: TCP
+      dnsPolicy: ClusterFirst
+      serviceAccountName: contour

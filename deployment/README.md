@@ -1,25 +1,26 @@
 # Deployment
 <!-- TOC -->
 
-- [Prerequisites](#prerequisites)
-- [Deploy Contour](#deploy-contour)
-- [Deploy Discoverers](#deploy-discoverers)
-    - [Kubernetes](#kubernetes)
-    - [Openstack](#openstack)
-- [Deploy Prometheus](#deploy-prometheus)
-    - [Quick start](#quick-start)
-    - [Access the Prometheus web UI](#access-the-prometheus-web-ui)
-    - [Access the Alertmanager web UI](#access-the-alertmanager-web-ui)
-- [Deploy Grafana](#deploy-grafana)
-    - [Quick start](#quick-start-1)
-    - [Access the Grafana UI](#access-the-grafana-ui)
-    - [Configure Grafana](#configure-grafana)
-        - [Configure datasource](#configure-datasource)
-        - [Dashboards](#dashboards)
-            - [Add Sample Kubernetes Dashboard](#add-sample-kubernetes-dashboard)
-- [Validation](#validation)
-    - [Discovery cluster](#discovery-cluster)
-    - [Gimbal cluster](#gimbal-cluster)
+- [Deployment](#deployment)
+    - [Prerequisites](#prerequisites)
+    - [Deploy Contour](#deploy-contour)
+    - [Deploy Discoverers](#deploy-discoverers)
+        - [Kubernetes](#kubernetes)
+        - [Openstack](#openstack)
+    - [Deploy Prometheus](#deploy-prometheus)
+        - [Quick start](#quick-start)
+        - [Access the Prometheus web UI](#access-the-prometheus-web-ui)
+        - [Access the Alertmanager web UI](#access-the-alertmanager-web-ui)
+    - [Deploy Grafana](#deploy-grafana)
+        - [Quick start](#quick-start-1)
+        - [Access the Grafana UI](#access-the-grafana-ui)
+        - [Configure Grafana](#configure-grafana)
+            - [Configure datasource](#configure-datasource)
+            - [Dashboards](#dashboards)
+                - [Add Sample Kubernetes Dashboard](#add-sample-kubernetes-dashboard)
+    - [Validation](#validation)
+        - [Discovery cluster](#discovery-cluster)
+        - [Gimbal cluster](#gimbal-cluster)
 
 <!-- /TOC -->
 
@@ -36,7 +37,7 @@
 
 ## Deploy Contour
 
-For information about Contour, see [the Gimbal architecture doc](../docs/gimbal-architecture.md).
+For additional information about Contour, see [the Gimbal architecture doc](../docs/gimbal-architecture.md).
 
 ```sh
 # Navigate to deployment directory
@@ -45,6 +46,8 @@ $ cd deployment
 # Deploy Contour
 $ kubectl create -f contour/
 ```
+
+The deployment also includes sample Network Policies which restrict access to Contour and Envoy as well as allow access from Prometheus to scrape for metrics. 
 
 **NOTE**: The current configuration exposes the Envoy Admin UI so that Prometheus can scrape for metrics.
 

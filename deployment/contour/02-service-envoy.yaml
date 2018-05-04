@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
- name: contour
+ name: envoy
  namespace: gimbal-contour
  annotations:
   # This annotation puts the AWS ELB into "TCP" mode so that it does not
@@ -16,11 +16,9 @@ spec:
  - port: 80
    name: http
    protocol: TCP
-   targetPort: 80
  - port: 443
    name: https
    protocol: TCP
-   targetPort: 8443
  selector:
-   app: contour
+   app: envoy
  type: ClusterIP
