@@ -55,7 +55,7 @@ data:
       "gnetId": null,
       "graphTooltip": 0,
       "id": null,
-      "iteration": 1523651524837,
+      "iteration": 1525704845409,
       "links": [],
       "panels": [
         {
@@ -95,11 +95,10 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "count(gimbal_service_event_timestamp{namespace=~\"$Namespace\",clustername=~\"$BackendCluster\"})",
+              "expr": "count(kube_service_labels{namespace=~\"$Namespace\",label_gimbal_heptio_com_cluster=~\"$BackendCluster\"}) ",
               "format": "time_series",
               "intervalFactor": 1,
-              "legendFormat": "",
-              "refId": "A"
+              "refId": "B"
             }
           ],
           "thresholds": [],
@@ -175,7 +174,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "count(gimbal_endpoints_event_timestamp{namespace=~\"$Namespace\",clustername=~\"$BackendCluster\"})",
+              "expr": "count(kube_endpoint_labels{namespace=~\"$Namespace\",label_gimbal_heptio_com_cluster=~\"$BackendCluster\"}) ",
               "format": "time_series",
               "intervalFactor": 1,
               "refId": "A"
@@ -490,7 +489,7 @@ data:
       "timezone": "",
       "title": "Gimbal Discovery",
       "uid": "ex4WqmZmk",
-      "version": 4
+      "version": 3
     }
   envoy.json: |
     {
