@@ -1,6 +1,6 @@
 # Teams with Gimbal
 
-A key feature of Gimbal is team management. The idea is enable teams to configure and define their own Ingress resources without requiring an administrator to assist. To enable this, users will be isolated to one or more namespaces and should have capabilities to create Ingress routes and also view Services and Endpoints within their respective namespace.
+A key feature of Gimbal is team management. The idea is enable teams to configure and define their own Ingress resources within the Gimbal cluster without requiring an administrator to assist. To enable this, users will be isolated to one or more namespaces in the Gimbal cluster and should have capabilities to create Ingress routes and also view Services and Endpoints within their respective team namespace. 
 
 ## RBAC Rules 
 
