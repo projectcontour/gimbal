@@ -14,11 +14,12 @@ limitations under the License.
 package util
 
 import (
-	"log"
 	"regexp"
 
 	"github.com/sirupsen/logrus"
 )
+
+var clusterNameRegex = regexp.MustCompile("^[a-z]([-a-z0-9]*[a-z0-9])?$")
 
 // GetFormatter returns a textformatter to customize logs
 func GetFormatter() *logrus.TextFormatter {
@@ -29,9 +30,5 @@ func GetFormatter() *logrus.TextFormatter {
 
 // IsInvalidClusterName returns true if valid cluster name
 func IsInvalidClusterName(clustername string) bool {
-	matched, err := regexp.MatchString("^[a-z]([-a-z0-9]*[a-z0-9])?$", clustername)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return !matched
+	return !clusterNameRegex.MatchString(clustername)
 }
