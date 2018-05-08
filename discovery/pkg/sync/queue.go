@@ -67,7 +67,7 @@ type Action interface {
 // Enqueue adds a new resource action to the worker queue
 func (sq *Queue) Enqueue(action Action) {
 	sq.Workqueue.AddRateLimited(action)
-	sq.Metrics.QueueSizeGaugeMetric(action.ObjectMeta().GetNamespace(), sq.ClusterName, sq.ClusterType, sq.Workqueue.Len())
+	sq.Metrics.QueueSizeGaugeMetric(sq.ClusterName, sq.ClusterType, sq.Workqueue.Len())
 }
 
 // Run starts the queue workers. It blocks until the stopCh is closed.

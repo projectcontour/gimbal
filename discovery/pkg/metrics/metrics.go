@@ -73,7 +73,7 @@ func NewMetrics() DiscovererMetrics {
 					Name: QueueSizeGauge,
 					Help: "Number of items in process queue",
 				},
-				[]string{"namespace", "clustername", "clustertype"},
+				[]string{"clustername", "clustertype"},
 			),
 			DiscovererAPILatencyMSGauge: prometheus.NewGaugeVec(
 				prometheus.GaugeOpts{
@@ -149,10 +149,10 @@ func (d *DiscovererMetrics) EndpointsEventTimestampMetric(namespace, clusterName
 }
 
 // QueueSizeGaugeMetric records the queue size prometheus metric
-func (d *DiscovererMetrics) QueueSizeGaugeMetric(namespace, clusterName, clusterType string, size int) {
+func (d *DiscovererMetrics) QueueSizeGaugeMetric(clusterName, clusterType string, size int) {
 	m, ok := d.metrics[QueueSizeGauge].(*prometheus.GaugeVec)
 	if ok {
-		m.WithLabelValues(namespace, clusterName, clusterType).Set(float64(size))
+		m.WithLabelValues(clusterName, clusterType).Set(float64(size))
 	}
 }
 

@@ -88,7 +88,6 @@ The Gimbal Discoverer currently has two different systems it can monitor, Kubern
     - name
     - errortype: type of error encountered
   - **gimbal_queuesize (gauge):** Number of items in process queue with the following labels:
-    - namespace
     - clustername
     - clustertype
   - **gimbal_discoverer_api_latency_ms (gauge):** The milliseconds it takes for requests to return from a remote discoverer api (e.g. Openstack)
