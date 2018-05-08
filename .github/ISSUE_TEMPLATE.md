@@ -11,8 +11,8 @@
 
 **Environment**:
 
-- Kubernetes version (use `kubectl version`):
-- OpenStack version (if applicable):
+- Gimbal Cluster Kubernetes version (use `kubectl version`):
+- Backend Cluster versions (OpenStack and/or Kubernetes):
 - Gimbal version (Gimbal git repository tag):
 - Contour version:
 - kubernetes-discoverer version:
