@@ -73,8 +73,8 @@ spec:
         - --statsd-enabled
         command:
         - contour
-        image: gcr.io/heptio-images/contour:v0.5.0
-        imagePullPolicy: IfNotPresent
+        image: gcr.io/heptio-images/contour:master
+        imagePullPolicy: Always
         name: envoy-initconfig
         volumeMounts:
         - name: contour-config
