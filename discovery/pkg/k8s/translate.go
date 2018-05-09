@@ -23,7 +23,7 @@ func translateService(svc *v1.Service, clusterName string) *v1.Service {
 	newService := &v1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: svc.Namespace,
-			Name:      translator.GetFormattedName(svc.Name, clusterName),
+			Name:      translator.BuildKubernetesDNSLabel(svc.Name, clusterName),
 			Labels:    translator.AddGimbalLabels(clusterName, svc.Namespace, svc.ObjectMeta.Name, svc.ObjectMeta.Labels),
 		},
 		Spec: v1.ServiceSpec{
@@ -45,7 +45,7 @@ func translateEndpoints(endpoints *v1.Endpoints, clusterName string) *v1.Endpoin
 	newEndpoint := &v1.Endpoints{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: endpoints.Namespace,
-			Name:      translator.GetFormattedName(endpoints.Name, clusterName),
+			Name:      translator.BuildKubernetesDNSLabel(endpoints.Name, clusterName),
 			Labels:    translator.AddGimbalLabels(clusterName, endpoints.Namespace, endpoints.ObjectMeta.Name, endpoints.ObjectMeta.Labels),
 		},
 		Subsets: endpoints.Subsets,

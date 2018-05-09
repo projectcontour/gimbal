@@ -15,6 +15,7 @@ package openstack
 
 import (
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
@@ -121,6 +122,8 @@ func (r *Reconciler) reconcile() {
 			continue
 		}
 
+		loadbalancers = r.skipInvalidLoadBalancers(projectName, loadbalancers)
+
 		// Get all pools defined in the project
 		pools, err := r.ListPools(project.ID)
 		if err != nil {
@@ -188,4 +191,32 @@ func (r *Reconciler) reconcileEndpoints(desired, current []v1.Endpoints) {
 		ep := e
 		r.syncqueue.Enqueue(sync.DeleteEndpointsAction(&ep))
 	}
+}
+
+func (r *Reconciler) skipInvalidLoadBalancers(projectName string, lbs []loadbalancers.LoadBalancer) []loadbalancers.LoadBalancer {
+	// Kubernetes DNS_LABEL, but allows uppercase letters
+	validName := regexp.MustCompile("^[a-zA-Z]([-a-zA-Z0-9]*[a-zA-Z0-9])?$")
+	valid := []loadbalancers.LoadBalancer{}
+
+	for _, lb := range lbs {
+		if lb.Name != "" && !validName.MatchString(lb.Name) {
+			r.Metrics.GenericMetricError(r.ClusterName, "InvalidLoadBalancerName")
+			r.Logger.Warningf("skipping load balancer '%s' in project '%s' as it has an invalid name '%s'", lb.ID, projectName, lb.Name)
+			continue
+		}
+		// go through all listeners in case multiple are invalid, instead of breaking out early
+		var invalidListener bool
+		for _, lis := range lb.Listeners {
+			if lis.Name != "" && !validName.MatchString(lis.Name) {
+				r.Metrics.GenericMetricError(r.ClusterName, "InvalidListenerName")
+				r.Logger.Warningf("skipping load balancer '%s' in project '%s' as listener '%s' has an invalid name '%s'", lb.ID, projectName, lis.ID, lis.Name)
+				invalidListener = true
+			}
+		}
+		if invalidListener {
+			continue
+		}
+		valid = append(valid, lb)
+	}
+	return valid
 }

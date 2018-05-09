@@ -32,7 +32,7 @@ func kubeServices(clusterName, tenantName string, lbs []loadbalancers.LoadBalanc
 		svc := v1.Service{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: tenantName,
-				Name:      translator.GetFormattedName(serviceName(lb), clusterName),
+				Name:      translator.BuildKubernetesDNSLabel(serviceName(lb), clusterName),
 				Labels:    translator.AddGimbalLabels(clusterName, tenantName, serviceName(lb), loadbalancerLabels(lb)),
 			},
 			Spec: v1.ServiceSpec{
@@ -55,7 +55,7 @@ func kubeEndpoints(clusterName, tenantName string, lbs []loadbalancers.LoadBalan
 		ep := v1.Endpoints{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: tenantName,
-				Name:      translator.GetFormattedName(serviceName(lb), clusterName),
+				Name:      translator.BuildKubernetesDNSLabel(serviceName(lb), clusterName),
 				Labels:    translator.AddGimbalLabels(clusterName, tenantName, serviceName(lb), loadbalancerLabels(lb)),
 			},
 		}
@@ -102,13 +102,15 @@ func loadbalancerLabels(lb loadbalancers.LoadBalancer) map[string]string {
 	}
 }
 
+// By default, the load balancer's ID is used as the service name, given that
+// names in OpenStack are optional and are not guaranteed to be unique. In the
+// case that the load balancer has a non-empty name, the ID is appended to
+// produce a unique service name.
 func serviceName(lb loadbalancers.LoadBalancer) string {
-	// OpenStack names are optional
-	lbName := lb.ID
-	if lb.Name != "" {
-		lbName = fmt.Sprintf("%s-%s", lb.Name, lb.ID)
+	if lb.Name == "" {
+		return lb.ID
 	}
-	return lbName
+	return fmt.Sprintf("%s-%s", lb.Name, lb.ID)
 }
 
 func servicePort(listener *listeners.Listener) v1.ServicePort {
@@ -125,5 +127,6 @@ func portName(listener *listeners.Listener) string {
 	if listener.Name == "" {
 		return "unnamed-" + p // TODO: port names must have at least 1 char. Is there something better we can do here?
 	}
-	return listener.Name + "-" + p
+	// port names must be kubernetes DNS_LABELs
+	return translator.BuildKubernetesDNSLabel(listener.Name, p)
 }
