@@ -8,6 +8,7 @@
         - [Kubernetes](#kubernetes)
         - [Openstack](#openstack)
     - [Deploy Prometheus](#deploy-prometheus)
+        - [Stateful Deployment](#stateful-deployment)
         - [Quick start](#quick-start)
         - [Access the Prometheus web UI](#access-the-prometheus-web-ui)
         - [Access the Alertmanager web UI](#access-the-alertmanager-web-ui)
@@ -102,7 +103,11 @@ For more information, see [the OpenStack Discoverer doc](../docs/openstack-disco
 
 ## Deploy Prometheus
 
-Sample development deployment of Prometheus and Alertmanager using temporary storage.
+Included in the Gimbal repo is a sample development deployment of Prometheus and Alertmanager using temporary storage and may not be suitable for all environments.
+
+### Stateful Deployment
+
+ A stateful deployment of Prometheus should utilize persistent storage within your Kubernetes cluster. This is accomplished by utilizing [Persistent Volumes and Persistent Volume Claims](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) to maintain a correlation between a data volume and the Prometheus pod. Persistent volumes can be `static` or `dynamic` and depends on the backend storage implementation utilized in environment in which the cluster is deployed. Please reference the [documentation](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#types-of-persistent-volumes) which best matches your environment & needs.
 
 ### Quick start
 
