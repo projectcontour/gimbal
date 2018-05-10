@@ -45,7 +45,7 @@ the following process:
 
 1. Each component of the _Discovered Name_ gets the same number of maximum
    characters allowed. The _Discovered Name_ has a total of two components, and
-   thus each component is allocated a maximum of 31 characters (one of the 62 is
+   thus each component is allocated a maximum of 31 characters (one of the 63 is
    used for the separator).
 
 2. Take the SHA256 hash of the _Discovered Name_ before shortening, and take the
