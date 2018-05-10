@@ -16,7 +16,7 @@ Gimbal is a comprised of many components and managing them can be difficult. The
 
 ## High-level design
 
-The primary goal of the Gimbal Operator is to manage one or more Discoverers for a Gimbal deployment. It does this by watching a Custom Resource Definition (CRD) which defines the access credentials, API Endpoint, as well as any other information needed to connect to remote clusters. When the Operator sees a new Discoverer CRD created, it will launch a new Discoverer. In the case that the CRD is changed, it will update the Discoverer and restart accordingly. 
+The primary goal of the Gimbal Operator is to manage one or more Discoverers for a Gimbal deployment. It does this by watching a Custom Resource Definition (CRD) which defines the access credentials, API Endpoint, as well as any other information needed to connect to remote clusters. When the Operator sees a new Discoverer CRD created, it will launch a new Discoverer. In the case that the CRD is changed, it will update the Discoverer and restart accordingly. In the event a CRD is deleted, then the Discoverer will be terminated and all associated ingress objects will be updated to remove reference to services related to that discovery backend.
 
 The Gimbal operator also manages the lifecycle of the Ingress routes which reference this DiscoveryBackend. In the event the cluster needs to be taken down, the user will change the clusterStatus field to “Maintenance”. The operator will notice this change, update all Ingress routes to redirect traffic away from the backend. 
 
