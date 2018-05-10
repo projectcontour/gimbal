@@ -25,7 +25,7 @@ Kubernetes Service names must adhere to the [rfc1035 DNS Label](https://github.c
 > with the '-' character allowed anywhere except the first or last character,
 > suitable for use as a hostname or segment in a domain name.
 
-### Handling of invalid characters
+### Handling names that contain invalid characters
 
 Backend systems other than Kubernetes (e.g. OpenStack) might support names that
 contain characters that are invalid according to the Kubernetes Service naming
@@ -48,17 +48,15 @@ the following process:
    thus each component is allocated a maximum of 31 characters (one of the 63 is
    used for the separator).
 
-2. Take the SHA256 hash of the _Discovered Name_ before shortening, and take the
-   first 6 characters of the resulting hash. This is called the _short hash_.
+2. Starting at the last _Discovered Name Component_, check whether it is longer
+   than the allocated number of characters. If it is, take the SHA256 hash of
+   the _Component_. Truncate the excess characters of the _Component_, and
+   replace with the first 6 characters of the hash.
 
-3. Starting at the last _Discovered Name Component_, check whether it is longer
-   than the allocated number of characters. If it is, truncate the excess
-   characters of the _Component_ and append `${short-hash}`.
+3. If the resulting _Discovered Name_ is still longer than 63 characters, move
+   onto the next _Component_ and shorten using the approach described above.
 
-4. If the resulting _Discovered Name_ is still longer than 63 characters, move
-   onto the next _Component_ and shorten using the _short hash_.
-
-5. The shortening process produces the final _Discovered Name_.
+4. The shortening process produces the final _Discovered Name_.
 
 #### Example
 
@@ -69,29 +67,30 @@ the following process:
    characters to each component (62/2, as one char is allocated for the
    separator).
 
-2. Take the SHA256 hash of `us-east-cluster-the-really-long-kube-service-name-that-is-exactly-63-characters`.
-
-    ```
-    SHA256 hash = 0ec4b92fc2ca5e9e74fff7b2a1d65aacaed325dca76a573cd9e6dae2eb19ee29
-    Short hash = 0ec4b9
-    ```
-
-3. Check if the last _Component_ of the _Discovered Name_ goes over 21 characters:
+2. Check if the last _Component_ of the _Discovered Name_ goes over 21 characters:
 
     ```
     "the-really-long-kube-service-name-that-is-exactly-63-characters" has 63 characters.
-    Shorten using the short hash by truncating and appending the short hash.
-    Result: "the-really-long-kube-se0ec4b9".
     ```
+
+3. Shorten the last _Component_ as it is longer than 21 characters:
+
+  ```
+  Take SHA256 of "the-really-long-kube-service-name-that-is-exactly-63-characters"
+  SHA256 hash = 1feeec450b150bcfd731a5e7399890e6c61088fec088eb61f83baa75ca3bd2d9
+  Short hash = 1feeec
+
+  Result = "the-really-long-kube-serv1feeec"
+  ```
 
 4. Check if the resulting _Discovered Name_ is shorter than 63 characters:
 
     ```
-    "us-east-cluster-the-really-long-kube-se0ec4b9" has 45 characters.
+    "us-east-cluster-the-really-long-kube-serv1feeec" has 47 characters.
     Thus, we have arrived at our shortened Discovered Name.
     ```
 
-Discovered name after shortening: `us-east-cluster-the-really-long-kube-se0ec4b9`
+Discovered name after shortening: `us-east-cluster-the-really-long-kube-serv1feeec`
 
 ## Discoverer Specifics
 
