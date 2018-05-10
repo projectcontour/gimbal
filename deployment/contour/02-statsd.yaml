@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: envoy-statsd
+  namespace: gimbal-contour
+data:
+  statsd.yaml: |2-
+    mappings: 
+    - match: 'envoy.cluster.*.upstream_cx_connect_ms'
+      name: "envoy_cluster_upstream_cx_connect_time"
+      timer_type: 'histogram'
+      labels:
+        cluster_name: "$1"
+    - match: 'envoy.cluster.*.upstream_cx_length_ms'
+      name: "envoy_cluster_upstream_cx_length"
+      timer_type: 'histogram'
+      labels:
+        cluster_name: "$1"
+    - match: 'envoy.cluster.*.upstream_rq_time'
+      name: "envoy_cluster_upstream_rq_time"
+      timer_type: 'histogram'
+      labels:
+        cluster_name: "$1"
+    - match: 'envoy.cluster.*.internal.upstream_rq_time'
+      name: "envoy_cluster_internal_upstream_rq_time"
+      timer_type: 'histogram'
+      labels:
+        cluster_name: "$1"
+    - match: 'envoy.cluster.*.external.upstream_rq_time'
+      name: "envoy_cluster_external_upstream_rq_time"
+      timer_type: 'histogram'
+      labels:
+        cluster_name: "$1"
+    - match: 'envoy.cluster.*.canary.upstream_rq_time'
+      name: "envoy_cluster_canary_upstream_rq_time"
+      timer_type: 'histogram'
+      labels:
+        cluster_name: "$1"
+    - match: 'envoy.http.*.downstream_cx_length_ms'
+      name: "envoy_http_downstream_cx_length"
+      timer_type: 'histogram'
+      labels:
+        http_conn_manager_prefix: "$1"
+    - match: 'envoy.http.*.downstream_rq_time'
+      name: "envoy_http_downstream_rq_time"
+      timer_type: 'histogram'
+      labels:
+        http_conn_manager_prefix: "$1"
+    - match: '.'
+      match_type: 'regex'
+      action: 'drop'
+      name: 'dropped'

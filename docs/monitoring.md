@@ -60,7 +60,7 @@ Envoy emits three types of values as statistics:
 
 - **Counters:** Unsigned integers that only increase and never decrease. E.g., total requests.
 - **Gauges:** Unsigned integers that both increase and decrease. E.g., currently active requests.
-- **Histograms:** Unsigned integers that are part of a stream of values that are then aggregated by the collector to ultimately yield summarized percentile values. E.g., upstream request time. _NOTE: Histograms are not currently supported in Prometheus directly._
+- **Histograms:** Unsigned integers that are part of a stream of values that are then aggregated by the collector to ultimately yield summarized percentile values. E.g., upstream request time.
 
 Detailed documentation on stats within Envoy are available on their site: https://www.envoyproxy.io/docs/envoy/latest/configuration/cluster_manager/cluster_stats#config-cluster-manager-cluster-stats
 
