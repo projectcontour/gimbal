@@ -11,7 +11,7 @@ Endpoints is called the _Discovered Name_, and is built from the following
 _Components_:
 
 ```
-${discoverer-prefix}-${service-name}-${backend-name}
+${backend-name}-${service-name}
 ```
 
 The name of service ports is not specified, and is handled independently by each
@@ -44,63 +44,54 @@ When the _Discovered Name_ is longer than 63 characters, it is shortened using
 the following process:
 
 1. Each component of the _Discovered Name_ gets the same number of maximum
-   characters allowed. The _Discovered Name_ has a total of three components,
-   and thus each component is allocated a maximum of 21 characters.
+   characters allowed. The _Discovered Name_ has a total of two components, and
+   thus each component is allocated a maximum of 31 characters (one of the 62 is
+   used for the separator).
 
 2. Take the SHA256 hash of the _Discovered Name_ before shortening, and take the
    first 6 characters of the resulting hash. This is called the _short hash_.
 
 3. Starting at the last _Discovered Name Component_, check whether it is longer
-   than the allocated number of characters. If it is, truncate the end of the
-   _Component_ and append `-${short-hash}`.
+   than the allocated number of characters. If it is, truncate the excess
+   characters of the _Component_ and append `${short-hash}`.
 
 4. If the resulting _Discovered Name_ is still longer than 63 characters, move
-   onto the next _Component_ and shorten using the _short hash_. Continue until
-   the resulting _Discovered Name_ is 63 characters or less.
+   onto the next _Component_ and shorten using the _short hash_.
 
-5. In the case that the _Discovered Name_ is longer than 63 characters after the
-   shortening process, the SHA256 hash produced in step 2 will be used as the
-   _Discovered Name_, prepended with `g-` to ensure the name starts with a
-   letter. This scenario will only happen if *all* _Components_ of the initial
-   _Discovered Name_ are longer than 21 characters, which is a rare case.
+5. The shortening process produces the final _Discovered Name_.
 
 #### Example
 
-- `${discoverer-prefix}`: `k8s`
-- `${service-name}`: `the-really-long-kube-service-name-that-is-exactly-63-characters`
 - `${backend-name}`: `us-east-cluster`
+- `${service-name}`: `the-really-long-kube-service-name-that-is-exactly-63-characters`
 
-1. The _Discovered Name_ has a total of three components. Thus, allocate 21 (61/3) characters to each.
+1. The _Discovered Name_ has a total of two components. Thus, allocate 31
+   characters to each component (62/2, as one char is allocated for the
+   separator).
 
-2. Take the SHA256 hash of `k8s-the-really-long-kube-service-name-that-is-exactly-63-characters-us-east-cluster`.
+2. Take the SHA256 hash of `us-east-cluster-the-really-long-kube-service-name-that-is-exactly-63-characters`.
 
     ```
-    SHA256 hash = cdbeb21c3261255a91ded1844754791ef1ec06ecbe5b2421ff2abe221950fc72
-    Short hash = cdbeb2
+    SHA256 hash = 0ec4b92fc2ca5e9e74fff7b2a1d65aacaed325dca76a573cd9e6dae2eb19ee29
+    Short hash = 0ec4b9
     ```
 
 3. Check if the last _Component_ of the _Discovered Name_ goes over 21 characters:
 
     ```
-    "us-east-cluster" has 15 characters. Move onto next component.
-    ```
-
-4. Check if the next _Component_ goes over 21 characters:
-
-    ```
     "the-really-long-kube-service-name-that-is-exactly-63-characters" has 63 characters.
     Shorten using the short hash by truncating and appending the short hash.
-    Result: "the-really-lon-cdbeb2".
+    Result: "the-really-long-kube-se0ec4b9".
     ```
 
-5. Check if the resulting _Discovered Name_ is shorter than 63 characters:
+4. Check if the resulting _Discovered Name_ is shorter than 63 characters:
 
     ```
-    "k8s-the-really-lon-cdbeb2-us-east-cluster" has 41 characters.
+    "us-east-cluster-the-really-long-kube-se0ec4b9" has 45 characters.
     Thus, we have arrived at our shortened Discovered Name.
     ```
 
-Discovered name after shortening: `k8s-the-really-lon-cdbeb2-us-east-cluster`
+Discovered name after shortening: `us-east-cluster-the-really-long-kube-se0ec4b9`
 
 ## Discoverer Specifics
 
@@ -108,28 +99,27 @@ The specifics of each discoverer are documented below.
 
 ### Kubernetes discoverer
 
-- `${discoverer-prefix}`: `k8s`
-- `${service-name}`: The name of the backend service, verbatim.
 - `${backend-name}`: The value of the `--cluster-name` flag provided to the
-  discoverer.
+  discoverer. Must begin with a lowercase letter.
+- `${service-name}`: The name of the backend service, verbatim.
 
 Service port names are copied verbatim from the backend service.
 
 ### OpenStack discoverer
 
-- `${discoverer-prefix}`: `os`
+- `${backend-name}`: The value of the `--cluster-name` flag provided to the
+  discoverer. Must begin with a lowercase letter.
 - `${service-name}`: `${name}-${id}` of the LBaaS Load Balancer. Both are
   lowercased during the discovery process.
-- `${backend-name}`: The value of the `--cluster-name` flag provided to the
-  discoverer.
 
-Service port names are set to `${discoverer-prefix}-${port-number}`.
+Service port names are set to `port-${port-number}`.
 
 #### Why is the `${service-name}` a composite name?
 
 The `${service-name}` produced by the OpenStack discoverer is composed of the
 name and ID of the LBaaS Load Balancer. This is required because names are not
-guaranteed to be unique in an OpenStack project.
+guaranteed to be unique in an OpenStack project. By appending the ID, we ensure
+that we are referncing a single Load Balancer in the OpenStack cluster.
 
 #### What happens to Load Balancers that do not have a name?
 
