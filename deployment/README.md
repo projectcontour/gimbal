@@ -50,7 +50,7 @@ $ kubectl create -f contour/
 
 The deployment also includes sample Network Policies which restrict access to Contour and Envoy as well as allow access from Prometheus to scrape for metrics. 
 
-**NOTE**: The current configuration exposes the Envoy Admin UI so that Prometheus can scrape for metrics.
+**NOTE**: The current configuration exposes the `/stats` path from the Envoy Admin UI so that Prometheus can scrape for metrics.
 
 ## Deploy Discoverers
 
