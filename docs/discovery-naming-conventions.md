@@ -67,13 +67,13 @@ the following process:
    characters to each component (62/2, as one char is allocated for the
    separator).
 
-2. Check if the last _Component_ of the _Discovered Name_ goes over 21 characters:
+2. Check if the last _Component_ of the _Discovered Name_ goes over 31 characters:
 
     ```
     "the-really-long-kube-service-name-that-is-exactly-63-characters" has 63 characters.
     ```
 
-3. Shorten the last _Component_ as it is longer than 21 characters:
+3. Shorten the last _Component_ as it is longer than 31 characters:
 
   ```
   Take SHA256 of "the-really-long-kube-service-name-that-is-exactly-63-characters"
