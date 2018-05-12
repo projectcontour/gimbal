@@ -34,14 +34,133 @@ func TestKubeServices(t *testing.T) {
 		expected    []v1.Service
 	}{
 		{
-			name:        "named lb, one listener",
+			name:        "unnamed lb",
+			clusterName: "us-east",
+			tenantName:  "finance",
+			lbs: []loadbalancers.LoadBalancer{
+				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", ""),
+			},
+			expected: []v1.Service{
+				service("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+					map[string]string{
+						"gimbal.heptio.com/cluster":            "us-east",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-name": ""},
+					nil),
+			},
+		},
+		{
+			name:        "named lb",
+			clusterName: "us-east",
+			tenantName:  "finance",
+			lbs: []loadbalancers.LoadBalancer{
+				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "stocks"),
+			},
+			expected: []v1.Service{
+				service("finance", "us-east-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+					map[string]string{
+						"gimbal.heptio.com/cluster":            "us-east",
+						"gimbal.heptio.com/service":            "stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-name": "stocks"},
+					nil),
+			},
+		},
+		{
+			name:        "lb with long name",
+			clusterName: "us-east",
+			tenantName:  "finance",
+			lbs: []loadbalancers.LoadBalancer{
+				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "very-long-openstack-load-balancer-name-that-is-longer-than-the-limit"),
+			},
+			expected: []v1.Service{
+				service("finance", "us-east-very-long-openstack-load-951f9d",
+					map[string]string{
+						"gimbal.heptio.com/cluster":            "us-east",
+						"gimbal.heptio.com/service":            "very-long-openstack-load-balancer-name-that-is-longer-tha951f9d",
+						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-name": "very-long-openstack-load-balancer-name-that-is-longer-tha80b28c"},
+					nil),
+			},
+		},
+		{
+			name:        "lb with name that begins with a number",
+			clusterName: "us-east",
+			tenantName:  "finance",
+			lbs: []loadbalancers.LoadBalancer{
+				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "1234-stocks"),
+			},
+			expected: []v1.Service{
+				service("finance", "us-east-1234-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+					map[string]string{
+						"gimbal.heptio.com/cluster":            "us-east",
+						"gimbal.heptio.com/service":            "1234-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-name": "1234-stocks"},
+					nil),
+			},
+		},
+		{
+			name:        "lb with name that contains uppercase letters",
+			clusterName: "us-east",
+			tenantName:  "finance",
+			lbs: []loadbalancers.LoadBalancer{
+				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "1234-STOCKS"),
+			},
+			expected: []v1.Service{
+				service("finance", "us-east-1234-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+					map[string]string{
+						"gimbal.heptio.com/cluster":            "us-east",
+						"gimbal.heptio.com/service":            "1234-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-name": "1234-STOCKS"},
+					nil),
+			},
+		},
+		{
+			name:        "long cluster name, normal lb name",
+			clusterName: "cluster-name-that-is-definitely-too-long-to-be-useful",
+			tenantName:  "finance",
+			lbs: []loadbalancers.LoadBalancer{
+				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "nginx"),
+			},
+			expected: []v1.Service{
+				service("finance", "cluster-name-that-is-defib224b3-nginx-5a5c3d9e-e679-43ec-e1c9a7",
+					map[string]string{
+						"gimbal.heptio.com/cluster":            "cluster-name-that-is-definitely-too-long-to-be-useful",
+						"gimbal.heptio.com/service":            "nginx-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-name": "nginx"},
+					nil),
+			},
+		},
+		{
+			name:        "long lb name and long cluster name",
+			clusterName: "cluster-name-that-is-definitely-too-long-to-be-useful",
+			tenantName:  "finance",
+			lbs: []loadbalancers.LoadBalancer{
+				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "very-long-openstack-load-balancer-name-that-is-longer-than-the-limit"),
+			},
+			expected: []v1.Service{
+				service("finance", "cluster-name-that-is-defib224b3-very-long-openstack-load-951f9d",
+					map[string]string{
+						"gimbal.heptio.com/cluster":            "cluster-name-that-is-definitely-too-long-to-be-useful",
+						"gimbal.heptio.com/service":            "very-long-openstack-load-balancer-name-that-is-longer-tha951f9d",
+						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-name": "very-long-openstack-load-balancer-name-that-is-longer-tha80b28c"},
+					nil),
+			},
+		},
+		{
+			name:        "named lb with one listener",
 			clusterName: "us-east",
 			tenantName:  "finance",
 			lbs: []loadbalancers.LoadBalancer{
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "stocks", listener("ls-1", "http", "tcp", "pool-1", 80)),
 			},
 			expected: []v1.Service{
-				service("finance", "stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e-us-east",
+				service("finance", "us-east-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 					map[string]string{
 						"gimbal.heptio.com/cluster":            "us-east",
 						"gimbal.heptio.com/service":            "stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
@@ -49,7 +168,30 @@ func TestKubeServices(t *testing.T) {
 						"gimbal.heptio.com/load-balancer-name": "stocks"},
 					[]v1.ServicePort{
 						{
-							Name:     "http-80",
+							Name:     "port-80",
+							Port:     80,
+							Protocol: v1.ProtocolTCP,
+						},
+					}),
+			},
+		},
+		{
+			name:        "one named lb, one listener",
+			clusterName: "us-east",
+			tenantName:  "finance",
+			lbs: []loadbalancers.LoadBalancer{
+				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "stocks", listener("ls-1", "http", "tcp", "pool-1", 80)),
+			},
+			expected: []v1.Service{
+				service("finance", "us-east-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+					map[string]string{
+						"gimbal.heptio.com/cluster":            "us-east",
+						"gimbal.heptio.com/service":            "stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-name": "stocks"},
+					[]v1.ServicePort{
+						{
+							Name:     "port-80",
 							Port:     80,
 							Protocol: v1.ProtocolTCP,
 						},
@@ -64,7 +206,7 @@ func TestKubeServices(t *testing.T) {
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "stocks", listener("ls-1", "http", "tcp", "pool-1", 80), listener("ls-1", "https", "tcp", "pool-1", 443)),
 			},
 			expected: []v1.Service{
-				service("finance", "stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e-us-east",
+				service("finance", "us-east-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 					map[string]string{
 						"gimbal.heptio.com/cluster":            "us-east",
 						"gimbal.heptio.com/service":            "stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
@@ -72,12 +214,12 @@ func TestKubeServices(t *testing.T) {
 						"gimbal.heptio.com/load-balancer-name": "stocks"},
 					[]v1.ServicePort{
 						{
-							Name:     "http-80",
+							Name:     "port-80",
 							Port:     80,
 							Protocol: v1.ProtocolTCP,
 						},
 						{
-							Name:     "https-443",
+							Name:     "port-443",
 							Port:     443,
 							Protocol: v1.ProtocolTCP,
 						},
@@ -92,7 +234,7 @@ func TestKubeServices(t *testing.T) {
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "", listener("ls-1", "http", "tcp", "pool-1", 80), listener("ls-1", "https", "tcp", "pool-1", 443)),
 			},
 			expected: []v1.Service{
-				service("finance", "5a5c3d9e-e679-43ec-b9fc-9bc51132541e-us-east",
+				service("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 					map[string]string{
 						"gimbal.heptio.com/cluster":            "us-east",
 						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
@@ -100,12 +242,12 @@ func TestKubeServices(t *testing.T) {
 						"gimbal.heptio.com/load-balancer-name": ""},
 					[]v1.ServicePort{
 						{
-							Name:     "http-80",
+							Name:     "port-80",
 							Port:     80,
 							Protocol: v1.ProtocolTCP,
 						},
 						{
-							Name:     "https-443",
+							Name:     "port-443",
 							Port:     443,
 							Protocol: v1.ProtocolTCP,
 						},
@@ -143,7 +285,7 @@ func TestKubeEndpoints(t *testing.T) {
 				pool("pool-1", "HTTP", "5a5c3d9e-e679-43ec-b9fc-9bc51132541e", poolmember("10.0.0.1", 8080)),
 			},
 			expected: []v1.Endpoints{
-				endpoints("finance", "stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e-us-east",
+				endpoints("finance", "us-east-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 					map[string]string{
 						"gimbal.heptio.com/cluster":            "us-east",
 						"gimbal.heptio.com/service":            "stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
@@ -152,7 +294,57 @@ func TestKubeEndpoints(t *testing.T) {
 					[]v1.EndpointSubset{
 						{
 							Addresses: []v1.EndpointAddress{{IP: "10.0.0.1"}},
-							Ports:     []v1.EndpointPort{{Name: "http-80", Port: 8080, Protocol: v1.ProtocolTCP}},
+							Ports:     []v1.EndpointPort{{Name: "port-80", Port: 8080, Protocol: v1.ProtocolTCP}},
+						},
+					}),
+			},
+		},
+		{
+			name:        "single listener, long cluster name",
+			clusterName: "cluster-name-that-is-definitely-too-long-to-be-useful-in-any-shape-or-form",
+			tenantName:  "finance",
+			lbs: []loadbalancers.LoadBalancer{
+				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "stocks", listener("970fd223-4684-4c50-bfa2-738d6dda096f", "http", "tcp", "pool-1", 80)),
+			},
+			pools: []pools.Pool{
+				pool("pool-1", "HTTP", "5a5c3d9e-e679-43ec-b9fc-9bc51132541e", poolmember("10.0.0.1", 8080)),
+			},
+			expected: []v1.Endpoints{
+				endpoints("finance", "cluster-name-that-is-defi7afb09-stocks-5a5c3d9e-e679-43ec549cd6",
+					map[string]string{
+						"gimbal.heptio.com/cluster":            "cluster-name-that-is-definitely-too-long-to-be-useful-in-7afb09",
+						"gimbal.heptio.com/service":            "stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-name": "stocks"},
+					[]v1.EndpointSubset{
+						{
+							Addresses: []v1.EndpointAddress{{IP: "10.0.0.1"}},
+							Ports:     []v1.EndpointPort{{Name: "port-80", Port: 8080, Protocol: v1.ProtocolTCP}},
+						},
+					}),
+			},
+		},
+		{
+			name:        "single listener, long load balancer name",
+			clusterName: "us-east",
+			tenantName:  "finance",
+			lbs: []loadbalancers.LoadBalancer{
+				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "very-long-openstack-load-balancer-name-that-is-longer-than-the-limit", listener("970fd223-4684-4c50-bfa2-738d6dda096f", "http", "tcp", "pool-1", 80)),
+			},
+			pools: []pools.Pool{
+				pool("pool-1", "HTTP", "5a5c3d9e-e679-43ec-b9fc-9bc51132541e", poolmember("10.0.0.1", 8080)),
+			},
+			expected: []v1.Endpoints{
+				endpoints("finance", "us-east-very-long-openstack-load-951f9d",
+					map[string]string{
+						"gimbal.heptio.com/cluster":            "us-east",
+						"gimbal.heptio.com/service":            "very-long-openstack-load-balancer-name-that-is-longer-tha951f9d",
+						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-name": "very-long-openstack-load-balancer-name-that-is-longer-tha80b28c"},
+					[]v1.EndpointSubset{
+						{
+							Addresses: []v1.EndpointAddress{{IP: "10.0.0.1"}},
+							Ports:     []v1.EndpointPort{{Name: "port-80", Port: 8080, Protocol: v1.ProtocolTCP}},
 						},
 					}),
 			},
@@ -169,7 +361,7 @@ func TestKubeEndpoints(t *testing.T) {
 				pool("pool-2", "HTTP", "loadbalancer-1", poolmember("10.0.0.5", 443), poolmember("10.0.0.6", 443), poolmember("10.0.0.7", 8443)),
 			},
 			expected: []v1.Endpoints{
-				endpoints("finance", "stocks-loadbalancer-1-us-east",
+				endpoints("finance", "us-east-stocks-loadbalancer-1",
 					map[string]string{
 						"gimbal.heptio.com/cluster":            "us-east",
 						"gimbal.heptio.com/service":            "stocks-loadbalancer-1",
@@ -178,19 +370,19 @@ func TestKubeEndpoints(t *testing.T) {
 					[]v1.EndpointSubset{
 						{
 							Addresses: []v1.EndpointAddress{{IP: "10.0.0.1"}, {IP: "10.0.0.4"}},
-							Ports:     []v1.EndpointPort{{Name: "http-80", Port: 8080, Protocol: v1.ProtocolTCP}},
+							Ports:     []v1.EndpointPort{{Name: "port-80", Port: 8080, Protocol: v1.ProtocolTCP}},
 						},
 						{
 							Addresses: []v1.EndpointAddress{{IP: "10.0.0.2"}, {IP: "10.0.0.3"}},
-							Ports:     []v1.EndpointPort{{Name: "http-80", Port: 80, Protocol: v1.ProtocolTCP}},
+							Ports:     []v1.EndpointPort{{Name: "port-80", Port: 80, Protocol: v1.ProtocolTCP}},
 						},
 						{
 							Addresses: []v1.EndpointAddress{{IP: "10.0.0.5"}, {IP: "10.0.0.6"}},
-							Ports:     []v1.EndpointPort{{Name: "https-443", Port: 443, Protocol: v1.ProtocolTCP}},
+							Ports:     []v1.EndpointPort{{Name: "port-443", Port: 443, Protocol: v1.ProtocolTCP}},
 						},
 						{
 							Addresses: []v1.EndpointAddress{{IP: "10.0.0.7"}},
-							Ports:     []v1.EndpointPort{{Name: "https-443", Port: 8443, Protocol: v1.ProtocolTCP}},
+							Ports:     []v1.EndpointPort{{Name: "port-443", Port: 8443, Protocol: v1.ProtocolTCP}},
 						},
 					}),
 			},

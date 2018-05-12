@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: 2018-05-07T14:46:08Z
+  labels:
+    gimbal.heptio.com/cluster: backend
+    gimbal.heptio.com/service: nginx
+  name: nginx-backend9
+  namespace: default
+  resourceVersion: "225396"
+  selfLink: /api/v1/namespaces/default/services/nginx-backend
+  uid: 609fe755-5205-11e8-9df8-080027fb9373
+spec:
+  clusterIP: None
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 80
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

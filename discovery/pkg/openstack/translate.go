@@ -16,6 +16,7 @@ package openstack
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/listeners"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/loadbalancers"
@@ -32,8 +33,8 @@ func kubeServices(clusterName, tenantName string, lbs []loadbalancers.LoadBalanc
 		svc := v1.Service{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: tenantName,
-				Name:      translator.GetFormattedName(serviceName(lb), clusterName),
-				Labels:    translator.AddGimbalLabels(clusterName, tenantName, serviceName(lb), loadbalancerLabels(lb)),
+				Name:      translator.BuildDiscoveredName(clusterName, serviceName(lb)),
+				Labels:    translator.AddGimbalLabels(clusterName, serviceName(lb), loadbalancerLabels(lb)),
 			},
 			Spec: v1.ServiceSpec{
 				Type:      v1.ServiceTypeClusterIP,
@@ -55,8 +56,8 @@ func kubeEndpoints(clusterName, tenantName string, lbs []loadbalancers.LoadBalan
 		ep := v1.Endpoints{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: tenantName,
-				Name:      translator.GetFormattedName(serviceName(lb), clusterName),
-				Labels:    translator.AddGimbalLabels(clusterName, tenantName, serviceName(lb), loadbalancerLabels(lb)),
+				Name:      translator.BuildDiscoveredName(clusterName, serviceName(lb)),
+				Labels:    translator.AddGimbalLabels(clusterName, serviceName(lb), loadbalancerLabels(lb)),
 			},
 		}
 		for _, l := range lb.Listeners {
@@ -98,17 +99,18 @@ func kubeEndpoints(clusterName, tenantName string, lbs []loadbalancers.LoadBalan
 func loadbalancerLabels(lb loadbalancers.LoadBalancer) map[string]string {
 	return map[string]string{
 		"gimbal.heptio.com/load-balancer-id":   lb.ID,
-		"gimbal.heptio.com/load-balancer-name": lb.Name,
+		"gimbal.heptio.com/load-balancer-name": translator.ShortenKubernetesLabelValue(lb.Name),
 	}
 }
 
+// the service name in openstack is obtained from the LB's name and ID. If the
+// name is empty, the service name is the LB's ID.
 func serviceName(lb loadbalancers.LoadBalancer) string {
-	// OpenStack names are optional
 	lbName := lb.ID
 	if lb.Name != "" {
 		lbName = fmt.Sprintf("%s-%s", lb.Name, lb.ID)
 	}
-	return lbName
+	return strings.ToLower(lbName)
 }
 
 func servicePort(listener *listeners.Listener) v1.ServicePort {
@@ -122,8 +124,5 @@ func servicePort(listener *listeners.Listener) v1.ServicePort {
 
 func portName(listener *listeners.Listener) string {
 	p := strconv.Itoa(listener.ProtocolPort)
-	if listener.Name == "" {
-		return "unnamed-" + p // TODO: port names must have at least 1 char. Is there something better we can do here?
-	}
-	return listener.Name + "-" + p
+	return "port-" + p
 }

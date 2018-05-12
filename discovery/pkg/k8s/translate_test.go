@@ -49,7 +49,7 @@ func TestTranslateService(t *testing.T) {
 			expected: &v1.Service{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: "default",
-					Name:      "kuard-cluster1",
+					Name:      "cluster1-kuard",
 					Labels:    map[string]string{"app": "kuard", "gimbal.heptio.com/cluster": "cluster1", "gimbal.heptio.com/service": "kuard"},
 				},
 				Spec: v1.ServiceSpec{
@@ -81,7 +81,7 @@ func TestTranslateService(t *testing.T) {
 			expected: &v1.Service{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: "default",
-					Name:      "kuard-cluster1",
+					Name:      "cluster1-kuard",
 					Labels:    map[string]string{"app": "kuard", "gimbal.heptio.com/cluster": "cluster1", "gimbal.heptio.com/service": "kuard"},
 				},
 				Spec: v1.ServiceSpec{
@@ -130,7 +130,7 @@ func TestTranslateEndpoints(t *testing.T) {
 			expected: &v1.Endpoints{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: "default",
-					Name:      "kuard-cluster1",
+					Name:      "cluster1-kuard",
 					Labels:    map[string]string{"app": "kuard", "gimbal.heptio.com/cluster": "cluster1", "gimbal.heptio.com/service": "kuard"},
 				},
 				Subsets: []v1.EndpointSubset{

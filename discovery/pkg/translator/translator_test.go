@@ -14,12 +14,16 @@
 package translator
 
 import (
+	"strings"
 	"testing"
+	"testing/quick"
 
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetFormattedName(t *testing.T) {
+var quickCheckConfig = &quick.Config{MaxCount: 1000000}
+
+func TestBuildDiscoveredName(t *testing.T) {
 	tests := []struct {
 		name        string
 		serviceName string
@@ -30,78 +34,152 @@ func TestGetFormattedName(t *testing.T) {
 			name:        "basic",
 			serviceName: "service1",
 			cluster:     "cluster1",
-			expected:    "service1-cluster1",
+			expected:    "cluster1-service1",
 		},
 		{
 			name:        "long service name",
-			serviceName: "service1service1service1service1service1service1service1service1service1service1service1service1service1",
+			serviceName: "the-really-long-kube-service-name-that-is-exactly-63-characters",
 			cluster:     "cluster1",
-			expected:    "service1service1service1-d8cb7f-cluster1",
+			expected:    "cluster1-the-really-long-kube-serv1feeec",
 		},
 		{
 			name:        "long cluster name",
-			serviceName: "service1service1service1service1service1service1service1service1service1service1service1service1service1",
-			cluster:     "cluster1cluster1cluster1cluster1cluster1cluster1cluster1cluster1",
-			expected:    "4ce97d89bfa193a277ddd97df3cad58484b30bb4bc4b815ea71c84518d9a830",
+			serviceName: "service1",
+			cluster:     "a-really-long-cluster-name-that-does-not-really-make-sense-and-is-not-useful-at-all",
+			expected:    "a-really-long-cluster-namfb8867-service1",
+		},
+		{
+			name:        "long service and cluster names",
+			serviceName: "the-really-long-kube-service-name-that-is-exactly-63-characters",
+			cluster:     "a-really-long-cluster-name-that-does-not-really-make-sense-and-is-not-useful-at-all",
+			expected:    "a-really-long-cluster-namfb8867-the-really-long-kube-serv1feeec",
+		},
+		{
+			name:        "exact lengths, no shortening",
+			serviceName: "name-that-is-exactly-at-d-limit",
+			cluster:     "name-that-is-exactly-at-d-limit",
+			expected:    "name-that-is-exactly-at-d-limit-name-that-is-exactly-at-d-limit",
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			result := GetFormattedName(test.serviceName, test.cluster)
-
+			result := BuildDiscoveredName(test.cluster, test.serviceName)
 			assert.Equal(t, test.expected, result, "Expected name does not match")
 		})
 	}
 }
-func TestAddLabels(t *testing.T) {
-	clusterName := "test01"
-	namespace := "default"
-	serviceName := "service01"
 
+func TestBuildDiscoveredNameQuickTest(t *testing.T) {
+	f := func(c, s string) bool {
+		r := BuildDiscoveredName(c, s)
+		// ensure discovered name does not go over limit
+		if len(r) > maxKubernetesDNSLabelLength {
+			return false
+		}
+		// ensure that no shortening occurs if the cluster name and service name are shorter than the limit
+		// skip if the randomly generated string contained "-"
+		maxPerComponent := (maxKubernetesDNSLabelLength - 1) / 2
+		if len(c) <= maxPerComponent && len(s) <= maxPerComponent && strings.Count(r, "-") == 1 {
+			comps := strings.Split(r, "-")
+			return comps[0] == c && comps[1] == s
+		}
+		return true
+	}
+	if err := quick.Check(f, quickCheckConfig); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestShortenKubernetesLabelValueQuickTest(t *testing.T) {
+	f := func(s string) bool {
+		r := ShortenKubernetesLabelValue(s)
+		// ensure string size does not go over limit
+		if len(r) > maxKubernetesDNSLabelLength {
+			return false
+		}
+		// ensure that strings are not shortened if they are under the limit
+		if len(s) <= maxKubernetesDNSLabelLength && r != s {
+			return false
+		}
+		return true
+	}
+	if err := quick.Check(f, quickCheckConfig); err != nil {
+		t.Error(err)
+	}
+}
+
+func TestAddLabels(t *testing.T) {
 	tests := []struct {
-		name      string
-		podLabels map[string]string
-		expected  map[string]string
+		name        string
+		podLabels   map[string]string
+		expected    map[string]string
+		clusterName string
+		serviceName string
 	}{
 		{
-			name:      "no existing labels",
-			podLabels: nil,
+			name:        "no existing labels",
+			clusterName: "test01",
+			serviceName: "service01",
+			podLabels:   nil,
 			expected: map[string]string{
-				"gimbal.heptio.com/cluster": clusterName,
-				"gimbal.heptio.com/service": serviceName,
+				"gimbal.heptio.com/cluster": "test01",
+				"gimbal.heptio.com/service": "service01",
 			},
 		},
 		{
-			name: "simple test",
+			name:        "simple test",
+			clusterName: "test01",
+			serviceName: "service01",
 			podLabels: map[string]string{
 				"key1": "value1",
 			},
 			expected: map[string]string{
-				"gimbal.heptio.com/cluster": clusterName,
-				"gimbal.heptio.com/service": serviceName,
+				"gimbal.heptio.com/cluster": "test01",
+				"gimbal.heptio.com/service": "service01",
 				"key1": "value1",
 			},
 		},
 		{
-			name: "heptio labels",
+			name:        "heptio labels",
+			clusterName: "test01",
+			serviceName: "service01",
 			podLabels: map[string]string{
 				"gimbal.heptio.com/cluster": "badClusterName",
 				"gimbal.heptio.com/service": "badService",
 				"key1": "value1",
 			},
 			expected: map[string]string{
-				"gimbal.heptio.com/cluster": clusterName,
-				"gimbal.heptio.com/service": serviceName,
+				"gimbal.heptio.com/cluster": "test01",
+				"gimbal.heptio.com/service": "service01",
 				"key1": "value1",
+			},
+		},
+		{
+			name:        "long cluster name",
+			clusterName: "a-really-long-cluster-name-that-does-not-really-make-sense-and-is-not-useful-at-all",
+			serviceName: "service01",
+			podLabels:   nil,
+			expected: map[string]string{
+				"gimbal.heptio.com/cluster": "a-really-long-cluster-name-that-does-not-really-make-sensfb8867",
+				"gimbal.heptio.com/service": "service01",
+			},
+		},
+		{
+			name:        "long service name",
+			clusterName: "cluster01",
+			serviceName: "a-really-long-service-name-that-does-not-really-make-sense-and-is-not-useful-at-all",
+			podLabels:   nil,
+			expected: map[string]string{
+				"gimbal.heptio.com/cluster": "cluster01",
+				"gimbal.heptio.com/service": "a-really-long-service-name-that-does-not-really-make-sens1c0b9b",
 			},
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			result := AddGimbalLabels(clusterName, namespace, serviceName, test.podLabels)
-
+			result := AddGimbalLabels(test.clusterName, test.serviceName, test.podLabels)
 			assert.Equal(t, test.expected, result, "Expected name does not match")
 		})
 	}
