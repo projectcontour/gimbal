@@ -49,3 +49,9 @@ rules:
   - get
   - list
   - watch
+- apiGroups: ["contour.heptio.com"]
+  resources: ["ingressroutes"]
+  verbs:
+  - get
+  - list
+  - watch

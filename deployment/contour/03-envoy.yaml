@@ -13,7 +13,7 @@ spec:
     metadata:
       annotations:
         prometheus.io/scrape: "true"
-        prometheus.io/port: "8001"
+        prometheus.io/port: "8002"
         prometheus.io/statsdport: "9102"
         prometheus.io/path: "/stats"
         prometheus.io/format: "prometheus"
