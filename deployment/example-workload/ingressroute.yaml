@@ -77,7 +77,7 @@ metadata:
   namespace: default
 spec: 
   virtualhost:
-    fqdn: kuard.local
+    fqdn: mixed.local
   routes: 
     - match: /
       services: 

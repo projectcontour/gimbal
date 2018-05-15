@@ -229,5 +229,5 @@ $ kubectl port-forward $(kubectl get pods -n gimbal-contour -l app=contour -o js
 
 # Make a request to Gimbal cluster which will proxy traffic to the secondary cluster
 # The curl should respond with the kuard and nginx alternating between requests
-$ curl -i -H "Host: kuard.local" localhost:9000
+$ curl -i -H "Host: mixed.local" localhost:9000
 ```
