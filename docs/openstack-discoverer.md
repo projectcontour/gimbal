@@ -8,9 +8,30 @@ The Discoverer will poll the Openstack API on a customizable interval and update
 
 The discoverer will only be responsible for monitoring a single cluster at a time. If multiple clusters are required to be watched, then multiple discoverers will need to be deployed.
 
+## Naming Requirements
+
+Named OpenStack Load Balancers must have names that are compatible with the Kubernetes service naming rules.
+
+The following requirements apply to OpenStack Load Balancers that have a non-empty name:
+
+* The allowed characters are `A-Z`, `a-z`, `0-9` and `-`.
+* The name must end with an alpha-numeric character
+
+The OpenStack discoverer will skip any Load Balancers that do not adhere to
+these rules, and log a warning that includes details about the Load Balancer
+that was skipped. Additionally, the OpenStack discoverer will increment the
+`gimbal_discoverer_error_total[errortype=InvalidLoadBalancerName]` prometheus
+metric.
+
+See the [naming conventions documentation](./discovery-naming-conventions.md)
+for more details.
+
 ## Technical Details
 
 The following sections outline the technical implementations of the discoverer.
+
+See the [design document](../discovery/design/openstack.md) for additional
+details.
 
 ### Arguments
 
