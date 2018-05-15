@@ -50,7 +50,7 @@ func TestTranslateService(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: "default",
 					Name:      "cluster1-kuard",
-					Labels:    map[string]string{"app": "kuard", "gimbal.heptio.com/cluster": "cluster1", "gimbal.heptio.com/service": "kuard"},
+					Labels:    map[string]string{"app": "kuard", "gimbal.heptio.com/backend": "cluster1", "gimbal.heptio.com/service": "kuard"},
 				},
 				Spec: v1.ServiceSpec{
 					ClusterIP: "None",
@@ -82,7 +82,7 @@ func TestTranslateService(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: "default",
 					Name:      "cluster1-kuard",
-					Labels:    map[string]string{"app": "kuard", "gimbal.heptio.com/cluster": "cluster1", "gimbal.heptio.com/service": "kuard"},
+					Labels:    map[string]string{"app": "kuard", "gimbal.heptio.com/backend": "cluster1", "gimbal.heptio.com/service": "kuard"},
 				},
 				Spec: v1.ServiceSpec{
 					ClusterIP: "None",
@@ -131,7 +131,7 @@ func TestTranslateEndpoints(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: "default",
 					Name:      "cluster1-kuard",
-					Labels:    map[string]string{"app": "kuard", "gimbal.heptio.com/cluster": "cluster1", "gimbal.heptio.com/service": "kuard"},
+					Labels:    map[string]string{"app": "kuard", "gimbal.heptio.com/backend": "cluster1", "gimbal.heptio.com/service": "kuard"},
 				},
 				Subsets: []v1.EndpointSubset{
 					{

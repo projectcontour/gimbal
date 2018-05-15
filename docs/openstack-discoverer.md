@@ -83,7 +83,7 @@ All synchronized services & endpoints will have additional labels added to assis
 Labels added to service and endpoints:
 ```
 gimbal.heptio.com/service=<serviceName>
-gimbal.heptio.com/cluster=<nodeName>
+gimbal.heptio.com/backend=<nodeName>
 gimbal.heptio.com/load-balancer-id=<LoadBalancer.ID>
 gimbal.heptio.com/load-balancer-name=<LoadBalancer..Name>
 ```

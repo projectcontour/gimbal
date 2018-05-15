@@ -123,7 +123,7 @@ func TestAddLabels(t *testing.T) {
 			serviceName: "service01",
 			podLabels:   nil,
 			expected: map[string]string{
-				"gimbal.heptio.com/cluster": "test01",
+				"gimbal.heptio.com/backend": "test01",
 				"gimbal.heptio.com/service": "service01",
 			},
 		},
@@ -135,7 +135,7 @@ func TestAddLabels(t *testing.T) {
 				"key1": "value1",
 			},
 			expected: map[string]string{
-				"gimbal.heptio.com/cluster": "test01",
+				"gimbal.heptio.com/backend": "test01",
 				"gimbal.heptio.com/service": "service01",
 				"key1": "value1",
 			},
@@ -145,12 +145,12 @@ func TestAddLabels(t *testing.T) {
 			clusterName: "test01",
 			serviceName: "service01",
 			podLabels: map[string]string{
-				"gimbal.heptio.com/cluster": "badClusterName",
+				"gimbal.heptio.com/backend": "badClusterName",
 				"gimbal.heptio.com/service": "badService",
 				"key1": "value1",
 			},
 			expected: map[string]string{
-				"gimbal.heptio.com/cluster": "test01",
+				"gimbal.heptio.com/backend": "test01",
 				"gimbal.heptio.com/service": "service01",
 				"key1": "value1",
 			},
@@ -161,7 +161,7 @@ func TestAddLabels(t *testing.T) {
 			serviceName: "service01",
 			podLabels:   nil,
 			expected: map[string]string{
-				"gimbal.heptio.com/cluster": "a-really-long-cluster-name-that-does-not-really-make-sensfb8867",
+				"gimbal.heptio.com/backend": "a-really-long-cluster-name-that-does-not-really-make-sensfb8867",
 				"gimbal.heptio.com/service": "service01",
 			},
 		},
@@ -171,7 +171,7 @@ func TestAddLabels(t *testing.T) {
 			serviceName: "a-really-long-service-name-that-does-not-really-make-sense-and-is-not-useful-at-all",
 			podLabels:   nil,
 			expected: map[string]string{
-				"gimbal.heptio.com/cluster": "cluster01",
+				"gimbal.heptio.com/backend": "cluster01",
 				"gimbal.heptio.com/service": "a-really-long-service-name-that-does-not-really-make-sens1c0b9b",
 			},
 		},

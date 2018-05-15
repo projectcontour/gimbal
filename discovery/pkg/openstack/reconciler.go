@@ -134,7 +134,7 @@ func (r *Reconciler) reconcile() {
 
 		// Get all services and endpoints that exist in the corresponding
 		// namespace
-		clusterLabelSelector := fmt.Sprintf("%s=%s", translator.GimbalLabelCluster, r.ClusterName)
+		clusterLabelSelector := fmt.Sprintf("%s=%s", translator.GimbalLabelBackend, r.ClusterName)
 		currentServices, err := r.GimbalKubeClient.CoreV1().Services(projectName).List(metav1.ListOptions{LabelSelector: clusterLabelSelector})
 		if err != nil {
 			r.Metrics.GenericMetricError(r.ClusterName, "ListServicesInNamespace")

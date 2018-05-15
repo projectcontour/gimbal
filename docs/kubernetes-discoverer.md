@@ -93,5 +93,5 @@ All synchronized services & endpoints will contain the same properties as the so
 Labels added to service and endpoints:
 ```
 gimbal.heptio.com/service=<serviceName>
-gimbal.heptio.com/cluster=<nodeName>
+gimbal.heptio.com/backend=<nodeName>
 ```
