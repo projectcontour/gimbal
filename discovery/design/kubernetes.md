@@ -77,9 +77,9 @@ If additional processing is required, then an argument can be changed to increas
 Those labels are defined as:
 
 - gimbal.heptio.com/backend: ClusterName (Defined via argument)
-- gimbal.heptio.com/Service: [ServiceName]
+- gimbal.heptio.com/service: [ServiceName]
 
-The name of the syncronized object will be a hash of the `ServiceName-Clustername`. The name is hashed because of length restrictions when creating a service object. 
+The name of the syncronized object will be a hash of the `ClusterName-ServiceName`. The name is hashed because of length restrictions when creating a service object.
 
 In the event that the total length of the hash is larger than 63 characters (maximum allowed length), then the components are hashed to keep within the limits. All attempts are made to keep the name as descriptive to the source as possible. 
 
