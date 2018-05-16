@@ -70,7 +70,7 @@ The Kubernetes Discoverer is responsible for looking at all services and endpoin
 ```sh
 # Kubernetes secret
 $ kubectl -n gimbal-discovery create secret generic remote-discover-kubecfg \
-    --from-file=./config \
+    --from-file=config=./config \
     --from-literal=cluster-name=node02
 
 # Deploy Discoverer
