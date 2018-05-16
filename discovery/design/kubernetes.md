@@ -23,7 +23,7 @@ In order for an Ingress controller to route traffic to endpoints off-cluster, we
 Name:              nginx-node02
 Namespace:         team1
 Labels:            gimbal.heptio.com/service=nginx
-                   gimbal.heptio.com/cluster=node02
+                   gimbal.heptio.com/backend=node02
                    run=nginx
 Annotations:       <none>
 Selector:          <none>
@@ -42,7 +42,7 @@ Events:            <none>
 Name:         nginx-node02
 Namespace:    team1
 Labels:       gimbal.heptio.com/service=nginx
-              gimbal.heptio.com/cluster=node02
+              gimbal.heptio.com/backend=node02
               run=nginx
 Annotations:  <none>
 Subsets:
@@ -76,10 +76,10 @@ If additional processing is required, then an argument can be changed to increas
 
 Those labels are defined as:
 
-- gimbal.heptio.com/Cluster: ClusterName (Defined via argument)
-- gimbal.heptio.com/Service: [ServiceName]
+- gimbal.heptio.com/backend: ClusterName (Defined via argument)
+- gimbal.heptio.com/service: [ServiceName]
 
-The name of the syncronized object will be a hash of the `ServiceName-Clustername`. The name is hashed because of length restrictions when creating a service object. 
+The name of the syncronized object will be a hash of the `ClusterName-ServiceName`. The name is hashed because of length restrictions when creating a service object.
 
 In the event that the total length of the hash is larger than 63 characters (maximum allowed length), then the components are hashed to keep within the limits. All attempts are made to keep the name as descriptive to the source as possible. 
 

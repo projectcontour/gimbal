@@ -23,8 +23,8 @@ func translateService(svc *v1.Service, clusterName string) *v1.Service {
 	newService := &v1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: svc.Namespace,
-			Name:      translator.GetFormattedName(svc.Name, clusterName),
-			Labels:    translator.AddGimbalLabels(clusterName, svc.Namespace, svc.ObjectMeta.Name, svc.ObjectMeta.Labels),
+			Name:      translator.BuildDiscoveredName(clusterName, svc.Name),
+			Labels:    translator.AddGimbalLabels(clusterName, svc.ObjectMeta.Name, svc.ObjectMeta.Labels),
 		},
 		Spec: v1.ServiceSpec{
 			ClusterIP: "None",
@@ -45,8 +45,8 @@ func translateEndpoints(endpoints *v1.Endpoints, clusterName string) *v1.Endpoin
 	newEndpoint := &v1.Endpoints{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: endpoints.Namespace,
-			Name:      translator.GetFormattedName(endpoints.Name, clusterName),
-			Labels:    translator.AddGimbalLabels(clusterName, endpoints.Namespace, endpoints.ObjectMeta.Name, endpoints.ObjectMeta.Labels),
+			Name:      translator.BuildDiscoveredName(clusterName, endpoints.Name),
+			Labels:    translator.AddGimbalLabels(clusterName, endpoints.ObjectMeta.Name, endpoints.ObjectMeta.Labels),
 		},
 		Subsets: endpoints.Subsets,
 	}

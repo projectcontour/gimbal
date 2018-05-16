@@ -15,6 +15,7 @@ package openstack
 
 import (
 	"fmt"
+	"regexp"
 	"time"
 
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
@@ -121,6 +122,8 @@ func (r *Reconciler) reconcile() {
 			continue
 		}
 
+		loadbalancers = r.skipInvalidLoadBalancers(projectName, loadbalancers)
+
 		// Get all pools defined in the project
 		pools, err := r.ListPools(project.ID)
 		if err != nil {
@@ -131,7 +134,7 @@ func (r *Reconciler) reconcile() {
 
 		// Get all services and endpoints that exist in the corresponding
 		// namespace
-		clusterLabelSelector := fmt.Sprintf("%s=%s", translator.GimbalLabelCluster, r.ClusterName)
+		clusterLabelSelector := fmt.Sprintf("%s=%s", translator.GimbalLabelBackend, r.ClusterName)
 		currentServices, err := r.GimbalKubeClient.CoreV1().Services(projectName).List(metav1.ListOptions{LabelSelector: clusterLabelSelector})
 		if err != nil {
 			r.Metrics.GenericMetricError(r.ClusterName, "ListServicesInNamespace")
@@ -156,6 +159,24 @@ func (r *Reconciler) reconcile() {
 
 	// Log to Prometheus the cycle duration
 	r.Metrics.CycleDurationMetric(r.ClusterName, r.ClusterType, time.Now().Sub(start))
+}
+
+// skip any load balancer that has invalid characters, according to the
+// characters allowed by the DNS_LABEL spec in Kubernetes.
+func (r *Reconciler) skipInvalidLoadBalancers(projectName string, lbs []loadbalancers.LoadBalancer) []loadbalancers.LoadBalancer {
+	// names can include letters, numbers or dashes.
+	// names must end with a letter or number.
+	validName := regexp.MustCompile("^[-a-zA-Z0-9]+[a-zA-Z0-9]$")
+	valid := []loadbalancers.LoadBalancer{}
+	for _, lb := range lbs {
+		if lb.Name != "" && !validName.MatchString(lb.Name) {
+			r.Metrics.GenericMetricError(r.ClusterName, "InvalidLoadBalancerName")
+			r.Logger.Warningf("skipping load balancer '%s' in project '%s' as it has an invalid name '%s'", lb.ID, projectName, lb.Name)
+			continue
+		}
+		valid = append(valid, lb)
+	}
+	return valid
 }
 
 func (r *Reconciler) reconcileSvcs(desiredSvcs, currentSvcs []v1.Service) {

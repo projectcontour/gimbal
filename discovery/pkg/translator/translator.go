@@ -20,19 +20,18 @@ import (
 )
 
 const (
-	// GimbalLabelCluster is the key of the label that contains the cluster name
-	GimbalLabelCluster = "gimbal.heptio.com/cluster"
-	gimbalLabelService = "gimbal.heptio.com/service"
-	// Services in Kubernetes are limited to 63 characters in length
-	maxNameLength = 63
+	// GimbalLabelBackend is the key of the label that contains the cluster name
+	GimbalLabelBackend          = "gimbal.heptio.com/backend"
+	gimbalLabelService          = "gimbal.heptio.com/service"
+	maxKubernetesDNSLabelLength = 63
 )
 
 // AddGimbalLabels returns a new set of labels that includes the incoming set of
 // labels, plus gimbal-specific ones.
-func AddGimbalLabels(clustername, namespace, name string, existingLabels map[string]string) map[string]string {
+func AddGimbalLabels(clustername, name string, existingLabels map[string]string) map[string]string {
 	gimbalLabels := map[string]string{
-		GimbalLabelCluster: clustername,
-		gimbalLabelService: name,
+		GimbalLabelBackend: ShortenKubernetesLabelValue(clustername),
+		gimbalLabelService: ShortenKubernetesLabelValue(name),
 	}
 	if existingLabels == nil {
 		return gimbalLabels
@@ -44,17 +43,25 @@ func AddGimbalLabels(clustername, namespace, name string, existingLabels map[str
 	return existingLabels
 }
 
-// GetFormattedName take the names of a service and formats to truncate if needed
-func GetFormattedName(name, cluster string) string {
-	return hashname(maxNameLength, name, cluster)
+// BuildDiscoveredName returns the discovered name of the service in a given
+// cluster. If the name is longer than the Kubernetes DNS_LABEL maximum
+// character limit, the name is shortened.
+func BuildDiscoveredName(clusterName, serviceName string) string {
+	return hashname(maxKubernetesDNSLabelLength, clusterName, serviceName)
 }
 
-// hashname takes a lenth l and a varargs of strings s and returns a string whose length
-// which does not exceed l. Internally s is joined with strings.Join(s, "/"). If the
-// combined length exceeds l then hashname truncates each element in s, starting from the
-// end using a hash derived from the contents of s (not the current element). This process
-// continues until the length of s does not exceed l, or all elements have been truncated.
-// In which case, the entire string is replaced with a hash not exceeding the length of l.
+// ShortenKubernetesLabelValue ensures that the given string's length does not
+// exceed the character limit imposed by Kubernetes. If it does, the label is
+// shortened.
+func ShortenKubernetesLabelValue(value string) string {
+	return hashname(maxKubernetesDNSLabelLength, value)
+}
+
+// hashname takes a length l and a varargs of strings s and returns a string
+// whose length which does not exceed l. Internally s is joined with
+// strings.Join(s, "-"). If the combined length exceeds l then hashname
+// truncates each element in s, starting from the end using a hash derived from
+// the element. This process continues until the length of s does not exceed l.
 func hashname(l int, s ...string) string {
 	const shorthash = 6 // the length of the shorthash
 
@@ -63,21 +70,20 @@ func hashname(l int, s ...string) string {
 		// we're under the limit, nothing to do
 		return r
 	}
-	hash := fmt.Sprintf("%x", sha256.Sum256([]byte(r)))
-	for n := len(s) - 1; n >= 0; n-- {
-		s[n] = truncate(l/len(s), s[n], hash[:shorthash])
+	for i := len(s) - 1; i >= 0; i-- {
+		hash := fmt.Sprintf("%x", sha256.Sum256([]byte(s[i])))
+		s[i] = truncate(l/len(s), s[i], hash[:shorthash])
 		r = strings.Join(s, "-")
 		if l > len(r) {
-			return r
+			// r is already short enough.
+			break
 		}
 	}
-	// truncated everything, but we're still too long
-	// just return the hash truncated to l.
-	return hash[:min(len(hash), l)]
+	return r
 }
 
 // truncate truncates s to l length by replacing the
-// end of s with -suffix.
+// end of s with suffix.
 func truncate(l int, s, suffix string) string {
 	if l >= len(s) {
 		// under the limit, nothing to do
@@ -87,7 +93,7 @@ func truncate(l int, s, suffix string) string {
 		// easy case, just return the start of the suffix
 		return suffix[:min(l, len(suffix))]
 	}
-	return s[:l-len(suffix)-1] + "-" + suffix
+	return s[:l-len(suffix)] + suffix
 }
 
 func min(a, b int) int {

@@ -12,6 +12,8 @@ The discoverer will only be responsible for monitoring a single cluster at a tim
 
 The following sections outline the technical implementations of the discoverer.
 
+See the [design documentation](../discovery/design/kubernetes.md) for additional details.
+
 ### Arguments
 
 Arguments are available to customize the discoverer, most have defaults but others are required to be configured by the cluster administrators:
@@ -93,5 +95,5 @@ All synchronized services & endpoints will contain the same properties as the so
 Labels added to service and endpoints:
 ```
 gimbal.heptio.com/service=<serviceName>
-gimbal.heptio.com/cluster=<nodeName>
+gimbal.heptio.com/backend=<nodeName>
 ```
