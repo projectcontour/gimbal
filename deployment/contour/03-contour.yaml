@@ -35,7 +35,7 @@ spec:
         - --envoy-http-port
         - "80"
         command: ["contour"]
-        image: gcr.io/heptio-images/contour:master
+        image: gcr.io/heptio-images/contour:v0.6.0-alpha.1
         imagePullPolicy: Always
         name: contour
         ports:
