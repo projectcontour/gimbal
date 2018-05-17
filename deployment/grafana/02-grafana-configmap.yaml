@@ -95,7 +95,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "count(kube_service_labels{namespace=~\"$Namespace\",label_gimbal_heptio_com_cluster=~\"$BackendCluster\"}) ",
+              "expr": "count(kube_service_labels{namespace=~\"$Namespace\",label_gimbal_heptio_com_backend=~\"$BackendCluster\"}) ",
               "format": "time_series",
               "intervalFactor": 1,
               "refId": "B"
@@ -174,7 +174,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "count(kube_endpoint_labels{namespace=~\"$Namespace\",label_gimbal_heptio_com_cluster=~\"$BackendCluster\"}) ",
+              "expr": "count(kube_endpoint_labels{namespace=~\"$Namespace\",label_gimbal_heptio_com_backend=~\"$BackendCluster\"}) ",
               "format": "time_series",
               "intervalFactor": 1,
               "refId": "A"
