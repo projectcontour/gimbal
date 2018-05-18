@@ -41,7 +41,7 @@ var (
 	printVersion                      bool
 	gimbalKubeCfgFile                 string
 	discoverStackCfgFile              string
-	clusterName                       string
+	backendName                       string
 	numProcessThreads                 int
 	debug                             bool
 	reconciliationPeriod              time.Duration
@@ -60,7 +60,7 @@ const (
 func init() {
 	flag.BoolVar(&printVersion, "version", false, "Show version and quit")
 	flag.StringVar(&gimbalKubeCfgFile, "gimbal-kubecfg-file", "", "Location of kubecfg file for access to gimbal system kubernetes api, defaults to service account tokens")
-	flag.StringVar(&clusterName, "cluster-name", "", "Name of cluster")
+	flag.StringVar(&backendName, "backend-name", "", "Name of cluster (must be unique)")
 	flag.IntVar(&numProcessThreads, "num-threads", 2, "Specify number of threads to use when processing queue items.")
 	flag.BoolVar(&debug, "debug", false, "Enable debug logging.")
 	flag.DurationVar(&reconciliationPeriod, "reconciliation-period", 30*time.Second, "The interval of time between reconciliation loop runs.")
@@ -92,10 +92,10 @@ func main() {
 	discovererMetrics.RegisterPrometheus()
 
 	// Validate cluster name
-	if util.IsInvalidClusterName(clusterName) {
-		log.Fatalf("The Kubernetes cluster name must be provided using the `--cluster-name` flag or the one passed is invalid")
+	if util.IsInvalidBackendName(backendName) {
+		log.Fatalf("The Kubernetes cluster name must be provided using the `--backend-name` flag or the one passed is invalid")
 	}
-	log.Infof("ClusterName is: %s", clusterName)
+	log.Infof("BackendName is: %s", backendName)
 
 	gimbalKubeClient, err := k8s.NewClient(gimbalKubeCfgFile, log)
 	if err != nil {
@@ -133,7 +133,7 @@ func main() {
 	transport := &openstack.LogRoundTripper{
 		RoundTripper: http.DefaultTransport,
 		Log:          log,
-		ClusterName:  clusterName,
+		BackendName:  backendName,
 		ClusterType:  clusterType,
 		Metrics:      &discovererMetrics,
 	}
@@ -170,7 +170,7 @@ func main() {
 	}
 
 	reconciler := openstack.NewReconciler(
-		clusterName,
+		backendName,
 		clusterType,
 		gimbalKubeClient,
 		reconciliationPeriod,

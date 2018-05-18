@@ -26,13 +26,13 @@ import (
 func TestTranslateService(t *testing.T) {
 	tests := []struct {
 		name        string
-		clusterName string
+		backendName string
 		service     *v1.Service
 		expected    *v1.Service
 	}{
 		{
 			name:        "simple service",
-			clusterName: "cluster1",
+			backendName: "cluster1",
 			service: &v1.Service{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: "default",
@@ -61,7 +61,7 @@ func TestTranslateService(t *testing.T) {
 		},
 		{
 			name:        "multi-port service",
-			clusterName: "cluster1",
+			backendName: "cluster1",
 			service: &v1.Service{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: "default",
@@ -97,7 +97,7 @@ func TestTranslateService(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := translateService(tc.service, tc.clusterName)
+			got := translateService(tc.service, tc.backendName)
 			assert.EqualValues(t, tc.expected, got)
 		})
 	}
@@ -107,13 +107,13 @@ func TestTranslateEndpoints(t *testing.T) {
 	nodeName := "minikube"
 	tests := []struct {
 		name        string
-		clusterName string
+		backendName string
 		endpoints   *v1.Endpoints
 		expected    *v1.Endpoints
 	}{
 		{
 			name:        "simple endpoints",
-			clusterName: "cluster1",
+			backendName: "cluster1",
 			endpoints: &v1.Endpoints{
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace: "default",
@@ -144,7 +144,7 @@ func TestTranslateEndpoints(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := translateEndpoints(tc.endpoints, tc.clusterName)
+			got := translateEndpoints(tc.endpoints, tc.backendName)
 			assert.EqualValues(t, tc.expected, got)
 		})
 	}

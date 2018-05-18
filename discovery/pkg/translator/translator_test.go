@@ -114,12 +114,12 @@ func TestAddLabels(t *testing.T) {
 		name        string
 		podLabels   map[string]string
 		expected    map[string]string
-		clusterName string
+		backendName string
 		serviceName string
 	}{
 		{
 			name:        "no existing labels",
-			clusterName: "test01",
+			backendName: "test01",
 			serviceName: "service01",
 			podLabels:   nil,
 			expected: map[string]string{
@@ -129,7 +129,7 @@ func TestAddLabels(t *testing.T) {
 		},
 		{
 			name:        "simple test",
-			clusterName: "test01",
+			backendName: "test01",
 			serviceName: "service01",
 			podLabels: map[string]string{
 				"key1": "value1",
@@ -142,10 +142,10 @@ func TestAddLabels(t *testing.T) {
 		},
 		{
 			name:        "heptio labels",
-			clusterName: "test01",
+			backendName: "test01",
 			serviceName: "service01",
 			podLabels: map[string]string{
-				"gimbal.heptio.com/backend": "badClusterName",
+				"gimbal.heptio.com/backend": "badBackendName",
 				"gimbal.heptio.com/service": "badService",
 				"key1": "value1",
 			},
@@ -157,7 +157,7 @@ func TestAddLabels(t *testing.T) {
 		},
 		{
 			name:        "long cluster name",
-			clusterName: "a-really-long-cluster-name-that-does-not-really-make-sense-and-is-not-useful-at-all",
+			backendName: "a-really-long-cluster-name-that-does-not-really-make-sense-and-is-not-useful-at-all",
 			serviceName: "service01",
 			podLabels:   nil,
 			expected: map[string]string{
@@ -167,7 +167,7 @@ func TestAddLabels(t *testing.T) {
 		},
 		{
 			name:        "long service name",
-			clusterName: "cluster01",
+			backendName: "cluster01",
 			serviceName: "a-really-long-service-name-that-does-not-really-make-sense-and-is-not-useful-at-all",
 			podLabels:   nil,
 			expected: map[string]string{
@@ -179,7 +179,7 @@ func TestAddLabels(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			result := AddGimbalLabels(test.clusterName, test.serviceName, test.podLabels)
+			result := AddGimbalLabels(test.backendName, test.serviceName, test.podLabels)
 			assert.Equal(t, test.expected, result, "Expected name does not match")
 		})
 	}

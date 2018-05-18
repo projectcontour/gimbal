@@ -22,63 +22,63 @@ import (
 func TestTranslateService(t *testing.T) {
 	tests := []struct {
 		name        string
-		clusterName string
+		backendName string
 		expected    bool
 	}{
 		{
 			name:        "empty string",
-			clusterName: "",
+			backendName: "",
 			expected:    true,
 		},
 		{
 			name:        "simple",
-			clusterName: "mycluster",
+			backendName: "mycluster",
 			expected:    false,
 		},
 		{
 			name:        "hyphen",
-			clusterName: "my-cluster",
+			backendName: "my-cluster",
 			expected:    false,
 		},
 		{
 			name:        "underscore",
-			clusterName: "my_cluster",
+			backendName: "my_cluster",
 			expected:    true,
 		},
 		{
 			name:        "multiple underscores",
-			clusterName: "my----cluster",
+			backendName: "my----cluster",
 			expected:    false,
 		},
 		{
 			name:        "can't start with underscores",
-			clusterName: "-mycluster",
+			backendName: "-mycluster",
 			expected:    true,
 		},
 		{
 			name:        "can't end with underscores",
-			clusterName: "mycluster-",
+			backendName: "mycluster-",
 			expected:    true,
 		},
 		{
 			name:        "special chars",
-			clusterName: "!@!mycl^%$uster**",
+			backendName: "!@!mycl^%$uster**",
 			expected:    true,
 		},
 		{
 			name:        "special chars with hyphen & underscore",
-			clusterName: "!@!my-cl^%$ust_er**",
+			backendName: "!@!my-cl^%$ust_er**",
 			expected:    true,
 		},
 		{
 			name:        "whitespace",
-			clusterName: "  my cluster  ",
+			backendName: "  my cluster  ",
 			expected:    true,
 		},
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := IsInvalidClusterName(tc.clusterName)
+			got := IsInvalidBackendName(tc.backendName)
 			assert.EqualValues(t, tc.expected, got)
 		})
 	}

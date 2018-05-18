@@ -19,7 +19,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var clusterNameRegex = regexp.MustCompile("^[a-z]([-a-z0-9]*[a-z0-9])?$")
+var backendNameRegex = regexp.MustCompile("^[a-z]([-a-z0-9]*[a-z0-9])?$")
 
 // GetFormatter returns a textformatter to customize logs
 func GetFormatter() *logrus.TextFormatter {
@@ -28,7 +28,7 @@ func GetFormatter() *logrus.TextFormatter {
 	}
 }
 
-// IsInvalidClusterName returns true if valid cluster name
-func IsInvalidClusterName(clustername string) bool {
-	return !clusterNameRegex.MatchString(clustername)
+// IsInvalidBackendName returns true if valid cluster name
+func IsInvalidBackendName(backendname string) bool {
+	return !backendNameRegex.MatchString(backendname)
 }

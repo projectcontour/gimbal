@@ -42,7 +42,7 @@ Arguments are available to customize the discoverer, most have defaults but othe
 | version  |  false | Show version, build information and quit  
 | num-threads  | 2  |  Specify number of threads to use when processing queue items
 | gimbal-kubecfg-file  | ""  | Location of kubecfg file for access to Kubernetes cluster hosting Gimbal
-| cluster-name  | ""  |   Name of cluster scraping for services & endpoints (Cannot start or end with a hyphen and must be lowercase alpha-numeric)
+| backend-name  | ""  |   Name of cluster scraping for services & endpoints (Cannot start or end with a hyphen and must be lowercase alpha-numeric)
 | debug | false | Enable debug logging 
 | reconciliation-period | 30s | The interval of time between reconciliation loop runs 
 | http-client-timeout | 5s | The HTTP client request timeout
@@ -72,7 +72,7 @@ Following example creates a Kubernetes secret which the Openstack discoverer wil
 ```sh
 kubectl create secret generic remote-discover-openstack \
     --from-file=certificate-authority-data=./ca.pem \
-    --from-literal=cluster-name=openstack \
+    --from-literal=backend-name=openstack \
     --from-literal=username=admin \
     --from-literal=password=abc123 \
     --from-literal=auth-url=https://api.openstack:5000/ \

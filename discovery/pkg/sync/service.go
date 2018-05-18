@@ -54,22 +54,22 @@ func (action serviceAction) ObjectMeta() *metav1.ObjectMeta {
 }
 
 // Sync performs the action on the given service
-func (action serviceAction) Sync(kubeClient kubernetes.Interface, metrics localmetrics.DiscovererMetrics, clusterName string) error {
+func (action serviceAction) Sync(kubeClient kubernetes.Interface, metrics localmetrics.DiscovererMetrics, backendName string) error {
 
 	var err error
 	switch action.kind {
 	case actionAdd:
-		err = addService(kubeClient, action.service, metrics, clusterName)
+		err = addService(kubeClient, action.service, metrics, backendName)
 	case actionUpdate:
-		err = updateService(kubeClient, action.service, metrics, clusterName)
+		err = updateService(kubeClient, action.service, metrics, backendName)
 	case actionDelete:
-		err = deleteService(kubeClient, action.service, metrics, clusterName)
+		err = deleteService(kubeClient, action.service, metrics, backendName)
 	}
 	if err != nil {
 		return fmt.Errorf("error handling %s: %v", action, err)
 	}
 
-	metrics.ServiceEventTimestampMetric(action.service.GetNamespace(), clusterName, action.service.GetName(), time.Now().Unix())
+	metrics.ServiceEventTimestampMetric(action.service.GetNamespace(), backendName, action.service.GetName(), time.Now().Unix())
 	return nil
 }
 
@@ -77,39 +77,39 @@ func (action serviceAction) String() string {
 	return fmt.Sprintf(`%s service '%s/%s'`, action.kind, action.service.Namespace, action.service.Name)
 }
 
-func addService(kubeClient kubernetes.Interface, service *v1.Service, lm localmetrics.DiscovererMetrics, clusterName string) error {
+func addService(kubeClient kubernetes.Interface, service *v1.Service, lm localmetrics.DiscovererMetrics, backendName string) error {
 	_, err := kubeClient.CoreV1().Services(service.Namespace).Create(service)
 	if errors.IsAlreadyExists(err) {
-		err = updateService(kubeClient, service, lm, clusterName)
+		err = updateService(kubeClient, service, lm, backendName)
 		if err != nil {
-			lm.ServiceMetricError(service.GetNamespace(), clusterName, service.GetName(), "UPDATE")
+			lm.ServiceMetricError(service.GetNamespace(), backendName, service.GetName(), "UPDATE")
 		}
 	} else {
 		if err != nil {
-			lm.ServiceMetricError(service.GetNamespace(), clusterName, service.GetName(), "ADD")
+			lm.ServiceMetricError(service.GetNamespace(), backendName, service.GetName(), "ADD")
 		}
 	}
 	return err
 }
 
-func deleteService(kubeClient kubernetes.Interface, service *v1.Service, lm localmetrics.DiscovererMetrics, clusterName string) error {
+func deleteService(kubeClient kubernetes.Interface, service *v1.Service, lm localmetrics.DiscovererMetrics, backendName string) error {
 	err := kubeClient.CoreV1().Services(service.Namespace).Delete(service.Name, &metav1.DeleteOptions{})
 
 	if err != nil {
-		lm.ServiceMetricError(service.GetNamespace(), clusterName, service.GetName(), "DELETE")
+		lm.ServiceMetricError(service.GetNamespace(), backendName, service.GetName(), "DELETE")
 	}
 	return err
 }
 
-func updateService(kubeClient kubernetes.Interface, service *v1.Service, lm localmetrics.DiscovererMetrics, clusterName string) error {
+func updateService(kubeClient kubernetes.Interface, service *v1.Service, lm localmetrics.DiscovererMetrics, backendName string) error {
 	client := kubeClient.CoreV1().Services(service.Namespace)
 	existing, err := client.Get(service.Name, metav1.GetOptions{})
 
 	if err != nil {
 		if errors.IsNotFound(err) {
-			err = addService(kubeClient, service, lm, clusterName)
+			err = addService(kubeClient, service, lm, backendName)
 			if err != nil {
-				lm.ServiceMetricError(service.GetNamespace(), clusterName, service.GetName(), "ADD")
+				lm.ServiceMetricError(service.GetNamespace(), backendName, service.GetName(), "ADD")
 			}
 			return err
 		}
@@ -135,7 +135,7 @@ func updateService(kubeClient kubernetes.Interface, service *v1.Service, lm loca
 	_, err = client.Patch(service.Name, types.StrategicMergePatchType, patchBytes)
 
 	if err != nil {
-		lm.ServiceMetricError(service.GetNamespace(), clusterName, service.GetName(), "UPDATE")
+		lm.ServiceMetricError(service.GetNamespace(), backendName, service.GetName(), "UPDATE")
 	}
 
 	return err

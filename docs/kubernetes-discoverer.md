@@ -24,18 +24,18 @@ Arguments are available to customize the discoverer, most have defaults but othe
 | num-threads  | 2  |  Specify number of threads to use when processing queue items
 | gimbal-kubecfg-file  | ""  | Location of kubecfg file for access to Kubernetes cluster hosting Gimbal
 | discover-kubecfg-file | ""  | Location of kubecfg file for access to remote Kubernetes cluster to watch for services / endpoints 
-| cluster-name  | ""  |   Name of cluster scraping for services & endpoints (Cannot start or end with a hyphen and must be lowercase alpha-numeric)
+| backend-name  | ""  |   Name of cluster scraping for services & endpoints (Cannot start or end with a hyphen and must be lowercase alpha-numeric)
 | debug | false | Enable debug logging 
 
 ### Credentials
 
 A valid [Kubernetes config file](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/) is required to access the remote cluster. This config file is stored as a Kubernetes secret in the Gimbal cluster. 
 
-The following example creates a secret from a file locally and places it in the namespace `gimbal-discovery`. **_NOTE: Path to `config file` as well as `cluster-name` will need to be customized._**
+The following example creates a secret from a file locally and places it in the namespace `gimbal-discovery`. **_NOTE: Path to `config file` as well as `backend-name` will need to be customized._**
 
 ```bash
 # Sample secret creation
-$ kubectl create secret generic remote-discover-kubecfg --from-file=./config --from-literal=cluster-name=nodek8s -n gimbal-discovery
+$ kubectl create secret generic remote-discover-kubecfg --from-file=./config --from-literal=backend-name=nodek8s -n gimbal-discovery
 ```
 
 #### Sample Kubernetes config file
