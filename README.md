@@ -8,7 +8,7 @@ Heptio Gimbal is a layer-7 load balancing platform built on Kubernetes, the [Env
 
 Gimbal was developed out of a joint effort between Heptio and Yahoo Japan Corporation's subsidiary, Actapio, to modernize Yahoo Japan’s infrastructure with Kubernetes,  without affecting legacy investments in OpenStack.
 
-At launch, Gimbal can discover services from Kubernetes and OpenStack clusters, but we expect to support additional platforms in the future.
+Early releases of Gimbal can discover services that run on Kubernetes and OpenStack clusters, but support for additional platforms is expected in future releases.
 
 ### Common Use Cases
 
@@ -36,18 +36,18 @@ Documentation for all the Gimbal components can be found in the [docs directory]
 
 ## Known Limitations
 
-* Upstream Kubernetes Pods and OpenStack VMs must be routable from the Gimbal load balancing cluster
-  * No support for Kubernetes clusters with overlay networks
-  * We are looking for feedback on community requirements to design a solution. One potential option is to use one GRE tunnel per upstream cluster.  [Feedback welcome here](https://github.com/heptio/gimbal/issues/39)!
-* The Kubernetes Ingress API is limited and insecure
-  * Only one backend per route
-  * Anyone can modify route rules for a domain
-  * More complex load balancing features like weighting and strategy are not supported
-  * Gimbal & Contour will solve this with a [new IngressRoute CRD](https://github.com/heptio/contour/blob/master/design/ingressroute-design.md)
+* Upstream Kubernetes Pods and OpenStack VMs must be routable from the Gimbal load balancing cluster.
+  * Support is not available for Kubernetes clusters with overlay networks.
+  * We are looking for community feedback on design requirements for a solution. A possible option is one GRE tunnel per upstream cluster. [Feedback welcome here](https://github.com/heptio/gimbal/issues/39)!
+* The Kubernetes Ingress API is limited and insecure.
+  * Provides only one backend per route.
+  * Anyone can modify route rules for a domain.
+  * More complex load balancing features like weighting and strategy are not supported.
+  * Gimbal & Contour will provide a solution with a [new IngressRoute CRD](https://github.com/heptio/contour/blob/master/design/ingressroute-design.md).
 
 ## Troubleshooting
 
-If you encounter any problems that the documentation does not address, please [file an issue](https://github.com/heptio/gimbal/issues) or talk to us on the Kubernetes Slack team channel [#gimbal](https://kubernetes.slack.com/messages/gimbal)
+If you encounter any problems that the documentation does not address, please [file an issue](https://github.com/heptio/gimbal/issues) or talk to us on the Kubernetes Slack team channel [#gimbal](https://kubernetes.slack.com/messages/gimbal).
 
 ## Contributing
 

@@ -2,12 +2,11 @@
 
 ## Add a new backend
 
-In order to route traffic to a new backend, you must deploy a new discoverer instance that will discover all the services and endpoints.
+To route traffic to a new backend, you must deploy a new Discoverer instance that discovers all Services and Endpoints and routes them appropriately.
 
 ### Kubernetes
 
-1. Obtain the cluster's kubeconfig file.
-2. Create a new secret for the discoverer, using the kubeconfig obtained in the previous step:
+1. Create a new Secret from the kubeconfig file for the cluster:
 
     ```sh
     BACKEND_NAME=new-k8s
@@ -17,19 +16,19 @@ In order to route traffic to a new backend, you must deploy a new discoverer ins
         --from-literal=cluster-name=${BACKEND_NAME}
     ```
 
-3. Update the [deployment manfiest](../deployment/gimbal-discoverer/02-kubernetes-discoverer.yaml). Set the deployment name to the name of the new backend, and update the secret name to the one created in the previous step.
-4. Apply the updated manifest against the Gimbal cluster:
+1. Update the [deployment manfiest](../deployment/gimbal-discoverer/02-kubernetes-discoverer.yaml). Set the deployment name to the name of the new backend, and set the Secret name to the name of the new Secret.
+1. Apply the updated manifest to the Gimbal cluster:
 
     ```sh
     kubectl -n gimbal-discovery apply -f new-k8s-discoverer.yaml
     ```
 
-5. Verify the discoverer is running by checking the number of Available replicas in the new deployment, and by verifying the logs of the new pod.
+1. Verify the Discoverer is running by checking the number of available replicas in the new deployment, and by checking the logs of the new pod.
 
 ### OpenStack
 
-1. Ensure you have all the required [credentials](./openstack-discoverer.md#credentials) to the remote OpenStack cluster.
-2. Create a new secret for the discoverer:
+1. Ensure you have all the required [credentials](./openstack-discoverer.md#credentials) for the OpenStack cluster.
+1. Create a new Secret:
 
     ```sh
     BACKEND_NAME=new-openstack
@@ -43,57 +42,57 @@ In order to route traffic to a new backend, you must deploy a new discoverer ins
         --from-literal=tenant-name=${OS_TENANT_NAME}
     ```
 
-3. Update the [deployment manifest](../deployment/gimbal-discoverer/02-openstack-discoverer.yaml). Set the deployment name to the name of the new backend, and update the secret name to the one created in the previous step.
-4. Apply the updated manifest against the Gimbal cluster:
+1. Update the [deployment manifest](../deployment/gimbal-discoverer/02-openstack-discoverer.yaml). Set the deployment name to the name of the new backend, and update the secret name to the one created in the previous step.
+1. Apply the updated manifest to the Gimbal cluster:
 
     ```sh
     kubectl -n gimbal-discovery apply -f new-openstack-discoverer.yaml
     ```
 
-5. Verify the discoverer is running by checking the number of Available replicas in the new deployment, and by verifying the logs of the new pod.
+1. Verify the Discoverer is running by checking the number of available replicas in the new deployment, and by verifying the logs of the new pod.
 
 ## Remove a backend
 
-To remove a backend from the Gimbal cluster, the discoverer and the discovered services must be deleted.
+To remove a backend from the Gimbal cluster, the Discoverer and the discovered services must be deleted.
 
 ### Delete the discoverer
 
-1. Find the discoverer instance responsable of the backend:
+1. Find the Discoverer instance that's responsible for the backend:
 
     ```sh
     # Assuming a Kubernetes backend
     kubectl -n gimbal-discovery get deployments -l app=kubernetes-discoverer
     ```
 
-2. Delete the discoverer instance responsable of the backend:
+1. Delete the instance:
 
     ```sh
     kubectl -n gimbal-discovery delete deployment ${DISCOVERER_NAME}
     ```
 
-3. Delete the secret that belongs to the backend cluster
+1. Delete the Secret that holds the credentials for the backend cluster:
 
     ```sh
     kubectl -n gimbal-discovery delete secret ${DISCOVERER_SECRET_NAME}
     ```
 
-### Delete all services/endpoints that were discovered
+### Delete Services and Endpoints
 
-**Warning: Performing this operation will result in Gimbal not sending traffic to this backend.**
+**Warning: Performing this operation results in Gimbal not sending traffic to this backend.**
 
-1. List services that belong to the cluster, and verify the list:
+1. List the Services that belong to the cluster, and verify the list:
 
     ```sh
     kubectl --all-namespaces get svc -l gimbal.heptio.com/backend=${CLUSTER_NAME}
     ```
 
-2. Get a list of namespaces that have services discovered from this cluster:
+1. List the namespaces with Services that were discovered:
 
     ```sh
     kubectl get svc --all-namespaces  -l gimbal.heptio.com/backend=${CLUSTER_NAME} -o jsonpath='{range .items[*]}{.metadata.namespace}{"\n"}{end}' | uniq
     ```
 
-3. Iterate over the namespaces and delete all services and endpoints discovered from this cluster:
+1. Iterate over the namespaces and delete all Services and Endpoints:
 
     ```sh
     NAMESPACES=$(kubectl get svc --all-namespaces  -l gimbal.heptio.com/backend=${CLUSTER_NAME} -o jsonpath='{range .items[*]}{.metadata.namespace}{"\n"}{end}' | uniq)

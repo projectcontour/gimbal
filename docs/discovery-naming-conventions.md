@@ -1,23 +1,22 @@
-# Discovery Naming Conventions
+# Discovery naming conventions
 
-In order to load balance and route traffic to backend systems, Gimbal must
-discover the backends and sync them to the Gimbal cluster. This is done
-by the Gimbal discovery components, such as the Kubernetes discoverer and the
-OpenStack discoverer.
+To load balance and route traffic to backend systems, Gimbal must
+discover the backends and synchronize them to the Gimbal cluster. This is done
+by the Gimbal discovery components -- currently the Kubernetes Discoverer and the
+OpenStack Discoverer.
 
 During the discovery process, Gimbal translates the discovered backends into
-Kubernetes Services and Endpoints. The name of the discovered Services and
-Endpoints is called the _Discovered Name_, and is built from the following
-_Components_:
+Kubernetes Services and Endpoints. The name of each discovered Service and
+Endpoint is formed by concatenating:
 
 ```
 ${backend-name}-${service-name}
 ```
 
-The name of service ports is not specified, and is handled independently by each
-discoverer implementation.
+The name of a service port is not specified, and is handled independently by each
+Discoverer implementation.
 
-## Kubernetes Service Naming Requirements
+## Kubernetes Service naming requirements
 
 Kubernetes Service names must adhere to the [rfc1035 DNS Label](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/architecture/identifiers.md) specification:
 

@@ -3,23 +3,23 @@
 [![Build Status](https://travis-ci.com/heptio/gimbal.svg?token=dGsEGqM7L7s2vaK7wDXC&branch=master)](https://travis-ci.com/heptio/gimbal)
 
 ## Overview
-The Gimbal Discoverer currently has two different systems it can monitor, Kubernetes and Openstack. The purpose of the Discoverers are to perform service discovery for remote clusters by finding remote endpoints and synchronizing them to a central Kubernetes cluster as Services & Endpoints. 
+The Gimbal Discoverer currently can monitor two systems, Kubernetes and Openstack. The Discoverers perform service discovery of remote clusters by finding remote endpoints and synchronizing them to a central Kubernetes cluster as Services & Endpoints. 
 
 ### Kubernetes 
-The Kubernetes discoverer monitors available Services and Endpoints for a single Kubernetes cluster. The credentials to access the each API server will be provided by the Administrators via a Kubernetes Secret.
+The Kubernetes Discoverer monitors available Services and Endpoints for a single Kubernetes cluster. The credentials to access each API server are provided with a Kubernetes Secret.
 
-The Discoverer will leverage the `watch` feature of the Kubernetes API to receive changes dynamically, rather than having to poll the API. All available services & endpoints will be synchronized to the Team namespace matching the source system.
+The Discoverer leverages the watch operation of the Kubernetes API to receive changes dynamically, instead of polling the API. All available Services and Endpoints are synchronized to the Team namespace that matches the source system.
 
 ### Openstack
-The Openstack discoverer monitors all Load Balancer as a Service (LBaaS) configured as well as the corresponding Members. They are synchronized to the Team namespace as Services and Endpoints, with the Namespace being configured as the TenantName in Openstack. 
+The Openstack Discoverer monitors all configured Load Balancers as a Service (LBaaS) plus their corresponding Members. They are synchronized to the Team namespace as Services and Endpoints. The namespace ia configured as the OpenStack TenantName. 
 
-The Discoverer will poll the Openstack API on a customizable interval.  
+The Discoverer polls the Openstack API on a customizable interval.  
 
 ## Get started
 
 #### Args
 
-Arguments are available to customize the discoverer:
+The following arguments are available to customize the Discoverer:
 
 | flag  | default  | description  | discoverer | 
 |---|---|---|---|
