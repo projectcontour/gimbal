@@ -11,7 +11,7 @@ The Kubernetes Discoverer monitors available Services and Endpoints for a single
 The Discoverer leverages the watch operation of the Kubernetes API to receive changes dynamically, instead of polling the API. All available Services and Endpoints are synchronized to the Team namespace that matches the source system.
 
 ### Openstack
-The Openstack Discoverer monitors all configured Load Balancers as a Service (LBaaS) plus their corresponding Members. They are synchronized to the Team namespace as Services and Endpoints. The namespace ia configured as the OpenStack TenantName. 
+The Openstack Discoverer monitors all configured Load Balancers as a Service (LBaaS) plus their corresponding Members. They are synchronized to the Team namespace as Services and Endpoints. The namespace is configured as the OpenStack TenantName. 
 
 The Discoverer polls the Openstack API on a customizable interval.  
 

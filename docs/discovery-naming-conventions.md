@@ -6,7 +6,7 @@ by the Gimbal discovery components -- currently the Kubernetes Discoverer and th
 OpenStack Discoverer.
 
 During the discovery process, Gimbal translates the discovered backends into
-Kubernetes Services and Endpoints. The name of each discovered Service and
+Kubernetes Services and Endpoints. The _Discovered Name_ of each Service and
 Endpoint is formed by concatenating:
 
 ```
