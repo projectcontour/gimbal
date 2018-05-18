@@ -19,11 +19,9 @@ Early releases of Gimbal can discover services that run on Kubernetes and OpenSt
 
 ![OverviewDiagram](docs/images/overview.png)
 
-## Prerequisites
+## Supported versions
 
-Gimbal is tested with Kubernetes clusters running version 1.9 and later but should work with any cluster running version 1.7 or later.
-
-Gimbal's service discovery is currently tested with Kubernetes 1.7+ and OpenStack Mitaka.
+Gimbal runs on Kubernetes version 1.9 or later, but is tested to provide service discovery for clusters running Kubernetes 1.7 or later, or OpenStack Mitaka.
 
 ## Get started
 
