@@ -34,11 +34,9 @@
   ```
 
 - A single Kubernetes cluster to deploy Gimbal
-- Kubernetes or Openstack clusters with flat networking. That is, each Pod has a route-able IP address on the network.
+- Kubernetes or Openstack clusters with flat networking. That is, each Pod has a routable IP address on the network.
 
 ## Deploy Contour
-
-For additional information about Contour, see [the Gimbal architecture doc](../docs/gimbal-architecture.md).
 
 ```sh
 # Navigate to deployment directory
@@ -48,13 +46,15 @@ $ cd deployment
 $ kubectl create -f contour/
 ```
 
-The deployment also includes sample Network Policies which restrict access to Contour and Envoy as well as allow access from Prometheus to scrape for metrics. 
+The deployment includes sample Network Policies that restrict access to Contour and Envoy. The policies explicitly allow access from Prometheus to scrape for metrics. 
 
 **NOTE**: The current configuration exposes the `/stats` path from the Envoy Admin UI so that Prometheus can scrape for metrics.
 
+For additional information about Contour, see [the Gimbal architecture doc](../docs/gimbal-architecture.md).
+
 ## Deploy Discoverers
 
-Service discovery is enabled with the Discoverers, which have both Kubernetes and Openstack implementations.
+Service discovery is enabled with Discoverers, which have both Kubernetes and Openstack implementations.
 
 ```sh
 # Create gimbal-discoverer namespace
@@ -103,11 +103,11 @@ For more information, see [the OpenStack Discoverer doc](../docs/openstack-disco
 
 ## Deploy Prometheus
 
-Included in the Gimbal repo is a sample development deployment of Prometheus and Alertmanager using temporary storage and may not be suitable for all environments.
+A sample deployment of Prometheus and Alertmanager is provided that uses temporary storage. This deployment can be used for testing and development, but might not be suitable for all environments.
 
 ### Stateful Deployment
 
- A stateful deployment of Prometheus should utilize persistent storage within your Kubernetes cluster. This is accomplished by utilizing [Persistent Volumes and Persistent Volume Claims](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) to maintain a correlation between a data volume and the Prometheus pod. Persistent volumes can be `static` or `dynamic` and depends on the backend storage implementation utilized in environment in which the cluster is deployed. Please reference the [documentation](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#types-of-persistent-volumes) which best matches your environment & needs.
+ A stateful deployment of Prometheus should use persistent storage with [Persistent Volumes and Persistent Volume Claims](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) to maintain a correlation between a data volume and the Prometheus Pod. Persistent volumes can be static or dynamic and depends on the backend storage implementation utilized in environment in which the cluster is deployed. For more information, see the [Kubernetes documentation on types of persistent volumes](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#types-of-persistent-volumes).
 
 ### Quick start
 
@@ -127,7 +127,7 @@ $ kubectl apply -f kubernetes/
 $ kubectl -n gimbal-monitoring port-forward $(kubectl -n gimbal-monitoring get pods -l app=prometheus -l component=server -o jsonpath='{.items[0].metadata.name}') 9090:9090
 ```
 
-then go to [http://localhost:9090](http://localhost:9090) in your browser
+then go to [http://localhost:9090](http://localhost:9090) in your browser.
 
 ### Access the Alertmanager web UI
 
@@ -135,11 +135,11 @@ then go to [http://localhost:9090](http://localhost:9090) in your browser
 $ kubectl -n gimbal-monitoring port-forward $(kubectl -n gimbal-monitoring get pods -l app=prometheus -l component=alertmanager -o jsonpath='{.items[0].metadata.name}') 9093:9093
 ```
 
-then go to [http://localhost:9093](http://localhost:9093) in your browser
+then go to [http://localhost:9093](http://localhost:9093) in your browser.
 
 ## Deploy Grafana
 
-Sample development deployment of Grafana using temporary storage.
+A sample deployment of Grafana is provided that uses temporary storage.
 
 ### Quick start
 
@@ -159,28 +159,28 @@ $ kubectl create secret generic grafana -n gimbal-monitoring \
 $ kubectl port-forward $(kubectl get pods -l app=grafana -n gimbal-monitoring -o jsonpath='{.items[0].metadata.name}') 3000 -n gimbal-monitoring
 ```
 
-then go to [http://localhost:3000](http://localhost:3000) in your browser, with `admin` as the username.
+then go to [http://localhost:3000](http://localhost:3000) in your browser. The username is `admin`.
 
 ### Configure Grafana
 
-Grafana requires some configuration after it's deployed. These steps configure a datasource and import a dashboard to validate the connection. 
+Grafana requires some configuration after it's deployed.
 
 #### Configure datasource
 
 1. On the main Grafana page, click **Add Datasource**
 2. For **Name** enter _prometheus_
-3. In `Type` selector, choose _Prometheus_ 
+3. In the **Type** selector, choose _Prometheus_ 
 4. For the URL, enter `http://prometheus:9090`
 5. Click **Save & Test**
-6. Look for the message box in green stating _Data source is working_
+6. Look for the message box _Data source is working_
 
-#### Dashboards
+#### Configure dashboards
 
 Dashboards for Envoy and the Discovery components are included as part of the sample Grafana deployment.
 
 ##### Add Sample Kubernetes Dashboard
 
-Add sample dashboard to validate that the data source is collecting data:
+Add a sample dashboard to validate that the data source is collecting data:
 
 1. On the main page, click the plus icon and choose **Import dashboard**
 2. Enter _1621_ in the first box
@@ -189,11 +189,9 @@ Add sample dashboard to validate that the data source is collecting data:
 
 ## Validation
 
-Now you can verify the deployment:
-
 ### Discovery cluster
 
-This example deploys a sample application into the default namespace of [the discovered Kubernetes cluster that you created](#kubernetes).
+This example deploys a sample application in the default namespace of [the discovered Kubernetes cluster that you created](#kubernetes).
 
 ```sh
 # Deploy sample apps

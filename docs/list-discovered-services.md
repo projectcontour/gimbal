@@ -1,6 +1,6 @@
 # List Discovered Services
 
-The Gimbal discoverers add labels to the discovered services and endpoints before storing them in the Gimbal cluster. These labels are useful when it comes to querying the Gimbal cluster for information about these services and endpoints.
+The Gimbal Discoverers add labels to the discovered services and endpoints before storing them in the Gimbal cluster. These labels are useful for querying the Gimbal cluster.
 
 ## List all discovered services and endpoints
 
@@ -8,7 +8,7 @@ The Gimbal discoverers add labels to the discovered services and endpoints befor
 kubectl get svc,endpoints -l gimbal.heptio.com/backend
 ```
 
-You may add `--all-namespaces` to list across all namespaces in the Gimbal cluster.
+You can add `--all-namespaces` to list across all namespaces in the Gimbal cluster.
 
 ## List services and endpoints that were discovered from a specific cluster
 
