@@ -47,8 +47,8 @@ type Reconciler struct {
 	LoadBalancerLister
 	ProjectLister
 
-	// ClusterName is the name of the OpenStack cluster
-	ClusterName string
+	// BackendName is the name of the OpenStack cluster
+	BackendName string
 	ClusterType string
 	// GimbalKubeClient is the client of the Kubernetes cluster where Gimbal is running
 	GimbalKubeClient kubernetes.Interface
@@ -61,10 +61,10 @@ type Reconciler struct {
 }
 
 // NewReconciler returns an OpenStack reconciler
-func NewReconciler(clusterName, clusterType string, gimbalKubeClient kubernetes.Interface, syncPeriod time.Duration, lbLister LoadBalancerLister,
+func NewReconciler(backendName, clusterType string, gimbalKubeClient kubernetes.Interface, syncPeriod time.Duration, lbLister LoadBalancerLister,
 	projectLister ProjectLister, log *logrus.Logger, queueWorkers int, metrics localmetrics.DiscovererMetrics) Reconciler {
 	return Reconciler{
-		ClusterName:        clusterName,
+		BackendName:        backendName,
 		ClusterType:        clusterType,
 		GimbalKubeClient:   gimbalKubeClient,
 		SyncPeriod:         syncPeriod,
@@ -72,7 +72,7 @@ func NewReconciler(clusterName, clusterType string, gimbalKubeClient kubernetes.
 		ProjectLister:      projectLister,
 		Logger:             log,
 		Metrics:            metrics,
-		syncqueue:          sync.NewQueue(log, clusterName, clusterType, gimbalKubeClient, queueWorkers, metrics),
+		syncqueue:          sync.NewQueue(log, backendName, clusterType, gimbalKubeClient, queueWorkers, metrics),
 	}
 }
 
@@ -107,7 +107,7 @@ func (r *Reconciler) reconcile() {
 	// Get all the openstack tenants that must be synced
 	projects, err := r.ProjectLister.ListProjects()
 	if err != nil {
-		r.Metrics.GenericMetricError(r.ClusterName, "ListProjects")
+		r.Metrics.GenericMetricError(r.BackendName, "ListProjects")
 		log.Errorf("error listing OpenStack projects: %v", err)
 		return
 	}
@@ -117,7 +117,7 @@ func (r *Reconciler) reconcile() {
 		// Get load balancers that are defined in the project
 		loadbalancers, err := r.ListLoadBalancers(project.ID)
 		if err != nil {
-			r.Metrics.GenericMetricError(r.ClusterName, "ListLoadBalancers")
+			r.Metrics.GenericMetricError(r.BackendName, "ListLoadBalancers")
 			log.Errorf("error reconciling project %q: %v", projectName, err)
 			continue
 		}
@@ -127,38 +127,38 @@ func (r *Reconciler) reconcile() {
 		// Get all pools defined in the project
 		pools, err := r.ListPools(project.ID)
 		if err != nil {
-			r.Metrics.GenericMetricError(r.ClusterName, "ListPools")
+			r.Metrics.GenericMetricError(r.BackendName, "ListPools")
 			log.Errorf("error reconciling project %q: %v", projectName, err)
 			continue
 		}
 
 		// Get all services and endpoints that exist in the corresponding
 		// namespace
-		clusterLabelSelector := fmt.Sprintf("%s=%s", translator.GimbalLabelBackend, r.ClusterName)
+		clusterLabelSelector := fmt.Sprintf("%s=%s", translator.GimbalLabelBackend, r.BackendName)
 		currentServices, err := r.GimbalKubeClient.CoreV1().Services(projectName).List(metav1.ListOptions{LabelSelector: clusterLabelSelector})
 		if err != nil {
-			r.Metrics.GenericMetricError(r.ClusterName, "ListServicesInNamespace")
+			r.Metrics.GenericMetricError(r.BackendName, "ListServicesInNamespace")
 			log.Errorf("error listing services in namespace %q: %v", projectName, err)
 			continue
 		}
 
 		currentEndpoints, err := r.GimbalKubeClient.CoreV1().Endpoints(projectName).List(metav1.ListOptions{LabelSelector: clusterLabelSelector})
 		if err != nil {
-			r.Metrics.GenericMetricError(r.ClusterName, "ListEndpointsInNamespace")
+			r.Metrics.GenericMetricError(r.BackendName, "ListEndpointsInNamespace")
 			log.Errorf("error listing endpoints in namespace:%q: %v", projectName, err)
 			continue
 		}
 
 		// Reconcile current state with desired state
-		desiredSvcs := kubeServices(r.ClusterName, projectName, loadbalancers)
+		desiredSvcs := kubeServices(r.BackendName, projectName, loadbalancers)
 		r.reconcileSvcs(desiredSvcs, currentServices.Items)
 
-		desiredEndpoints := kubeEndpoints(r.ClusterName, projectName, loadbalancers, pools)
+		desiredEndpoints := kubeEndpoints(r.BackendName, projectName, loadbalancers, pools)
 		r.reconcileEndpoints(desiredEndpoints, currentEndpoints.Items)
 	}
 
 	// Log to Prometheus the cycle duration
-	r.Metrics.CycleDurationMetric(r.ClusterName, r.ClusterType, time.Now().Sub(start))
+	r.Metrics.CycleDurationMetric(r.BackendName, r.ClusterType, time.Now().Sub(start))
 }
 
 // skip any load balancer that has invalid characters, according to the
@@ -170,7 +170,7 @@ func (r *Reconciler) skipInvalidLoadBalancers(projectName string, lbs []loadbala
 	valid := []loadbalancers.LoadBalancer{}
 	for _, lb := range lbs {
 		if lb.Name != "" && !validName.MatchString(lb.Name) {
-			r.Metrics.GenericMetricError(r.ClusterName, "InvalidLoadBalancerName")
+			r.Metrics.GenericMetricError(r.BackendName, "InvalidLoadBalancerName")
 			r.Logger.Warningf("skipping load balancer '%s' in project '%s' as it has an invalid name '%s'", lb.ID, projectName, lb.Name)
 			continue
 		}

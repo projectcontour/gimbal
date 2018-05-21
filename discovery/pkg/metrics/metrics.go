@@ -45,56 +45,56 @@ func NewMetrics() DiscovererMetrics {
 					Name: ServiceEventTimestampGauge,
 					Help: "Timestamp last service event was processed",
 				},
-				[]string{"namespace", "clustername", "name"},
+				[]string{"namespace", "backendname", "name"},
 			),
 			EndpointsEventTimestampGauge: prometheus.NewGaugeVec(
 				prometheus.GaugeOpts{
 					Name: EndpointsEventTimestampGauge,
 					Help: "Timestamp last endpoints event was processed",
 				},
-				[]string{"namespace", "clustername", "name"},
+				[]string{"namespace", "backendname", "name"},
 			),
 			ServiceErrorTotalCounter: prometheus.NewCounterVec(
 				prometheus.CounterOpts{
 					Name: ServiceErrorTotalCounter,
 					Help: "Number of service errors encountered",
 				},
-				[]string{"namespace", "clustername", "name", "errortype"},
+				[]string{"namespace", "backendname", "name", "errortype"},
 			),
 			EndpointsErrorTotalCounter: prometheus.NewCounterVec(
 				prometheus.CounterOpts{
 					Name: EndpointsErrorTotalCounter,
 					Help: "Number of endpoints errors encountered",
 				},
-				[]string{"namespace", "clustername", "name", "errortype"},
+				[]string{"namespace", "backendname", "name", "errortype"},
 			),
 			QueueSizeGauge: prometheus.NewGaugeVec(
 				prometheus.GaugeOpts{
 					Name: QueueSizeGauge,
 					Help: "Number of items in process queue",
 				},
-				[]string{"clustername", "clustertype"},
+				[]string{"backendname", "clustertype"},
 			),
 			DiscovererAPILatencyMSGauge: prometheus.NewGaugeVec(
 				prometheus.GaugeOpts{
 					Name: DiscovererAPILatencyMSGauge,
 					Help: "The milliseconds it takes for requests to return from a remote discoverer api",
 				},
-				[]string{"clustername", "clustertype", "path"},
+				[]string{"backendname", "clustertype", "path"},
 			),
 			DiscovererCycleDurationMSGauge: prometheus.NewGaugeVec(
 				prometheus.GaugeOpts{
 					Name: DiscovererCycleDurationMSGauge,
 					Help: "The milliseconds it takes for all objects to be synced from a remote discoverer api",
 				},
-				[]string{"clustername", "clustertype"},
+				[]string{"backendname", "clustertype"},
 			),
 			DiscovererErrorTotal: prometheus.NewCounterVec(
 				prometheus.CounterOpts{
 					Name: DiscovererErrorTotal,
 					Help: "Number of errors that have occurred in the Discoverer",
 				},
-				[]string{"clustername", "errortype"},
+				[]string{"backendname", "errortype"},
 			),
 		},
 	}
@@ -109,65 +109,65 @@ func (d *DiscovererMetrics) RegisterPrometheus() {
 }
 
 // ServiceMetricError formats a service prometheus metric and increments
-func (d *DiscovererMetrics) ServiceMetricError(namespace, clusterName, serviceName, errtype string) {
+func (d *DiscovererMetrics) ServiceMetricError(namespace, backendName, serviceName, errtype string) {
 	m, ok := d.metrics[ServiceErrorTotalCounter].(*prometheus.CounterVec)
 	if ok {
-		m.WithLabelValues(namespace, clusterName, serviceName, errtype).Inc()
+		m.WithLabelValues(namespace, backendName, serviceName, errtype).Inc()
 	}
 }
 
 // EndpointsMetricError formats an endpoint prometheus metric and increments
-func (d *DiscovererMetrics) EndpointsMetricError(namespace, clusterName, endpointsName, errtype string) {
+func (d *DiscovererMetrics) EndpointsMetricError(namespace, backendName, endpointsName, errtype string) {
 	m, ok := d.metrics[EndpointsErrorTotalCounter].(*prometheus.CounterVec)
 	if ok {
-		m.WithLabelValues(namespace, clusterName, endpointsName, errtype).Inc()
+		m.WithLabelValues(namespace, backendName, endpointsName, errtype).Inc()
 	}
 }
 
 // GenericMetricError formats a generic prometheus metric and increments
-func (d *DiscovererMetrics) GenericMetricError(clusterName, errtype string) {
+func (d *DiscovererMetrics) GenericMetricError(backendName, errtype string) {
 	m, ok := d.metrics[DiscovererErrorTotal].(*prometheus.CounterVec)
 	if ok {
-		m.WithLabelValues(clusterName, errtype).Inc()
+		m.WithLabelValues(backendName, errtype).Inc()
 	}
 }
 
 // ServiceEventTimestampMetric formats a Service event timestamp prometheus metric
-func (d *DiscovererMetrics) ServiceEventTimestampMetric(namespace, clusterName, name string, timestamp int64) {
+func (d *DiscovererMetrics) ServiceEventTimestampMetric(namespace, backendName, name string, timestamp int64) {
 	m, ok := d.metrics[ServiceEventTimestampGauge].(*prometheus.GaugeVec)
 	if ok {
-		m.WithLabelValues(namespace, clusterName, name).Set(float64(timestamp))
+		m.WithLabelValues(namespace, backendName, name).Set(float64(timestamp))
 	}
 }
 
 // EndpointsEventTimestampMetric formats a Endpoint event timestamp prometheus metric
-func (d *DiscovererMetrics) EndpointsEventTimestampMetric(namespace, clusterName, name string, timestamp int64) {
+func (d *DiscovererMetrics) EndpointsEventTimestampMetric(namespace, backendName, name string, timestamp int64) {
 	m, ok := d.metrics[EndpointsEventTimestampGauge].(*prometheus.GaugeVec)
 	if ok {
-		m.WithLabelValues(namespace, clusterName, name).Set(float64(timestamp))
+		m.WithLabelValues(namespace, backendName, name).Set(float64(timestamp))
 	}
 }
 
 // QueueSizeGaugeMetric records the queue size prometheus metric
-func (d *DiscovererMetrics) QueueSizeGaugeMetric(clusterName, clusterType string, size int) {
+func (d *DiscovererMetrics) QueueSizeGaugeMetric(backendName, clusterType string, size int) {
 	m, ok := d.metrics[QueueSizeGauge].(*prometheus.GaugeVec)
 	if ok {
-		m.WithLabelValues(clusterName, clusterType).Set(float64(size))
+		m.WithLabelValues(backendName, clusterType).Set(float64(size))
 	}
 }
 
 // CycleDurationMetric formats a cycle duration gauge prometheus metric
-func (d *DiscovererMetrics) CycleDurationMetric(clusterName, clusterType string, duration time.Duration) {
+func (d *DiscovererMetrics) CycleDurationMetric(backendName, clusterType string, duration time.Duration) {
 	m, ok := d.metrics[DiscovererCycleDurationMSGauge].(*prometheus.GaugeVec)
 	if ok {
-		m.WithLabelValues(clusterName, clusterType).Set(math.Floor(duration.Seconds() * 1e3))
+		m.WithLabelValues(backendName, clusterType).Set(math.Floor(duration.Seconds() * 1e3))
 	}
 }
 
 // APILatencyMetric formats a cycle duration gauge prometheus metric
-func (d *DiscovererMetrics) APILatencyMetric(clusterName, clusterType, path string, duration time.Duration) {
+func (d *DiscovererMetrics) APILatencyMetric(backendName, clusterType, path string, duration time.Duration) {
 	m, ok := d.metrics[DiscovererAPILatencyMSGauge].(*prometheus.GaugeVec)
 	if ok {
-		m.WithLabelValues(clusterName, clusterType, path).Set(math.Floor(duration.Seconds() * 1e3))
+		m.WithLabelValues(backendName, clusterType, path).Set(math.Floor(duration.Seconds() * 1e3))
 	}
 }

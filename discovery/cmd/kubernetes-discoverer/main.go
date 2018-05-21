@@ -37,7 +37,7 @@ var (
 	gimbalKubeCfgFile     string
 	discovererKubeCfgFile string
 	numProcessThreads     int
-	clusterName           string
+	backendName           string
 	resyncInterval        time.Duration
 	debug                 bool
 	prometheusListenPort  int
@@ -49,7 +49,7 @@ func init() {
 	flag.IntVar(&numProcessThreads, "num-threads", 2, "Specify number of threads to use when processing queue items.")
 	flag.StringVar(&gimbalKubeCfgFile, "gimbal-kubecfg-file", "", "Location of kubecfg file for access to gimbal system kubernetes api, defaults to service account tokens")
 	flag.StringVar(&discovererKubeCfgFile, "discover-kubecfg-file", "", "Location of kubecfg file for access to remote discover system kubernetes api")
-	flag.StringVar(&clusterName, "cluster-name", "", "Name of cluster")
+	flag.StringVar(&backendName, "backend-name", "", "Name of backend (must be unique)")
 	flag.DurationVar(&resyncInterval, "resync-interval", time.Minute*30, "Default resync period for watcher to refresh")
 	flag.BoolVar(&debug, "debug", false, "Enable debug logging.")
 	flag.IntVar(&prometheusListenPort, "prometheus-listen-address", 8080, "The address to listen on for Prometheus HTTP requests")
@@ -79,10 +79,10 @@ func main() {
 	}
 
 	// Verify cluster name is passed
-	if util.IsInvalidClusterName(clusterName) {
-		log.Fatalf("The Kubernetes cluster name must be provided using the `--cluster-name` flag or the one passed is invalid")
+	if util.IsInvalidBackendName(backendName) {
+		log.Fatalf("The Kubernetes cluster name must be provided using the `--backend-name` flag or the one passed is invalid")
 	}
-	log.Infof("ClusterName is: %s", clusterName)
+	log.Infof("BackendName is: %s", backendName)
 
 	// Discovered cluster is passed
 	if discovererKubeCfgFile == "" {
@@ -104,7 +104,7 @@ func main() {
 
 	kubeInformerFactory := kubeinformers.NewSharedInformerFactory(k8sDiscovererClient, resyncInterval)
 
-	c := k8s.NewController(log, gimbalKubeClient, kubeInformerFactory, clusterName, numProcessThreads, discovererMetrics)
+	c := k8s.NewController(log, gimbalKubeClient, kubeInformerFactory, backendName, numProcessThreads, discovererMetrics)
 	if err != nil {
 		log.Fatal("Could not init Controller! ", err)
 	}

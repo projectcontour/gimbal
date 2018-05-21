@@ -28,14 +28,14 @@ import (
 func TestKubeServices(t *testing.T) {
 	tests := []struct {
 		name        string
-		clusterName string
+		backendName string
 		tenantName  string
 		lbs         []loadbalancers.LoadBalancer
 		expected    []v1.Service
 	}{
 		{
 			name:        "unnamed lb",
-			clusterName: "us-east",
+			backendName: "us-east",
 			tenantName:  "finance",
 			lbs: []loadbalancers.LoadBalancer{
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", ""),
@@ -52,7 +52,7 @@ func TestKubeServices(t *testing.T) {
 		},
 		{
 			name:        "named lb",
-			clusterName: "us-east",
+			backendName: "us-east",
 			tenantName:  "finance",
 			lbs: []loadbalancers.LoadBalancer{
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "stocks"),
@@ -69,7 +69,7 @@ func TestKubeServices(t *testing.T) {
 		},
 		{
 			name:        "lb with long name",
-			clusterName: "us-east",
+			backendName: "us-east",
 			tenantName:  "finance",
 			lbs: []loadbalancers.LoadBalancer{
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "very-long-openstack-load-balancer-name-that-is-longer-than-the-limit"),
@@ -86,7 +86,7 @@ func TestKubeServices(t *testing.T) {
 		},
 		{
 			name:        "lb with name that begins with a number",
-			clusterName: "us-east",
+			backendName: "us-east",
 			tenantName:  "finance",
 			lbs: []loadbalancers.LoadBalancer{
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "1234-stocks"),
@@ -103,7 +103,7 @@ func TestKubeServices(t *testing.T) {
 		},
 		{
 			name:        "lb with name that contains uppercase letters",
-			clusterName: "us-east",
+			backendName: "us-east",
 			tenantName:  "finance",
 			lbs: []loadbalancers.LoadBalancer{
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "1234-STOCKS"),
@@ -120,7 +120,7 @@ func TestKubeServices(t *testing.T) {
 		},
 		{
 			name:        "long cluster name, normal lb name",
-			clusterName: "cluster-name-that-is-definitely-too-long-to-be-useful",
+			backendName: "cluster-name-that-is-definitely-too-long-to-be-useful",
 			tenantName:  "finance",
 			lbs: []loadbalancers.LoadBalancer{
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "nginx"),
@@ -137,7 +137,7 @@ func TestKubeServices(t *testing.T) {
 		},
 		{
 			name:        "long lb name and long cluster name",
-			clusterName: "cluster-name-that-is-definitely-too-long-to-be-useful",
+			backendName: "cluster-name-that-is-definitely-too-long-to-be-useful",
 			tenantName:  "finance",
 			lbs: []loadbalancers.LoadBalancer{
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "very-long-openstack-load-balancer-name-that-is-longer-than-the-limit"),
@@ -154,7 +154,7 @@ func TestKubeServices(t *testing.T) {
 		},
 		{
 			name:        "named lb with one listener",
-			clusterName: "us-east",
+			backendName: "us-east",
 			tenantName:  "finance",
 			lbs: []loadbalancers.LoadBalancer{
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "stocks", listener("ls-1", "http", "tcp", "pool-1", 80)),
@@ -177,7 +177,7 @@ func TestKubeServices(t *testing.T) {
 		},
 		{
 			name:        "one named lb, one listener",
-			clusterName: "us-east",
+			backendName: "us-east",
 			tenantName:  "finance",
 			lbs: []loadbalancers.LoadBalancer{
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "stocks", listener("ls-1", "http", "tcp", "pool-1", 80)),
@@ -200,7 +200,7 @@ func TestKubeServices(t *testing.T) {
 		},
 		{
 			name:        "named lb, two listeners",
-			clusterName: "us-east",
+			backendName: "us-east",
 			tenantName:  "finance",
 			lbs: []loadbalancers.LoadBalancer{
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "stocks", listener("ls-1", "http", "tcp", "pool-1", 80), listener("ls-1", "https", "tcp", "pool-1", 443)),
@@ -229,7 +229,7 @@ func TestKubeServices(t *testing.T) {
 		{
 			name:        "unnammed lb, two listeners",
 			tenantName:  "finance",
-			clusterName: "us-east",
+			backendName: "us-east",
 			lbs: []loadbalancers.LoadBalancer{
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "", listener("ls-1", "http", "tcp", "pool-1", 80), listener("ls-1", "https", "tcp", "pool-1", 443)),
 			},
@@ -258,7 +258,7 @@ func TestKubeServices(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := kubeServices(tc.clusterName, tc.tenantName, tc.lbs)
+			got := kubeServices(tc.backendName, tc.tenantName, tc.lbs)
 			assert.Equal(t, tc.expected, got)
 			assert.Len(t, got, len(tc.lbs))
 		})
@@ -269,14 +269,14 @@ func TestKubeEndpoints(t *testing.T) {
 	tests := []struct {
 		name        string
 		tenantName  string
-		clusterName string
+		backendName string
 		lbs         []loadbalancers.LoadBalancer
 		pools       []pools.Pool
 		expected    []v1.Endpoints
 	}{
 		{
 			name:        "single listener",
-			clusterName: "us-east",
+			backendName: "us-east",
 			tenantName:  "finance",
 			lbs: []loadbalancers.LoadBalancer{
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "stocks", listener("970fd223-4684-4c50-bfa2-738d6dda096f", "http", "tcp", "pool-1", 80)),
@@ -301,7 +301,7 @@ func TestKubeEndpoints(t *testing.T) {
 		},
 		{
 			name:        "single listener, long cluster name",
-			clusterName: "cluster-name-that-is-definitely-too-long-to-be-useful-in-any-shape-or-form",
+			backendName: "cluster-name-that-is-definitely-too-long-to-be-useful-in-any-shape-or-form",
 			tenantName:  "finance",
 			lbs: []loadbalancers.LoadBalancer{
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "stocks", listener("970fd223-4684-4c50-bfa2-738d6dda096f", "http", "tcp", "pool-1", 80)),
@@ -326,7 +326,7 @@ func TestKubeEndpoints(t *testing.T) {
 		},
 		{
 			name:        "single listener, long load balancer name",
-			clusterName: "us-east",
+			backendName: "us-east",
 			tenantName:  "finance",
 			lbs: []loadbalancers.LoadBalancer{
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "very-long-openstack-load-balancer-name-that-is-longer-than-the-limit", listener("970fd223-4684-4c50-bfa2-738d6dda096f", "http", "tcp", "pool-1", 80)),
@@ -352,7 +352,7 @@ func TestKubeEndpoints(t *testing.T) {
 		{
 			name:        "multiple listeners",
 			tenantName:  "finance",
-			clusterName: "us-east",
+			backendName: "us-east",
 			lbs: []loadbalancers.LoadBalancer{
 				loadbalancer("loadbalancer-1", "stocks", listener("listener-1", "http", "tcp", "pool-1", 80), listener("listener-2", "https", "tcp", "pool-2", 443)),
 			},
@@ -390,7 +390,7 @@ func TestKubeEndpoints(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := kubeEndpoints(tc.clusterName, tc.tenantName, tc.lbs, tc.pools)
+			got := kubeEndpoints(tc.backendName, tc.tenantName, tc.lbs, tc.pools)
 			// Cannot use assert.Equal on the structs as the order of subsets is undetermined.
 			for i := range tc.expected {
 				assert.Equal(t, tc.expected[i].Namespace, got[i].Namespace)

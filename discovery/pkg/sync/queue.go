@@ -40,12 +40,12 @@ type Queue struct {
 	Workqueue   workqueue.RateLimitingInterface
 	Threadiness int
 	Metrics     localmetrics.DiscovererMetrics
-	ClusterName string
+	BackendName string
 	ClusterType string
 }
 
 // NewQueue returns an initialized sync.Queue for syncing resources with a Gimbal cluster.
-func NewQueue(logger *logrus.Logger, clusterName, clusterType string, kubeClient kubernetes.Interface,
+func NewQueue(logger *logrus.Logger, backendName, clusterType string, kubeClient kubernetes.Interface,
 	threadiness int, metrics localmetrics.DiscovererMetrics) Queue {
 	return Queue{
 		KubeClient:  kubeClient,
@@ -53,21 +53,21 @@ func NewQueue(logger *logrus.Logger, clusterName, clusterType string, kubeClient
 		Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
 		Threadiness: threadiness,
 		Metrics:     metrics,
-		ClusterName: clusterName,
+		BackendName: backendName,
 		ClusterType: clusterType,
 	}
 }
 
 // Action that is added to the queue for processing
 type Action interface {
-	Sync(kube kubernetes.Interface, lm localmetrics.DiscovererMetrics, clusterName string) error
+	Sync(kube kubernetes.Interface, lm localmetrics.DiscovererMetrics, backendName string) error
 	ObjectMeta() *metav1.ObjectMeta
 }
 
 // Enqueue adds a new resource action to the worker queue
 func (sq *Queue) Enqueue(action Action) {
 	sq.Workqueue.AddRateLimited(action)
-	sq.Metrics.QueueSizeGaugeMetric(sq.ClusterName, sq.ClusterType, sq.Workqueue.Len())
+	sq.Metrics.QueueSizeGaugeMetric(sq.BackendName, sq.ClusterType, sq.Workqueue.Len())
 }
 
 // Run starts the queue workers. It blocks until the stopCh is closed.
@@ -118,7 +118,7 @@ func (sq *Queue) processNextWorkItem() bool {
 			return fmt.Errorf("ignoring unknown item of type %T in queue", obj)
 		}
 
-		err := action.Sync(sq.KubeClient, sq.Metrics, sq.ClusterName)
+		err := action.Sync(sq.KubeClient, sq.Metrics, sq.BackendName)
 		if err != nil {
 			return err
 		}

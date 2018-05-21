@@ -26,13 +26,13 @@ spec:
           imagePullPolicy: Always
           name: openstack-discoverer
           command: ["/openstack-discoverer"]
-          args: ["--cluster-name", "$(CLUSTER_NAME)", "--openstack-certificate-authority","/etc/remote-openstack-config/ca.pem"]
+          args: ["--backend-name", "$(CLUSTER_NAME)", "--openstack-certificate-authority","/etc/remote-openstack-config/ca.pem"]
           env:
             - name: CLUSTER_NAME
               valueFrom:
                 secretKeyRef:
                   name: remote-discover-openstack
-                  key: cluster-name
+                  key: backend-name
             - name: OS_USERNAME
               valueFrom:
                 secretKeyRef:

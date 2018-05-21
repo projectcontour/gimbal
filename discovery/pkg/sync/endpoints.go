@@ -54,22 +54,22 @@ func (action endpointsAction) ObjectMeta() *metav1.ObjectMeta {
 }
 
 // Sync performs the action on the given Endpoints resource
-func (action endpointsAction) Sync(kubeClient kubernetes.Interface, metrics localmetrics.DiscovererMetrics, clusterName string) error {
+func (action endpointsAction) Sync(kubeClient kubernetes.Interface, metrics localmetrics.DiscovererMetrics, backendName string) error {
 
 	var err error
 	switch action.kind {
 	case actionAdd:
-		err = addEndpoints(kubeClient, action.endpoints, metrics, clusterName)
+		err = addEndpoints(kubeClient, action.endpoints, metrics, backendName)
 	case actionUpdate:
-		err = updateEndpoints(kubeClient, action.endpoints, metrics, clusterName)
+		err = updateEndpoints(kubeClient, action.endpoints, metrics, backendName)
 	case actionDelete:
-		err = deleteEndpoints(kubeClient, action.endpoints, metrics, clusterName)
+		err = deleteEndpoints(kubeClient, action.endpoints, metrics, backendName)
 	}
 	if err != nil {
 		return fmt.Errorf("error handling %s: %v", action, err)
 	}
 
-	metrics.EndpointsEventTimestampMetric(action.endpoints.GetNamespace(), clusterName, action.endpoints.GetName(), time.Now().Unix())
+	metrics.EndpointsEventTimestampMetric(action.endpoints.GetNamespace(), backendName, action.endpoints.GetName(), time.Now().Unix())
 	return nil
 }
 
@@ -77,40 +77,40 @@ func (action endpointsAction) String() string {
 	return fmt.Sprintf(`%s endpoints '%s/%s'`, action.kind, action.endpoints.Namespace, action.endpoints.Name)
 }
 
-func addEndpoints(kubeClient kubernetes.Interface, endpoints *v1.Endpoints, lm localmetrics.DiscovererMetrics, clusterName string) error {
+func addEndpoints(kubeClient kubernetes.Interface, endpoints *v1.Endpoints, lm localmetrics.DiscovererMetrics, backendName string) error {
 	_, err := kubeClient.CoreV1().Endpoints(endpoints.Namespace).Create(endpoints)
 	if errors.IsAlreadyExists(err) {
-		err = updateEndpoints(kubeClient, endpoints, lm, clusterName)
+		err = updateEndpoints(kubeClient, endpoints, lm, backendName)
 		if err != nil {
-			lm.EndpointsMetricError(endpoints.GetNamespace(), clusterName, endpoints.GetName(), "UPDATE")
+			lm.EndpointsMetricError(endpoints.GetNamespace(), backendName, endpoints.GetName(), "UPDATE")
 		}
 	} else {
 		if err != nil {
-			lm.EndpointsMetricError(endpoints.GetNamespace(), clusterName, endpoints.GetName(), "ADD")
+			lm.EndpointsMetricError(endpoints.GetNamespace(), backendName, endpoints.GetName(), "ADD")
 		}
 	}
 	return err
 }
 
-func deleteEndpoints(kubeClient kubernetes.Interface, endpoints *v1.Endpoints, lm localmetrics.DiscovererMetrics, clusterName string) error {
+func deleteEndpoints(kubeClient kubernetes.Interface, endpoints *v1.Endpoints, lm localmetrics.DiscovererMetrics, backendName string) error {
 	err := kubeClient.CoreV1().Endpoints(endpoints.Namespace).Delete(endpoints.Name, &metav1.DeleteOptions{})
 
 	if err != nil {
-		lm.EndpointsMetricError(endpoints.GetNamespace(), clusterName, endpoints.GetName(), "DELETE")
+		lm.EndpointsMetricError(endpoints.GetNamespace(), backendName, endpoints.GetName(), "DELETE")
 	}
 
 	return err
 }
 
-func updateEndpoints(kubeClient kubernetes.Interface, endpoints *v1.Endpoints, lm localmetrics.DiscovererMetrics, clusterName string) error {
+func updateEndpoints(kubeClient kubernetes.Interface, endpoints *v1.Endpoints, lm localmetrics.DiscovererMetrics, backendName string) error {
 	client := kubeClient.CoreV1().Endpoints(endpoints.Namespace)
 	existing, err := client.Get(endpoints.Name, metav1.GetOptions{})
 
 	if err != nil {
 		if errors.IsNotFound(err) {
-			err = addEndpoints(kubeClient, endpoints, lm, clusterName)
+			err = addEndpoints(kubeClient, endpoints, lm, backendName)
 			if err != nil {
-				lm.EndpointsMetricError(endpoints.GetNamespace(), clusterName, endpoints.GetName(), "ADD")
+				lm.EndpointsMetricError(endpoints.GetNamespace(), backendName, endpoints.GetName(), "ADD")
 			}
 		}
 		return err
@@ -135,7 +135,7 @@ func updateEndpoints(kubeClient kubernetes.Interface, endpoints *v1.Endpoints, l
 	_, err = client.Patch(endpoints.Name, types.MergePatchType, patchBytes)
 
 	if err != nil {
-		lm.EndpointsMetricError(endpoints.GetNamespace(), clusterName, endpoints.GetName(), "UPDATE")
+		lm.EndpointsMetricError(endpoints.GetNamespace(), backendName, endpoints.GetName(), "UPDATE")
 	}
 
 	return err
