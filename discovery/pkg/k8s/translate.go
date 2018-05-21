@@ -19,12 +19,12 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func translateService(svc *v1.Service, clusterName string) *v1.Service {
+func translateService(svc *v1.Service, backendName string) *v1.Service {
 	newService := &v1.Service{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: svc.Namespace,
-			Name:      translator.BuildDiscoveredName(clusterName, svc.Name),
-			Labels:    translator.AddGimbalLabels(clusterName, svc.ObjectMeta.Name, svc.ObjectMeta.Labels),
+			Name:      translator.BuildDiscoveredName(backendName, svc.Name),
+			Labels:    translator.AddGimbalLabels(backendName, svc.ObjectMeta.Name, svc.ObjectMeta.Labels),
 		},
 		Spec: v1.ServiceSpec{
 			ClusterIP: "None",
@@ -41,12 +41,12 @@ func translateService(svc *v1.Service, clusterName string) *v1.Service {
 	return newService
 }
 
-func translateEndpoints(endpoints *v1.Endpoints, clusterName string) *v1.Endpoints {
+func translateEndpoints(endpoints *v1.Endpoints, backendName string) *v1.Endpoints {
 	newEndpoint := &v1.Endpoints{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: endpoints.Namespace,
-			Name:      translator.BuildDiscoveredName(clusterName, endpoints.Name),
-			Labels:    translator.AddGimbalLabels(clusterName, endpoints.ObjectMeta.Name, endpoints.ObjectMeta.Labels),
+			Name:      translator.BuildDiscoveredName(backendName, endpoints.Name),
+			Labels:    translator.AddGimbalLabels(backendName, endpoints.ObjectMeta.Name, endpoints.ObjectMeta.Labels),
 		},
 		Subsets: endpoints.Subsets,
 	}

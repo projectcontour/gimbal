@@ -71,7 +71,7 @@ The Kubernetes Discoverer is responsible for looking at all services and endpoin
 # Kubernetes secret
 $ kubectl -n gimbal-discovery create secret generic remote-discover-kubecfg \
     --from-file=config=./config \
-    --from-literal=cluster-name=node02
+    --from-literal=backend-name=node02
 
 # Deploy Discoverer
 $ kubectl apply -f gimbal-discoverer/02-kubernetes-discoverer.yaml
@@ -89,7 +89,7 @@ The Openstack Discoverer is responsible for looking at all LBaaS and members in 
 # Openstack secret
 $ kubectl -n gimbal-discovery create secret generic remote-discover-openstack \
     --from-file=certificate-authority-data=./ca.pem \
-    --from-literal=cluster-name=openstack \
+    --from-literal=backend-name=openstack \
     --from-literal=username=admin \
     --from-literal=password=abc123 \
     --from-literal=auth-url=https://api.openstack:5000/ \

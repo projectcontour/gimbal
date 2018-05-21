@@ -170,9 +170,9 @@ func TestAddServiceQueue(t *testing.T) {
 					Logger:      logrus.New(),
 					Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
 					Threadiness: 1,
-					ClusterName: "test",
+					BackendName: "test",
 				},
-				clusterName: "test",
+				backendName: "test",
 			}
 
 			c.addService(tc.service)
@@ -191,9 +191,9 @@ func TestUpdateServiceQueue(t *testing.T) {
 					Logger:      logrus.New(),
 					Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
 					Threadiness: 1,
-					ClusterName: "test",
+					BackendName: "test",
 				},
-				clusterName: "test",
+				backendName: "test",
 			}
 
 			c.updateService(tc.service)
@@ -212,9 +212,9 @@ func TestDeleteServiceQueue(t *testing.T) {
 					Logger:      logrus.New(),
 					Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
 					Threadiness: 1,
-					ClusterName: "test",
+					BackendName: "test",
 				},
-				clusterName: "test",
+				backendName: "test",
 			}
 
 			c.deleteService(tc.service)
@@ -233,9 +233,9 @@ func TestAddEndpointsQueue(t *testing.T) {
 					Logger:      logrus.New(),
 					Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
 					Threadiness: 1,
-					ClusterName: "test",
+					BackendName: "test",
 				},
-				clusterName: "test",
+				backendName: "test",
 			}
 
 			c.addEndpoints(tc.endpoint)
@@ -254,9 +254,9 @@ func TestUpdateEndpointsQueue(t *testing.T) {
 					Logger:      logrus.New(),
 					Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
 					Threadiness: 1,
-					ClusterName: "test",
+					BackendName: "test",
 				},
-				clusterName: "test",
+				backendName: "test",
 			}
 
 			c.updateEndpoints(tc.endpoint)
@@ -275,9 +275,9 @@ func TestDeleteEndpointsQueue(t *testing.T) {
 					Logger:      logrus.New(),
 					Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
 					Threadiness: 1,
-					ClusterName: "test",
+					BackendName: "test",
 				},
-				clusterName: "test",
+				backendName: "test",
 			}
 
 			c.deleteEndpoints(tc.endpoint)

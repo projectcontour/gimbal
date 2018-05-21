@@ -26,13 +26,13 @@ spec:
         imagePullPolicy: Always
         name: kubernetes-discoverer
         command: ["/kubernetes-discoverer"]
-        args: ["--discover-kubecfg-file", "/etc/remote-discover-kubecfg/config", "--cluster-name", "$(CLUSTER_NAME)"]
+        args: ["--discover-kubecfg-file", "/etc/remote-discover-kubecfg/config", "--backend-name", "$(CLUSTER_NAME)"]
         env:
         - name: CLUSTER_NAME
           valueFrom:
             secretKeyRef:
               name: remote-discover-kubecfg
-              key: cluster-name
+              key: backend-name
         volumeMounts:
         - name: discover-kubecfg
           readOnly: true

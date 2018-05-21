@@ -66,33 +66,33 @@ Based on the Service and Pod definitions, Endpoints’ "Target Port" may be diff
 
 The Kubernetes Discoverer will write the available Services and Endpoint information to the corresponding Team namespace as standard Kubernetes services & endpoints.
 
-The discoverer will only be responsible for monitoring a single cluster at a time. If multiple clusters are required to be watched, then multiple discoverer components will need to be deployed. Initially, discoverer's will be deployed manually via Deployments, but further iterations will introduce a Disovery Operator which will take over this repsonsibility. 
+The discoverer will only be responsible for monitoring a single cluster at a time. If multiple clusters are required to be watched, then multiple discoverer components will need to be deployed. Initially, discoverer's will be deployed manually via Deployments, but further iterations will introduce a Discovery Operator which will take over this responsibility. 
 
 ## Detailed Design
 
 Watches are setup to monitor for changes to Services or Endpoints in a Kubernetes cluster. These updates (e.g. ADD, MODIFY, DELETE) are places onto a queue. Items are processed off of that rate-limited queue so that we can maintain sane performance. The queue is an in-memory queue with no durability aimed at reducing the load on the Gimbal Kubernetes API. 
 
-If additional processing is required, then an argument can be changed to increase the number of threads available to consume items from the queue. All objects syncronized to the coresponding Team namespace. When an object is added or updated, the entire object is copied with all labels, anotations, etc. Additional labels are added so that Izzy can have more detailed information about the object. 
+If additional processing is required, then an argument can be changed to increase the number of threads available to consume items from the queue. All objects synchronized to the corresponding Team namespace. When an object is added or updated, the entire object is copied with all labels, annotations, etc. Additional labels are added so that Izzy can have more detailed information about the object. 
 
 Those labels are defined as:
 
-- gimbal.heptio.com/backend: ClusterName (Defined via argument)
+- gimbal.heptio.com/backend: BackendName (Defined via argument)
 - gimbal.heptio.com/service: [ServiceName]
 
-The name of the syncronized object will be a hash of the `ClusterName-ServiceName`. The name is hashed because of length restrictions when creating a service object.
+The name of the synchronized object will be a hash of the `BackendName-ServiceName`. The name is hashed because of length restrictions when creating a service object.
 
 In the event that the total length of the hash is larger than 63 characters (maximum allowed length), then the components are hashed to keep within the limits. All attempts are made to keep the name as descriptive to the source as possible. 
 
-The discoverer should syncronize the cluster on first startup so that any changes missed while being offline are properly updated. This is handled automatically since a new watch on a resource sends the current list of items upon initialization. The add logic then checks to see if the object is already existing and in that case passes it off to the update method. 
+The discoverer should synchronize the cluster on first startup so that any changes missed while being offline are properly updated. This is handled automatically since a new watch on a resource sends the current list of items upon initialization. The add logic then checks to see if the object is already existing and in that case passes it off to the update method. 
 
 The discoverer component will have arguments which will allow users to customize or override default values:
 
 - *num-threads*: Specify number of threads to use when processing queue items.
 - *gimbal-kubecfg-file*: Location of kubecfg file for access to kubernetes cluster hosting Izzy
 - *discover-kubecfg-file*: Location of kubecfg file for access to remote kubernetes cluster to watch for services / endpoints
-- *cluster-name*: Name of cluster scraping for services & endpoints
+- *backend-name*: Name of cluster scraping for services & endpoints
 
-By default, the `kube-system` namespace is isgnored when looking for services / endpoints. Future iterations of discoverer should allow for namespace whilelisting and blacklisting to allow for further customization. 
+By default, the `kube-system` namespace is ignored when looking for services / endpoints. Future iterations of discoverer should allow for namespace whitelisting and blacklisting to allow for further customization. 
 
 ## Security/Performance Concerns
 

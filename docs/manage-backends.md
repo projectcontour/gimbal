@@ -13,7 +13,7 @@ To route traffic to a new backend, you must deploy a new Discoverer instance tha
     SECRET_NAME=${BACKEND_NAME}-discover-kubecfg
     kubectl -n gimbal-discovery create secret generic ${SECRET_NAME} \
         --from-file=config=./config \
-        --from-literal=cluster-name=${BACKEND_NAME}
+        --from-literal=backend-name=${BACKEND_NAME}
     ```
 
 1. Update the [deployment manfiest](../deployment/gimbal-discoverer/02-kubernetes-discoverer.yaml). Set the deployment name to the name of the new backend, and set the Secret name to the name of the new Secret.
@@ -35,7 +35,7 @@ To route traffic to a new backend, you must deploy a new Discoverer instance tha
     SECRET_NAME=${BACKEND_NAME}-discover-openstack
     kubectl -n gimbal-discovery create secret generic ${SECRET_NAME} \
         --from-file=certificate-authority-data=${CA_DATA_FILE} \
-        --from-literal=cluster-name=${BACKEND_NAME} \
+        --from-literal=backend-name=${BACKEND_NAME} \
         --from-literal=username=${OS_USERNAME} \
         --from-literal=password=${OS_PASSWORD} \
         --from-literal=auth-url=${OS_AUTH_URL} \

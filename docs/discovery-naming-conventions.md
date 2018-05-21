@@ -97,7 +97,7 @@ The specifics of each discoverer are documented below.
 
 ### Kubernetes discoverer
 
-- `${backend-name}`: The value of the `--cluster-name` flag provided to the
+- `${backend-name}`: The value of the `--backend-name` flag provided to the
   discoverer. Must begin with a lowercase letter.
 - `${service-name}`: The name of the backend service, verbatim.
 
@@ -105,7 +105,7 @@ Service port names are copied verbatim from the backend service.
 
 ### OpenStack discoverer
 
-- `${backend-name}`: The value of the `--cluster-name` flag provided to the
+- `${backend-name}`: The value of the `--backend-name` flag provided to the
   discoverer. Must begin with a lowercase letter.
 - `${service-name}`: `${name}-${id}` of the LBaaS Load Balancer. Both are
   lowercased during the discovery process.

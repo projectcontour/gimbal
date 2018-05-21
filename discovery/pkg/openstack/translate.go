@@ -27,14 +27,14 @@ import (
 )
 
 // returns a kubernetes service for each load balancer in the slice
-func kubeServices(clusterName, tenantName string, lbs []loadbalancers.LoadBalancer) []v1.Service {
+func kubeServices(backendName, tenantName string, lbs []loadbalancers.LoadBalancer) []v1.Service {
 	var svcs []v1.Service
 	for _, lb := range lbs {
 		svc := v1.Service{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: tenantName,
-				Name:      translator.BuildDiscoveredName(clusterName, serviceName(lb)),
-				Labels:    translator.AddGimbalLabels(clusterName, serviceName(lb), loadbalancerLabels(lb)),
+				Name:      translator.BuildDiscoveredName(backendName, serviceName(lb)),
+				Labels:    translator.AddGimbalLabels(backendName, serviceName(lb), loadbalancerLabels(lb)),
 			},
 			Spec: v1.ServiceSpec{
 				Type:      v1.ServiceTypeClusterIP,
@@ -50,14 +50,14 @@ func kubeServices(clusterName, tenantName string, lbs []loadbalancers.LoadBalanc
 }
 
 // returns a kubernetes endpoints resource for each load balancer in the slice
-func kubeEndpoints(clusterName, tenantName string, lbs []loadbalancers.LoadBalancer, ps []pools.Pool) []v1.Endpoints {
+func kubeEndpoints(backendName, tenantName string, lbs []loadbalancers.LoadBalancer, ps []pools.Pool) []v1.Endpoints {
 	var endpoints []v1.Endpoints
 	for _, lb := range lbs {
 		ep := v1.Endpoints{
 			ObjectMeta: metav1.ObjectMeta{
 				Namespace: tenantName,
-				Name:      translator.BuildDiscoveredName(clusterName, serviceName(lb)),
-				Labels:    translator.AddGimbalLabels(clusterName, serviceName(lb), loadbalancerLabels(lb)),
+				Name:      translator.BuildDiscoveredName(backendName, serviceName(lb)),
+				Labels:    translator.AddGimbalLabels(backendName, serviceName(lb), loadbalancerLabels(lb)),
 			},
 		}
 		for _, l := range lb.Listeners {

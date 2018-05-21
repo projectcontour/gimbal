@@ -255,21 +255,21 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum(gimbal_service_error_total{namespace=~\"$Namespace\",clustername=~\"$BackendCluster\"}) by (clustername)",
+              "expr": "sum(gimbal_service_error_total{namespace=~\"$Namespace\",backendname=~\"$BackendCluster\"}) by (backendname)",
               "format": "time_series",
               "hide": false,
               "interval": "",
               "intervalFactor": 1,
-              "legendFormat": "Service errors: {{clustername}}",
+              "legendFormat": "Service errors: {{backendname}}",
               "refId": "A"
             },
             {
-              "expr": "sum(gimbal_endpoints_error_total{namespace=~\"$Namespace\",clustername=~\"$BackendCluster\"}) by (clustername)",
+              "expr": "sum(gimbal_endpoints_error_total{namespace=~\"$Namespace\",backendname=~\"$BackendCluster\"}) by (backendname)",
               "format": "time_series",
               "hide": false,
               "interval": "",
               "intervalFactor": 1,
-              "legendFormat": "Endpoints errors: {{clustername}}",
+              "legendFormat": "Endpoints errors: {{backendname}}",
               "refId": "B"
             }
           ],
@@ -348,7 +348,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum(gimbal_service_error_total{namespace=~\"$Namespace\",clustername=~\"$BackendCluster\"}) by (namespace)",
+              "expr": "sum(gimbal_service_error_total{namespace=~\"$Namespace\",backendname=~\"$BackendCluster\"}) by (namespace)",
               "format": "time_series",
               "hide": false,
               "interval": "",
@@ -357,7 +357,7 @@ data:
               "refId": "A"
             },
             {
-              "expr": "sum(gimbal_endpoints_error_total{namespace=~\"$Namespace\",clustername=~\"$BackendCluster\"}) by (namespace)",
+              "expr": "sum(gimbal_endpoints_error_total{namespace=~\"$Namespace\",backendname=~\"$BackendCluster\"}) by (namespace)",
               "format": "time_series",
               "hide": false,
               "interval": "",
@@ -446,11 +446,11 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "gimbal_queuesize{clustername=~\"$BackendCluster\"} ",
+              "expr": "gimbal_queuesize{backendname=~\"$BackendCluster\"} ",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 1,
-              "legendFormat": "{{clustername}}",
+              "legendFormat": "{{backendname}}",
               "refId": "A"
             }
           ],
@@ -529,12 +529,12 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "gimbal_discoverer_cycle_duration_ms{clustername=~\"$BackendCluster\"} ",
+              "expr": "gimbal_discoverer_cycle_duration_ms{backendname=~\"$BackendCluster\"} ",
               "format": "time_series",
               "hide": false,
               "interval": "",
               "intervalFactor": 1,
-              "legendFormat": "{{clustername}}",
+              "legendFormat": "{{backendname}}",
               "refId": "A"
             }
           ],
@@ -613,11 +613,11 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "avg(gimbal_discoverer_api_latency_ms{clustername=~\"$BackendCluster\"}) by (clustername)",
+              "expr": "avg(gimbal_discoverer_api_latency_ms{backendname=~\"$BackendCluster\"}) by (backendname)",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 1,
-              "legendFormat": "{{clustername}}",
+              "legendFormat": "{{backendname}}",
               "refId": "A"
             }
           ],
@@ -694,7 +694,7 @@ data:
             "multi": true,
             "name": "BackendCluster",
             "options": [],
-            "query": "label_values(clustername)",
+            "query": "label_values(backendname)",
             "refresh": 2,
             "regex": "",
             "sort": 0,

@@ -31,7 +31,7 @@ type LogRoundTripper struct {
 	numReauthAttempts int
 	Log               *logrus.Logger
 	Metrics           *localmetrics.DiscovererMetrics
-	ClusterName       string
+	BackendName       string
 	ClusterType       string
 }
 
@@ -64,7 +64,7 @@ func (lrt *LogRoundTripper) RoundTrip(request *http.Request) (*http.Response, er
 
 	lrt.Log.Debugf("-- Response Status: %s", response.Status)
 
-	lrt.Metrics.APILatencyMetric(lrt.ClusterName, lrt.ClusterType, request.URL.Path, latency)
+	lrt.Metrics.APILatencyMetric(lrt.BackendName, lrt.ClusterType, request.URL.Path, latency)
 
 	return response, nil
 }

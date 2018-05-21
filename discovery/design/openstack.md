@@ -32,9 +32,9 @@ cluster.
 Given that Izzy will support multiple OpenStack clusters, all the resources synced by the OpenStack discoverer must be
 scoped to a specific cluster to avoid collisions.
 
-Thus, the `name` of synced Services and Endpoints will be `ClusterName-Name`:
+Thus, the `name` of synced Services and Endpoints will be `BackendName-Name`:
 
-- `ClusterName`: The name of the OpenStack cluster. This is configurable through a command-line flag.
+- `BackendName`: The name of the OpenStack cluster. This is configurable through a command-line flag.
 - `Name`: The OpenStack Load Balancer's name concatenated (using hyphen as a separator) with the Load Balancer's ID. If
   the load balancer does not have a name, the ID is used. (Names are optional in OpenStack).
 
@@ -99,7 +99,7 @@ the OpenStack Load Balancer:
 | Service             | Load Balancer                                  |
 |---------------------|------------------------------------------------|
 | `Namespace`         | `ProjectId -> Project Name`                    |
-| `Name`              | `ClusterName-Name`                             |
+| `Name`              | `BackendName-Name`                             |
 | `Ports[i].Name`     | `Listeners[i].Name-Listeners[i].Protocol_Port` |
 | `Ports[i].Protocol` | `Listeners[i].Protocol`                        |
 | `Ports[i].Port`     | `Listeners[i].Protocol_Port`                   |
@@ -114,7 +114,7 @@ the Load Balancer's Listeners, Pools and Pool Members.
 
 The Kubernetes Endpoint will be derived as follows:
 
-- Set the `name` to `ClusterName-Name`
+- Set the `name` to `BackendName-Name`
 - For each Listener, group all members that are listening on the same port into an `EndpointSubset`.
 - Set the `name` of the `EndpointPort` to `port-${Listeners[i].Protocol_Port}`.
 - Set the `addresses` list of the `EndpointSubset` to the list of IP addresses of each member in the group.

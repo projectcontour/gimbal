@@ -27,7 +27,7 @@ The following arguments are available to customize the Discoverer:
 | --num-threads  | 2  |  Specify number of threads to use when processing queue items. | ALL
 | --gimbal-kubecfg-file  | ""  | Location of kubecfg file for access to kubernetes cluster hosting Gimbal | ALL
 | --discover-kubecfg-file | ""  | Location of kubecfg file for access to remote kubernetes cluster to watch for services / endpoints | Kubernetes
-| --cluster-name  | ""  |   Name of cluster scraping for services & endpoints | ALL
+| --backend-name  | ""  |   Name of cluster scraping for services & endpoints | ALL
 | --debug | false | Enable debug logging | ALL
 | --reconciliation-period | 30s | The interval of time between reconciliation loop runs | Openstack
 | --http-client-timeout | 5s | The HTTP client request timeout | Openstack
@@ -65,7 +65,7 @@ $ kubectl create secret generic remote-discover-openstack --from-literal=keyston
 The Kubernetes discoverer requires two configs, first is the Gimbal system which will run Contour and store services & endpoints, the other is the remote cluster to scrape for services & endpoints. The config file is standard kubeconfig file, just make sure it's named `config`. Please include any certs required to access to the remote cluster api:
 
 ```
-$ go run cmd/kubernetes-discoverer/main.go --gimbal-kubecfg-file=./config --discover-kubecfg-file=./config --cluster-name=clustername
+$ go run cmd/kubernetes-discoverer/main.go --gimbal-kubecfg-file=./config --discover-kubecfg-file=./config --backend-name=backendname
 ```
 
 ### Openstack
@@ -73,7 +73,7 @@ $ go run cmd/kubernetes-discoverer/main.go --gimbal-kubecfg-file=./config --disc
 The Openstack discoverer requires the config for the Gimbal Kubernetes cluster which will run Contour and store services & endpoints, the other is the remote cluster to scrape for load balancers and members. The config file is standard kubeconfig file, just make sure it's named `config`. Please include any certs required to access to the remote cluster api:
 
 ```
-$ OS_USERNAME=user OS_PASSWORD=password OS_AUTH_URL=https://url OS_TENANT_NAME=tenant go run cmd/openstack-discoverer/main.go --gimbal-kubecfg-file=./config --cluster-name=clustername
+$ OS_USERNAME=user OS_PASSWORD=password OS_AUTH_URL=https://url OS_TENANT_NAME=tenant go run cmd/openstack-discoverer/main.go --gimbal-kubecfg-file=./config --backend-name=backendname
 ```
 
 ## Build / Test

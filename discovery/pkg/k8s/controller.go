@@ -41,12 +41,12 @@ type Controller struct {
 	servicesSynced  cache.InformerSynced
 	endpointsSynced cache.InformerSynced
 
-	clusterName string
+	backendName string
 }
 
 // NewController returns a new NewController
 func NewController(log *logrus.Logger, gimbalKubeClient kubernetes.Interface, kubeInformerFactory kubeinformers.SharedInformerFactory,
-	clusterName string, threadiness int, metrics localmetrics.DiscovererMetrics) *Controller {
+	backendName string, threadiness int, metrics localmetrics.DiscovererMetrics) *Controller {
 
 	// obtain references to shared index informers for the services types.
 	serviceInformer := kubeInformerFactory.Core().V1().Services()
@@ -54,10 +54,10 @@ func NewController(log *logrus.Logger, gimbalKubeClient kubernetes.Interface, ku
 
 	c := &Controller{
 		Logger:          log,
-		syncqueue:       sync.NewQueue(log, clusterName, clusterType, gimbalKubeClient, threadiness, metrics),
+		syncqueue:       sync.NewQueue(log, backendName, clusterType, gimbalKubeClient, threadiness, metrics),
 		servicesSynced:  serviceInformer.Informer().HasSynced,
 		endpointsSynced: endpointsInformer.Informer().HasSynced,
-		clusterName:     clusterName,
+		backendName:     backendName,
 	}
 
 	// Set up an event handler for when Service resources change.
@@ -91,42 +91,42 @@ func NewController(log *logrus.Logger, gimbalKubeClient kubernetes.Interface, ku
 
 func (c *Controller) addService(service *v1.Service) {
 	if !skipProcessing(service.GetName(), service.GetNamespace()) {
-		svc := translateService(service, c.clusterName)
+		svc := translateService(service, c.backendName)
 		c.syncqueue.Enqueue(sync.AddServiceAction(svc))
 	}
 }
 
 func (c *Controller) updateService(service *v1.Service) {
 	if !skipProcessing(service.GetName(), service.GetNamespace()) {
-		svc := translateService(service, c.clusterName)
+		svc := translateService(service, c.backendName)
 		c.syncqueue.Enqueue(sync.UpdateServiceAction(svc))
 	}
 }
 
 func (c *Controller) deleteService(service *v1.Service) {
 	if !skipProcessing(service.GetName(), service.GetNamespace()) {
-		svc := translateService(service, c.clusterName)
+		svc := translateService(service, c.backendName)
 		c.syncqueue.Enqueue(sync.DeleteServiceAction(svc))
 	}
 }
 
 func (c *Controller) addEndpoints(endpoints *v1.Endpoints) {
 	if !skipProcessing(endpoints.GetName(), endpoints.GetNamespace()) {
-		svc := translateEndpoints(endpoints, c.clusterName)
+		svc := translateEndpoints(endpoints, c.backendName)
 		c.syncqueue.Enqueue(sync.AddEndpointsAction(svc))
 	}
 }
 
 func (c *Controller) updateEndpoints(endpoints *v1.Endpoints) {
 	if !skipProcessing(endpoints.GetName(), endpoints.GetNamespace()) {
-		svc := translateEndpoints(endpoints, c.clusterName)
+		svc := translateEndpoints(endpoints, c.backendName)
 		c.syncqueue.Enqueue(sync.UpdateEndpointsAction(svc))
 	}
 }
 
 func (c *Controller) deleteEndpoints(endpoints *v1.Endpoints) {
 	if !skipProcessing(endpoints.GetName(), endpoints.GetNamespace()) {
-		svc := translateEndpoints(endpoints, c.clusterName)
+		svc := translateEndpoints(endpoints, c.backendName)
 		c.syncqueue.Enqueue(sync.DeleteEndpointsAction(svc))
 	}
 }

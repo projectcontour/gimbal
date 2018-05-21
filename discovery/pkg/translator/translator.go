@@ -28,9 +28,9 @@ const (
 
 // AddGimbalLabels returns a new set of labels that includes the incoming set of
 // labels, plus gimbal-specific ones.
-func AddGimbalLabels(clustername, name string, existingLabels map[string]string) map[string]string {
+func AddGimbalLabels(backendname, name string, existingLabels map[string]string) map[string]string {
 	gimbalLabels := map[string]string{
-		GimbalLabelBackend: ShortenKubernetesLabelValue(clustername),
+		GimbalLabelBackend: ShortenKubernetesLabelValue(backendname),
 		gimbalLabelService: ShortenKubernetesLabelValue(name),
 	}
 	if existingLabels == nil {
@@ -46,8 +46,8 @@ func AddGimbalLabels(clustername, name string, existingLabels map[string]string)
 // BuildDiscoveredName returns the discovered name of the service in a given
 // cluster. If the name is longer than the Kubernetes DNS_LABEL maximum
 // character limit, the name is shortened.
-func BuildDiscoveredName(clusterName, serviceName string) string {
-	return hashname(maxKubernetesDNSLabelLength, clusterName, serviceName)
+func BuildDiscoveredName(backendName, serviceName string) string {
+	return hashname(maxKubernetesDNSLabelLength, backendName, serviceName)
 }
 
 // ShortenKubernetesLabelValue ensures that the given string's length does not
