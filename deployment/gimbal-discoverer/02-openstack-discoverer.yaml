@@ -22,7 +22,7 @@ spec:
         cluster: openstack
     spec:
       containers:
-        - image: gcr.io/heptio-images/gimbal-discoverer:master
+        - image: gcr.io/heptio-images/gimbal-discoverer:v0.2.0
           imagePullPolicy: Always
           name: openstack-discoverer
           command: ["/openstack-discoverer"]
