@@ -115,6 +115,7 @@ func (sq *Queue) processNextWorkItem() bool {
 		action, ok := obj.(Action)
 		if !ok {
 			sq.Workqueue.Forget(obj)
+			sq.Metrics.QueueSizeGaugeMetric(sq.BackendName, sq.ClusterType, sq.Workqueue.Len())
 			return fmt.Errorf("ignoring unknown item of type %T in queue", obj)
 		}
 
@@ -127,6 +128,7 @@ func (sq *Queue) processNextWorkItem() bool {
 		// Finally, if no error occurs we Forget this item so it does not
 		// get queued again until another change happens.
 		sq.Workqueue.Forget(obj)
+		sq.Metrics.QueueSizeGaugeMetric(sq.BackendName, sq.ClusterType, sq.Workqueue.Len())
 		return nil
 	}(obj)
 
