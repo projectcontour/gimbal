@@ -296,6 +296,22 @@ data:
       - source_labels: [__meta_kubernetes_pod_name]
         action: replace
         target_label: kubernetes_pod_name
+      metric_relabel_configs:
+      - source_labels: [envoy_cluster_name]
+        regex: '(.+?)\/(.+?)\/(.*)'
+        action: replace
+        target_label: namespace
+        replacement: '$1'
+      - source_labels: [envoy_cluster_name]
+        regex: '(.+?)\/(.+?)\/(.*)'
+        action: replace
+        target_label: service
+        replacement: '$2'
+      - source_labels: [envoy_cluster_name]
+        regex: '(.+?)\/(.+?)\/(.*)'
+        action: replace
+        target_label: port
+        replacement: '$3'
 
     - job_name: 'envoy-statsd'
       scrape_interval: 30s

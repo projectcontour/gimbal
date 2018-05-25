@@ -6,36 +6,60 @@ metadata:
 data:
   statsd.yaml: |2-
     mappings: 
-    - match: 'envoy.cluster.*.upstream_cx_connect_ms'
+    - match: 'envoy\.cluster\.(.+?)\/(.+?)\/(.+?)\.upstream_cx_connect_ms'
+      match_type: regex
       name: "envoy_cluster_upstream_cx_connect_time"
       timer_type: 'histogram'
       labels:
-        cluster_name: "$1"
-    - match: 'envoy.cluster.*.upstream_cx_length_ms'
+        cluster_name: "$1/$2/$3"
+        namespace: "$1"
+        service: "$2"
+        port: "$3"
+    - match: 'envoy\.cluster\.(.+?)\/(.+?)\/(.+?)\.upstream_cx_length_ms'
+      match_type: regex
       name: "envoy_cluster_upstream_cx_length"
       timer_type: 'histogram'
       labels:
-        cluster_name: "$1"
-    - match: 'envoy.cluster.*.upstream_rq_time'
+        cluster_name: "$1/$2/$3"
+        namespace: "$1"
+        service: "$2"
+        port: "$3"
+    - match: 'envoy\.cluster\.(.+?)\/(.+?)\/(.+?)\.upstream_rq_time'
+      match_type: regex
       name: "envoy_cluster_upstream_rq_time"
       timer_type: 'histogram'
       labels:
-        cluster_name: "$1"
-    - match: 'envoy.cluster.*.internal.upstream_rq_time'
+        cluster_name: "$1/$2/$3"
+        namespace: "$1"
+        service: "$2"
+        port: "$3"
+    - match: 'envoy\.cluster\.(.+?)\/(.+?)\/(.+?)\.internal.upstream_rq_time'
+      match_type: regex
       name: "envoy_cluster_internal_upstream_rq_time"
       timer_type: 'histogram'
       labels:
-        cluster_name: "$1"
-    - match: 'envoy.cluster.*.external.upstream_rq_time'
+        cluster_name: "$1/$2/$3"
+        namespace: "$1"
+        service: "$2"
+        port: "$3"
+    - match: 'envoy\.cluster\.(.+?)\/(.+?)\/(.+?)\.external.upstream_rq_time'
+      match_type: regex
       name: "envoy_cluster_external_upstream_rq_time"
       timer_type: 'histogram'
       labels:
-        cluster_name: "$1"
-    - match: 'envoy.cluster.*.canary.upstream_rq_time'
+        cluster_name: "$1/$2/$3"
+        namespace: "$1"
+        service: "$2"
+        port: "$3"
+    - match: 'envoy\.cluster\.(.+?)\/(.+?)\/(.+?)\.canary.upstream_rq_time'
+      match_type: regex
       name: "envoy_cluster_canary_upstream_rq_time"
       timer_type: 'histogram'
       labels:
-        cluster_name: "$1"
+        cluster_name: "$1/$2/$3"
+        namespace: "$1"
+        service: "$2"
+        port: "$3"
     - match: 'envoy.http.*.downstream_cx_length_ms'
       name: "envoy_http_downstream_cx_length"
       timer_type: 'histogram'
