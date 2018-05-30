@@ -789,6 +789,7 @@ data:
       "gnetId": null,
       "graphTooltip": 0,
       "id": null,
+      "iteration": 1527251027708,
       "links": [],
       "panels": [
         {
@@ -799,22 +800,24 @@ data:
           "datasource": "prometheus",
           "fill": 1,
           "gridPos": {
-            "h": 9,
-            "w": 8,
+            "h": 8,
+            "w": 6,
             "x": 0,
             "y": 0
           },
           "id": 3,
           "legend": {
-            "alignAsTable": false,
-            "avg": false,
-            "current": false,
-            "max": false,
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "max": true,
             "min": false,
             "rightSide": false,
             "show": true,
+            "sort": "current",
+            "sortDesc": true,
             "total": false,
-            "values": false
+            "values": true
           },
           "lines": true,
           "linewidth": 1,
@@ -830,10 +833,10 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum(rate(envoy_http_downstream_rq_total[1m])) by (kubernetes_pod_name, envoy_http_conn_manager_prefix)",
+              "expr": "sum(rate(envoy_http_downstream_rq_total[1m])) by (kubernetes_pod_name)",
               "format": "time_series",
               "intervalFactor": 2,
-              "legendFormat": "{{kubernetes_pod_name}}/{{envoy_http_conn_manager_prefix}}",
+              "legendFormat": "{{kubernetes_pod_name}}",
               "refId": "A"
             }
           ],
@@ -881,20 +884,23 @@ data:
           "datasource": "prometheus",
           "fill": 1,
           "gridPos": {
-            "h": 9,
-            "w": 8,
-            "x": 8,
+            "h": 8,
+            "w": 6,
+            "x": 6,
             "y": 0
           },
           "id": 9,
           "legend": {
-            "avg": false,
-            "current": false,
-            "max": false,
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "max": true,
             "min": false,
             "show": true,
+            "sort": "current",
+            "sortDesc": true,
             "total": false,
-            "values": false
+            "values": true
           },
           "lines": true,
           "linewidth": 1,
@@ -910,10 +916,10 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum(rate(envoy_http_downstream_rq_total[1m])) by (kubernetes_pod_name, envoy_http_conn_manager_prefix)",
+              "expr": "sum(rate(envoy_http_downstream_cx_total[1m])) by (kubernetes_pod_name)",
               "format": "time_series",
               "intervalFactor": 1,
-              "legendFormat": "{{kubernetes_pod_name}}/{{envoy_http_conn_manager_prefix}}",
+              "legendFormat": "{{kubernetes_pod_name}}",
               "refId": "A"
             }
           ],
@@ -961,22 +967,24 @@ data:
           "datasource": "prometheus",
           "fill": 1,
           "gridPos": {
-            "h": 9,
-            "w": 8,
-            "x": 16,
+            "h": 8,
+            "w": 6,
+            "x": 12,
             "y": 0
           },
-          "id": 4,
+          "id": 16,
           "legend": {
-            "alignAsTable": false,
-            "avg": false,
-            "current": false,
-            "max": false,
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "hideZero": true,
+            "max": true,
             "min": false,
-            "rightSide": false,
             "show": true,
+            "sort": "current",
+            "sortDesc": true,
             "total": false,
-            "values": false
+            "values": true
           },
           "lines": true,
           "linewidth": 1,
@@ -992,19 +1000,112 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "envoy_http_downstream_cx_active",
+              "expr": "histogram_quantile(0.9, sum(rate(envoy_http_downstream_rq_time_bucket[1m])) by (le, kubernetes_pod_name))",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{kubernetes_pod_name}} 90%",
+              "refId": "A"
+            },
+            {
+              "expr": "histogram_quantile(0.5, sum(rate(envoy_http_downstream_rq_time_bucket[1m])) by (le, kubernetes_pod_name))",
+              "format": "time_series",
+              "hide": false,
+              "intervalFactor": 1,
+              "legendFormat": "{{kubernetes_pod_name}} 50% ",
+              "refId": "B"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Downstream Latency",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "s",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "prometheus",
+          "fill": 1,
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 18,
+            "y": 0
+          },
+          "id": 4,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "hideZero": true,
+            "max": true,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sort": "current",
+            "sortDesc": true,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "sum(envoy_http_downstream_cx_active) by (kubernetes_pod_name)",
               "format": "time_series",
               "instant": false,
               "interval": "",
               "intervalFactor": 2,
-              "legendFormat": "{{kubernetes_pod_name}}/{{envoy_http_conn_manager_prefix}}",
+              "legendFormat": "{{kubernetes_pod_name}}",
               "refId": "A"
             }
           ],
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Downstream Active Connections",
+          "title": "Downstream Total Connections",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -1046,19 +1147,20 @@ data:
           "description": "Displays the number of Requests per Second being performed against each Upstream.",
           "fill": 1,
           "gridPos": {
-            "h": 9,
-            "w": 24,
+            "h": 8,
+            "w": 6,
             "x": 0,
-            "y": 9
+            "y": 8
           },
           "id": 2,
           "legend": {
             "alignAsTable": true,
-            "avg": false,
+            "avg": true,
             "current": true,
-            "max": false,
+            "hideZero": true,
+            "max": true,
             "min": false,
-            "rightSide": true,
+            "rightSide": false,
             "show": true,
             "sort": "current",
             "sortDesc": true,
@@ -1079,10 +1181,10 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum(rate(envoy_cluster_upstream_rq_total[1m])) by (envoy_cluster_name)",
+              "expr": "sum(rate(envoy_cluster_upstream_rq_total{namespace=~\"$Namespace\",service=~\"$Service\"}[1m])) by (service,namespace)",
               "format": "time_series",
               "intervalFactor": 2,
-              "legendFormat": "{{envoy_cluster_name}}",
+              "legendFormat": "{{namespace}}/{{service}}",
               "refId": "A"
             }
           ],
@@ -1130,20 +1232,22 @@ data:
           "datasource": "prometheus",
           "fill": 1,
           "gridPos": {
-            "h": 9,
-            "w": 24,
-            "x": 0,
-            "y": 18
+            "h": 8,
+            "w": 6,
+            "x": 6,
+            "y": 8
           },
-          "id": 5,
+          "id": 14,
           "legend": {
             "alignAsTable": true,
-            "avg": false,
+            "avg": true,
             "current": true,
-            "max": false,
+            "hideZero": true,
+            "max": true,
             "min": false,
-            "rightSide": true,
             "show": true,
+            "sort": "current",
+            "sortDesc": true,
             "total": false,
             "values": true
           },
@@ -1161,9 +1265,527 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum(envoy_cluster_upstream_rq_xx{envoy_response_code_class=\"5\"}) by (envoy_cluster_name)",
+              "expr": "sum(rate(envoy_cluster_upstream_cx_total{namespace=~\"$Namespace\",service=~\"$Service\"}[1m])) by (namespace, service)",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{namespace}}/{{service}}",
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Upstream CPS",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "prometheus",
+          "fill": 1,
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 12,
+            "y": 8
+          },
+          "id": 10,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "hideZero": true,
+            "max": true,
+            "min": false,
+            "show": true,
+            "sort": "current",
+            "sortDesc": true,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.9, sum(rate(envoy_cluster_upstream_rq_time_bucket{service=~\"$Service\",namespace=~\"$Namespace\"}[1m])) by (le, service, namespace))",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{namespace}}/{{service}} 90%",
+              "refId": "A"
+            },
+            {
+              "expr": "histogram_quantile(0.5, sum(rate(envoy_cluster_upstream_rq_time_bucket{service=~\"$Service\",namespace=~\"$Namespace\"}[1m])) by (le, service, namespace))",
+              "format": "time_series",
+              "hide": false,
+              "intervalFactor": 1,
+              "legendFormat": "{{namespace}}/{{service}} 50% ",
+              "refId": "B"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Upstream Latency",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "s",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "prometheus",
+          "fill": 1,
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 18,
+            "y": 8
+          },
+          "id": 15,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "hideZero": true,
+            "max": true,
+            "min": false,
+            "show": true,
+            "sort": "current",
+            "sortDesc": true,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "sum(envoy_cluster_upstream_cx_active{namespace=~\"$Namespace\",service=~\"$Service\"}) by (namespace, service)",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{namespace}}/{{service}}",
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Upstream Total Connections",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "prometheus",
+          "fill": 1,
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 0,
+            "y": 16
+          },
+          "id": 5,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "hideEmpty": false,
+            "hideZero": true,
+            "max": true,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sort": "current",
+            "sortDesc": true,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "sum(rate(envoy_cluster_upstream_rq_xx{namespace=~\"$Namespace\",service=~\"$Service\",envoy_response_code_class=~\"2\"}[1m])) by (namespace,service)",
               "format": "time_series",
               "intervalFactor": 2,
+              "legendFormat": "{{namespace}}/{{service}}",
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Upstream 2xx Responses",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "prometheus",
+          "fill": 1,
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 6,
+            "y": 16
+          },
+          "id": 11,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "hideZero": true,
+            "max": true,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sort": "current",
+            "sortDesc": true,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "sum(rate(envoy_cluster_upstream_rq_xx{namespace=~\"$Namespace\",service=~\"$Service\",envoy_response_code_class=\"3\"}[1m])) by (namespace,service)",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "{{namespace}}/{{service}}",
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Upstream 3xx Responses",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "prometheus",
+          "fill": 1,
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 12,
+            "y": 16
+          },
+          "id": 12,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "hideZero": true,
+            "max": true,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sort": "current",
+            "sortDesc": true,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "sum(rate(envoy_cluster_upstream_rq_xx{namespace=~\"$Namespace\",service=~\"$Service\",envoy_response_code_class=\"4\"}[1m])) by (namespace,service)",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "{{namespace}}/{{service}}",
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Upstream 4xx Responses",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "prometheus",
+          "fill": 1,
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 18,
+            "y": 16
+          },
+          "id": 13,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "hideZero": true,
+            "max": true,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "sort": "current",
+            "sortDesc": true,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "sum(rate(envoy_cluster_upstream_rq_xx{namespace=~\"$Namespace\",service=~\"$Service\",envoy_response_code_class=\"5\"}[1m])) by (namespace,service)",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "{{namespace}}/{{service}}",
               "refId": "A"
             }
           ],
@@ -1214,7 +1836,7 @@ data:
             "h": 7,
             "w": 12,
             "x": 0,
-            "y": 27
+            "y": 24
           },
           "id": 6,
           "legend": {
@@ -1310,7 +1932,7 @@ data:
             "h": 7,
             "w": 12,
             "x": 12,
-            "y": 27
+            "y": 24
           },
           "id": 7,
           "legend": {
@@ -1394,12 +2016,53 @@ data:
           ]
         }
       ],
-      "refresh": "30s",
+      "refresh": "10s",
       "schemaVersion": 16,
       "style": "dark",
       "tags": [],
       "templating": {
-        "list": []
+        "list": [
+          {
+            "allValue": "",
+            "current": {},
+            "datasource": "prometheus",
+            "hide": 0,
+            "includeAll": true,
+            "label": null,
+            "multi": true,
+            "name": "Namespace",
+            "options": [],
+            "query": "label_values(envoy_cluster_upstream_rq_time_bucket,namespace)",
+            "refresh": 2,
+            "regex": "",
+            "sort": 0,
+            "tagValuesQuery": "",
+            "tags": [],
+            "tagsQuery": "",
+            "type": "query",
+            "useTags": false
+          },
+          {
+            "allValue": "",
+            "current": {},
+            "datasource": "prometheus",
+            "hide": 0,
+            "includeAll": true,
+            "label": null,
+            "multi": true,
+            "name": "Service",
+            "options": [],
+            "query": "label_values(envoy_cluster_upstream_rq_time_bucket,service)",
+            "refresh": 2,
+            "regex": "",
+            "sort": 0,
+            "tagValuesQuery": "",
+            "tags": [],
+            "tagsQuery": "",
+            "type": "query",
+            "useTags": false
+          }
+        ]
       },
       "time": {
         "from": "now-30m",
@@ -1433,7 +2096,7 @@ data:
       "timezone": "",
       "title": "Envoy Metrics",
       "uid": "khVnG8iiz",
-      "version": 10
+      "version": 8
     }
 
 ---
