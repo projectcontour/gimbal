@@ -40,12 +40,10 @@ type Queue struct {
 	Workqueue   workqueue.RateLimitingInterface
 	Threadiness int
 	Metrics     localmetrics.DiscovererMetrics
-	BackendName string
-	ClusterType string
 }
 
 // NewQueue returns an initialized sync.Queue for syncing resources with a Gimbal cluster.
-func NewQueue(logger *logrus.Logger, backendName, clusterType string, kubeClient kubernetes.Interface,
+func NewQueue(logger *logrus.Logger, kubeClient kubernetes.Interface,
 	threadiness int, metrics localmetrics.DiscovererMetrics) Queue {
 	return Queue{
 		KubeClient:  kubeClient,
@@ -53,21 +51,22 @@ func NewQueue(logger *logrus.Logger, backendName, clusterType string, kubeClient
 		Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
 		Threadiness: threadiness,
 		Metrics:     metrics,
-		BackendName: backendName,
-		ClusterType: clusterType,
 	}
 }
 
 // Action that is added to the queue for processing
 type Action interface {
-	Sync(kube kubernetes.Interface, lm localmetrics.DiscovererMetrics, backendName string) error
+	Sync(kube kubernetes.Interface, logger *logrus.Logger) error
 	ObjectMeta() *metav1.ObjectMeta
+	SetMetrics(gimbalKubeClient kubernetes.Interface, lm localmetrics.DiscovererMetrics, logger *logrus.Logger)
+	SetMetricError(metrics localmetrics.DiscovererMetrics)
+	GetActionType() string
 }
 
 // Enqueue adds a new resource action to the worker queue
 func (sq *Queue) Enqueue(action Action) {
 	sq.Workqueue.AddRateLimited(action)
-	sq.Metrics.QueueSizeGaugeMetric(sq.BackendName, sq.ClusterType, sq.Workqueue.Len())
+	sq.Metrics.QueueSizeGaugeMetric(sq.Workqueue.Len())
 }
 
 // Run starts the queue workers. It blocks until the stopCh is closed.
@@ -110,17 +109,21 @@ func (sq *Queue) processNextWorkItem() bool {
 	action, ok := obj.(Action)
 	if !ok {
 		sq.Workqueue.Forget(obj)
-		sq.Metrics.QueueSizeGaugeMetric(sq.BackendName, sq.ClusterType, sq.Workqueue.Len())
+		sq.Metrics.QueueSizeGaugeMetric(sq.Workqueue.Len())
 		sq.Logger.Errorf("got an unknown item of type %T in the queue", obj)
 		return true
 	}
 
-	err := action.Sync(sq.KubeClient, sq.Metrics, sq.BackendName)
+	err := action.Sync(sq.KubeClient, sq.Logger)
+	if err != nil {
+		action.SetMetricError(sq.Metrics)
+	}
+	action.SetMetrics(sq.KubeClient, sq.Metrics, sq.Logger)
 
 	// We successfully handled the action, so we can forget the item and keep going.
 	if err == nil {
 		sq.Workqueue.Forget(obj)
-		sq.Metrics.QueueSizeGaugeMetric(sq.BackendName, sq.ClusterType, sq.Workqueue.Len())
+		sq.Metrics.QueueSizeGaugeMetric(sq.Workqueue.Len())
 		sq.Logger.Infof("Successfully handled: %s", action)
 		return true
 	}
@@ -131,7 +134,7 @@ func (sq *Queue) processNextWorkItem() bool {
 	if numRequeues < queueMaxRetries {
 		sq.Logger.Errorf("Error handling %s: %v. Number of requeues: %d. Requeuing.", action, err, numRequeues)
 		sq.Workqueue.AddRateLimited(obj)
-		sq.Metrics.QueueSizeGaugeMetric(sq.BackendName, sq.ClusterType, sq.Workqueue.Len())
+		sq.Metrics.QueueSizeGaugeMetric(sq.Workqueue.Len())
 		return true
 	}
 
@@ -139,6 +142,6 @@ func (sq *Queue) processNextWorkItem() bool {
 	// the queue.
 	sq.Workqueue.Forget(obj)
 	sq.Logger.Errorf("Dropping %s out of the queue because we failed to handle the item %d times: %v", action, queueMaxRetries, err)
-	sq.Metrics.QueueSizeGaugeMetric(sq.BackendName, sq.ClusterType, sq.Workqueue.Len())
+	sq.Metrics.QueueSizeGaugeMetric(sq.Workqueue.Len())
 	return true
 }

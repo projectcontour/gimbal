@@ -51,8 +51,8 @@ func kubeServices(backendName, tenantName string, lbs []loadbalancers.LoadBalanc
 }
 
 // returns a kubernetes endpoints resource for each load balancer in the slice
-func kubeEndpoints(backendName, tenantName string, lbs []loadbalancers.LoadBalancer, ps []pools.Pool) []v1.Endpoints {
-	var endpoints []v1.Endpoints
+func kubeEndpoints(backendName, tenantName string, lbs []loadbalancers.LoadBalancer, ps []pools.Pool) []Endpoints {
+	endpoints := []Endpoints{}
 	for _, lb := range lbs {
 		ep := v1.Endpoints{
 			ObjectMeta: metav1.ObjectMeta{
@@ -92,7 +92,7 @@ func kubeEndpoints(backendName, tenantName string, lbs []loadbalancers.LoadBalan
 				ep.Subsets = append(ep.Subsets, s)
 			}
 		}
-		endpoints = append(endpoints, ep)
+		endpoints = append(endpoints, Endpoints{endpoints: ep, upstreamName: serviceNameOriginal(lb)})
 	}
 	return endpoints
 }
@@ -110,6 +110,15 @@ func serviceName(lb loadbalancers.LoadBalancer) string {
 	lbName := lb.ID
 	if lb.Name != "" {
 		lbName = fmt.Sprintf("%s-%s", lb.Name, lb.ID)
+	}
+	return strings.ToLower(lbName)
+}
+
+// get the lb Name or ID if name is empty
+func serviceNameOriginal(lb loadbalancers.LoadBalancer) string {
+	lbName := lb.Name
+	if lb.Name == "" {
+		lbName = lb.ID
 	}
 	return strings.ToLower(lbName)
 }

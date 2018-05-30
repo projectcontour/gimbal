@@ -397,13 +397,18 @@ func TestKubeEndpoints(t *testing.T) {
 	}
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			got := kubeEndpoints(tc.backendName, tc.tenantName, tc.lbs, tc.pools)
+			gotReturn := kubeEndpoints(tc.backendName, tc.tenantName, tc.lbs, tc.pools)
 			// Cannot use assert.Equal on the structs as the order of subsets is undetermined.
+			var got []Endpoints
+			for _, v := range gotReturn {
+				got = append(got, v)
+			}
+
 			for i := range tc.expected {
-				assert.Equal(t, tc.expected[i].Namespace, got[i].Namespace)
-				assert.Equal(t, tc.expected[i].Name, got[i].Name)
-				assert.Equal(t, tc.expected[i].Labels, got[i].Labels)
-				assert.ElementsMatch(t, tc.expected[i].Subsets, got[i].Subsets)
+				assert.Equal(t, tc.expected[i].Namespace, got[i].endpoints.Namespace)
+				assert.Equal(t, tc.expected[i].Name, got[i].endpoints.Name)
+				assert.Equal(t, tc.expected[i].Labels, got[i].endpoints.Labels)
+				assert.ElementsMatch(t, tc.expected[i].Subsets, got[i].endpoints.Subsets)
 			}
 		})
 	}

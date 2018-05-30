@@ -32,7 +32,6 @@ type LogRoundTripper struct {
 	Log               *logrus.Logger
 	Metrics           *localmetrics.DiscovererMetrics
 	BackendName       string
-	ClusterType       string
 }
 
 // RoundTrip performs a round-trip HTTP request and logs relevant information about it.
@@ -64,7 +63,7 @@ func (lrt *LogRoundTripper) RoundTrip(request *http.Request) (*http.Response, er
 
 	lrt.Log.Debugf("-- Response Status: %s", response.Status)
 
-	lrt.Metrics.APILatencyMetric(lrt.BackendName, lrt.ClusterType, request.URL.Path, latency)
+	lrt.Metrics.APILatencyMetric(request.URL.Path, latency)
 
 	return response, nil
 }

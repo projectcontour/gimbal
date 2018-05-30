@@ -16,11 +16,14 @@ package sync
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/sirupsen/logrus"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -86,7 +89,7 @@ func TestEndpointsAction(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			client := fake.NewSimpleClientset(&tc.existingEndpoints)
 			a := endpointsAction{kind: tc.actionKind, endpoints: &tc.endpoints}
-			err := a.Sync(client, localmetrics.NewMetrics(), "testnode")
+			err := a.Sync(client, logrus.New())
 
 			if !tc.expectErr {
 				require.NoError(t, err)
@@ -138,7 +141,150 @@ func TestUpdateEndpoints(t *testing.T) {
 		},
 	}
 	expectedPatch := `{"subsets":[{"addresses":[{"ip":"192.168.0.2"}],"ports":[{"port":8080}]},{"addresses":[{"ip":"192.168.0.3"}],"ports":[{"port":80}]}]}`
-	err := updateEndpoints(client, &newEndpoints, localmetrics.NewMetrics(), "testnode")
+	err := updateEndpoints(client, &newEndpoints)
 	require.NoError(t, err)
 	assert.Equal(t, expectedPatch, string(gotPatchBytes))
+}
+
+func TestDiscovererEndpointsMetrics(t *testing.T) {
+	backendName := "backend"
+	backendType := "backtype"
+	tests := []struct {
+		name              string
+		actionKind        string
+		endpoints         v1.Endpoints
+		existingendpoints v1.Endpoints
+		expectErr         bool
+		expectedCount     float64
+		expectedTimestamp float64
+	}{
+		{
+			name:       "add new endpoint resource",
+			actionKind: actionAdd,
+			endpoints: v1.Endpoints{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "foo",
+					Name:      "bar",
+					Labels: map[string]string{
+						"gimbal.heptio.com/backend": backendName,
+					},
+				},
+				Subsets: []v1.EndpointSubset{
+					{
+						Addresses: []v1.EndpointAddress{{IP: "192.168.0.1"}},
+						Ports:     []v1.EndpointPort{{Port: 80}},
+					},
+				},
+			},
+			existingendpoints: v1.Endpoints{},
+			expectedCount:     float64(1),
+			expectedTimestamp: 9.467208e+08,
+		},
+		{
+			name:       "add new endpoint resource, multiple ips",
+			actionKind: actionAdd,
+			endpoints: v1.Endpoints{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "foo",
+					Name:      "bar",
+					Labels: map[string]string{
+						"gimbal.heptio.com/backend": backendName,
+					},
+				},
+				Subsets: []v1.EndpointSubset{
+					{
+						Addresses: []v1.EndpointAddress{{IP: "192.168.0.1"}},
+						Ports:     []v1.EndpointPort{{Port: 80}},
+					},
+					{
+						Addresses: []v1.EndpointAddress{{IP: "192.168.0.2"}, {IP: "192.168.0.3"}},
+						Ports:     []v1.EndpointPort{{Port: 443}},
+					},
+				},
+			},
+			existingendpoints: v1.Endpoints{},
+			expectedCount:     float64(3),
+			expectedTimestamp: 9.467208e+08,
+		},
+		{
+			name:       "add new endpoint resource, existing-non gimbal",
+			actionKind: actionAdd,
+			endpoints: v1.Endpoints{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "foo",
+					Name:      "bar",
+					Labels: map[string]string{
+						"gimbal.heptio.com/backend": backendName,
+					},
+				},
+				Subsets: []v1.EndpointSubset{
+					{
+						Addresses: []v1.EndpointAddress{{IP: "192.168.0.1"}, {IP: "192.168.0.2"}},
+						Ports:     []v1.EndpointPort{{Port: 80}},
+					},
+				},
+			},
+			existingendpoints: v1.Endpoints{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "foo",
+					Name:      "ep-existing",
+					Labels: map[string]string{
+						"who": "dis",
+					},
+				},
+				Subsets: []v1.EndpointSubset{
+					{
+						Addresses: []v1.EndpointAddress{{IP: "192.168.0.1"}},
+						Ports:     []v1.EndpointPort{{Port: 80}},
+					},
+				},
+			},
+			expectedCount:     float64(2),
+			expectedTimestamp: 9.467208e+08,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			nowFunc = func() time.Time {
+				return time.Date(2000, 1, 1, 10, 0, 00, 0, time.UTC)
+			}
+			client := fake.NewSimpleClientset(&tc.existingendpoints)
+			metrics := localmetrics.NewMetrics(backendType, backendName)
+			metrics.RegisterPrometheus(false)
+			a := endpointsAction{kind: tc.actionKind, endpoints: &tc.endpoints}
+
+			err := a.Sync(client, logrus.New())
+
+			if !tc.expectErr {
+				require.NoError(t, err)
+			}
+
+			a.SetMetrics(client, metrics, logrus.New())
+
+			gatherers := prometheus.Gatherers{
+				metrics.Registry,
+				prometheus.DefaultGatherer,
+			}
+
+			gathering, err := gatherers.Gather()
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			replicatedEndpoints := float64(-1)
+			timestamp := float64(-1)
+			for _, mf := range gathering {
+				if mf.GetName() == localmetrics.DiscovererReplicatedEndpointsGauge {
+					replicatedEndpoints = mf.Metric[0].Gauge.GetValue()
+				} else if mf.GetName() == localmetrics.EndpointsEventTimestampGauge {
+					timestamp = mf.Metric[0].Gauge.GetValue()
+				}
+			}
+
+			assert.Equal(t, tc.expectedCount, replicatedEndpoints)
+			assert.Equal(t, tc.expectedTimestamp, timestamp)
+		})
+	}
+
 }
