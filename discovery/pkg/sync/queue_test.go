@@ -21,7 +21,7 @@ func TestQueueSuccessfulSync(t *testing.T) {
 		createAttempts++
 		return true, nil, nil
 	})
-	q := NewQueue(logrus.New(), "backend", "kubernetes", client, 4, metrics.NewMetrics())
+	q := NewQueue(logrus.New(), client, 4, metrics.NewMetrics("test", "backend"))
 	stop := make(chan struct{})
 	go q.Run(stop)
 
@@ -47,7 +47,7 @@ func TestQueueStopsRetryingAfterSuccess(t *testing.T) {
 	})
 
 	// Start the queue
-	q := NewQueue(logrus.New(), "backend", "kubernetes", client, 4, metrics.NewMetrics())
+	q := NewQueue(logrus.New(), client, 4, metrics.NewMetrics("test", "backend"))
 	stop := make(chan struct{})
 	go q.Run(stop)
 
@@ -73,7 +73,7 @@ func TestQueueMaxRetries(t *testing.T) {
 	})
 
 	// Start the queue
-	q := NewQueue(logrus.New(), "backend", "kubernetes", client, 4, metrics.NewMetrics())
+	q := NewQueue(logrus.New(), client, 4, metrics.NewMetrics("test", "backend"))
 	stop := make(chan struct{})
 	go q.Run(stop)
 

@@ -16,9 +16,9 @@ package sync
 import (
 	"encoding/json"
 	"fmt"
-	"time"
 
 	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
+	"github.com/sirupsen/logrus"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -53,23 +53,26 @@ func (action serviceAction) ObjectMeta() *metav1.ObjectMeta {
 	return &action.service.ObjectMeta
 }
 
+func (action serviceAction) GetActionType() string {
+	return action.kind
+}
+
 // Sync performs the action on the given service
-func (action serviceAction) Sync(kubeClient kubernetes.Interface, metrics localmetrics.DiscovererMetrics, backendName string) error {
+func (action serviceAction) Sync(kubeClient kubernetes.Interface, logger *logrus.Logger) error {
 
 	var err error
 	switch action.kind {
 	case actionAdd:
-		err = addService(kubeClient, action.service, metrics, backendName)
+		err = addService(kubeClient, action.service)
 	case actionUpdate:
-		err = updateService(kubeClient, action.service, metrics, backendName)
+		err = updateService(kubeClient, action.service)
 	case actionDelete:
-		err = deleteService(kubeClient, action.service, metrics, backendName)
+		err = deleteService(kubeClient, action.service)
 	}
 	if err != nil {
 		return fmt.Errorf("error handling %s: %v", action, err)
 	}
 
-	metrics.ServiceEventTimestampMetric(action.service.GetNamespace(), backendName, action.service.GetName(), time.Now().Unix())
 	return nil
 }
 
@@ -77,41 +80,25 @@ func (action serviceAction) String() string {
 	return fmt.Sprintf(`%s service '%s/%s'`, action.kind, action.service.Namespace, action.service.Name)
 }
 
-func addService(kubeClient kubernetes.Interface, service *v1.Service, lm localmetrics.DiscovererMetrics, backendName string) error {
+func addService(kubeClient kubernetes.Interface, service *v1.Service) error {
 	_, err := kubeClient.CoreV1().Services(service.Namespace).Create(service)
 	if errors.IsAlreadyExists(err) {
-		err = updateService(kubeClient, service, lm, backendName)
-		if err != nil {
-			lm.ServiceMetricError(service.GetNamespace(), backendName, service.GetName(), "UPDATE")
-		}
-	} else {
-		if err != nil {
-			lm.ServiceMetricError(service.GetNamespace(), backendName, service.GetName(), "ADD")
-		}
+		return updateService(kubeClient, service)
 	}
 	return err
 }
 
-func deleteService(kubeClient kubernetes.Interface, service *v1.Service, lm localmetrics.DiscovererMetrics, backendName string) error {
-	err := kubeClient.CoreV1().Services(service.Namespace).Delete(service.Name, &metav1.DeleteOptions{})
-
-	if err != nil {
-		lm.ServiceMetricError(service.GetNamespace(), backendName, service.GetName(), "DELETE")
-	}
-	return err
+func deleteService(kubeClient kubernetes.Interface, service *v1.Service) error {
+	return kubeClient.CoreV1().Services(service.Namespace).Delete(service.Name, &metav1.DeleteOptions{})
 }
 
-func updateService(kubeClient kubernetes.Interface, service *v1.Service, lm localmetrics.DiscovererMetrics, backendName string) error {
+func updateService(kubeClient kubernetes.Interface, service *v1.Service) error {
 	client := kubeClient.CoreV1().Services(service.Namespace)
 	existing, err := client.Get(service.Name, metav1.GetOptions{})
 
 	if err != nil {
 		if errors.IsNotFound(err) {
-			err = addService(kubeClient, service, lm, backendName)
-			if err != nil {
-				lm.ServiceMetricError(service.GetNamespace(), backendName, service.GetName(), "ADD")
-			}
-			return err
+			return addService(kubeClient, service)
 		}
 		return err
 	}
@@ -133,10 +120,33 @@ func updateService(kubeClient kubernetes.Interface, service *v1.Service, lm loca
 		return err
 	}
 	_, err = client.Patch(service.Name, types.StrategicMergePatchType, patchBytes)
-
-	if err != nil {
-		lm.ServiceMetricError(service.GetNamespace(), backendName, service.GetName(), "UPDATE")
-	}
-
 	return err
+}
+
+func (action serviceAction) SetMetrics(gimbalKubeClient kubernetes.Interface, metrics localmetrics.DiscovererMetrics,
+	logger *logrus.Logger) {
+
+	// Log Service Event Timestamp
+	metrics.ServiceEventTimestampMetric(action.service.GetNamespace(), action.service.GetName(), now().Unix())
+
+	// Log Total Services Metric
+	totalServices, err := getTotalServicesCount(gimbalKubeClient, action.ObjectMeta().GetNamespace(), metrics)
+	if err != nil {
+		logger.Error("Error getting total services count: ", err)
+	} else {
+		metrics.DiscovererReplicatedServicesMetric(action.service.GetNamespace(), totalServices)
+	}
+}
+
+func (action serviceAction) SetMetricError(metrics localmetrics.DiscovererMetrics) {
+	metrics.ServiceMetricError(action.ObjectMeta().GetNamespace(), action.ObjectMeta().GetName(), action.GetActionType())
+}
+
+// GetTotalServicesCount returns the number of services in a namespace for the particular backend
+func getTotalServicesCount(gimbalKubeClient kubernetes.Interface, namespace string, metrics localmetrics.DiscovererMetrics) (int, error) {
+	svcs, err := gimbalKubeClient.CoreV1().Services(namespace).List(metav1.ListOptions{LabelSelector: fmt.Sprintf("gimbal.heptio.com/backend=%s", metrics.BackendName)})
+	if err != nil {
+		return 0, err
+	}
+	return len(svcs.Items), nil
 }

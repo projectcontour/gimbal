@@ -20,16 +20,21 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 
+	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
 	"github.com/heptio/gimbal/discovery/pkg/sync"
+	"github.com/prometheus/client_golang/prometheus"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	kubeinformers "k8s.io/client-go/informers"
+	"k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/util/workqueue"
 )
 
 var serviceTests = []struct {
-	name     string
-	service  *v1.Service
-	expected int
+	name                  string
+	service               *v1.Service
+	expected              int
+	expectedServicesCount int
 }{
 	{
 		name: "service",
@@ -45,7 +50,8 @@ var serviceTests = []struct {
 				},
 			},
 		},
-		expected: 1,
+		expected:              1,
+		expectedServicesCount: 1,
 	},
 	{
 		name: "service into kube-system namespace",
@@ -61,7 +67,8 @@ var serviceTests = []struct {
 				},
 			},
 		},
-		expected: 0,
+		expected:              0,
+		expectedServicesCount: 1,
 	},
 	{
 		name: "kubernetes service",
@@ -77,7 +84,8 @@ var serviceTests = []struct {
 				},
 			},
 		},
-		expected: 0,
+		expected:              0,
+		expectedServicesCount: 1,
 	},
 	{
 		name: "kubernetes service diff namespace",
@@ -93,14 +101,16 @@ var serviceTests = []struct {
 				},
 			},
 		},
-		expected: 1,
+		expected:              1,
+		expectedServicesCount: 1,
 	},
 }
 
 var endpointTests = []struct {
-	name     string
-	endpoint *v1.Endpoints
-	expected int
+	name                   string
+	endpoint               *v1.Endpoints
+	expected               int
+	expectedEndpointsCount int
 }{
 	{
 		name: "add endpoint",
@@ -115,7 +125,8 @@ var endpointTests = []struct {
 				},
 			},
 		},
-		expected: 1,
+		expected:               1,
+		expectedEndpointsCount: 1,
 	},
 	{
 		name: "service into kube-system namespace",
@@ -129,7 +140,8 @@ var endpointTests = []struct {
 				},
 			},
 		},
-		expected: 0,
+		expected:               0,
+		expectedEndpointsCount: 1,
 	},
 	{
 		name: "kubernetes endpoint",
@@ -143,7 +155,8 @@ var endpointTests = []struct {
 				},
 			},
 		},
-		expected: 0,
+		expected:               0,
+		expectedEndpointsCount: 1,
 	},
 	{
 		name: "kubernetes endpoint diff namespace",
@@ -157,24 +170,15 @@ var endpointTests = []struct {
 				},
 			},
 		},
-		expected: 1,
+		expected:               1,
+		expectedEndpointsCount: 1,
 	},
 }
 
 func TestAddServiceQueue(t *testing.T) {
 	for _, tc := range serviceTests {
 		t.Run(tc.name, func(t *testing.T) {
-			c := &Controller{
-				Logger: logrus.New(),
-				syncqueue: sync.Queue{
-					Logger:      logrus.New(),
-					Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
-					Threadiness: 1,
-					BackendName: "test",
-				},
-				backendName: "test",
-			}
-
+			c := getDefaultController(localmetrics.NewMetrics("backendtype", "backend"))
 			c.addService(tc.service)
 			time.Sleep(100 * time.Millisecond) // Give queue time to process (huh?)
 			got := c.syncqueue.Workqueue.Len()
@@ -185,17 +189,7 @@ func TestAddServiceQueue(t *testing.T) {
 func TestUpdateServiceQueue(t *testing.T) {
 	for _, tc := range serviceTests {
 		t.Run(tc.name, func(t *testing.T) {
-			c := &Controller{
-				Logger: logrus.New(),
-				syncqueue: sync.Queue{
-					Logger:      logrus.New(),
-					Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
-					Threadiness: 1,
-					BackendName: "test",
-				},
-				backendName: "test",
-			}
-
+			c := getDefaultController(localmetrics.NewMetrics("backendtype", "backend"))
 			c.updateService(tc.service)
 			time.Sleep(100 * time.Millisecond) // Give queue time to process (huh?)
 			got := c.syncqueue.Workqueue.Len()
@@ -206,17 +200,7 @@ func TestUpdateServiceQueue(t *testing.T) {
 func TestDeleteServiceQueue(t *testing.T) {
 	for _, tc := range serviceTests {
 		t.Run(tc.name, func(t *testing.T) {
-			c := &Controller{
-				Logger: logrus.New(),
-				syncqueue: sync.Queue{
-					Logger:      logrus.New(),
-					Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
-					Threadiness: 1,
-					BackendName: "test",
-				},
-				backendName: "test",
-			}
-
+			c := getDefaultController(localmetrics.NewMetrics("backendtype", "backend"))
 			c.deleteService(tc.service)
 			time.Sleep(100 * time.Millisecond) // Give queue time to process (huh?)
 			got := c.syncqueue.Workqueue.Len()
@@ -227,17 +211,7 @@ func TestDeleteServiceQueue(t *testing.T) {
 func TestAddEndpointsQueue(t *testing.T) {
 	for _, tc := range endpointTests {
 		t.Run(tc.name, func(t *testing.T) {
-			c := &Controller{
-				Logger: logrus.New(),
-				syncqueue: sync.Queue{
-					Logger:      logrus.New(),
-					Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
-					Threadiness: 1,
-					BackendName: "test",
-				},
-				backendName: "test",
-			}
-
+			c := getDefaultController(localmetrics.NewMetrics("backendtype", "backend"))
 			c.addEndpoints(tc.endpoint)
 			time.Sleep(100 * time.Millisecond) // Give queue time to process (huh?)
 			got := c.syncqueue.Workqueue.Len()
@@ -248,17 +222,7 @@ func TestAddEndpointsQueue(t *testing.T) {
 func TestUpdateEndpointsQueue(t *testing.T) {
 	for _, tc := range endpointTests {
 		t.Run(tc.name, func(t *testing.T) {
-			c := &Controller{
-				Logger: logrus.New(),
-				syncqueue: sync.Queue{
-					Logger:      logrus.New(),
-					Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
-					Threadiness: 1,
-					BackendName: "test",
-				},
-				backendName: "test",
-			}
-
+			c := getDefaultController(localmetrics.NewMetrics("backendtype", "backend"))
 			c.updateEndpoints(tc.endpoint)
 			time.Sleep(100 * time.Millisecond) // Give queue time to process (huh?)
 			got := c.syncqueue.Workqueue.Len()
@@ -269,21 +233,114 @@ func TestUpdateEndpointsQueue(t *testing.T) {
 func TestDeleteEndpointsQueue(t *testing.T) {
 	for _, tc := range endpointTests {
 		t.Run(tc.name, func(t *testing.T) {
+			c := getDefaultController(localmetrics.NewMetrics("backendtype", "backend"))
+			c.deleteEndpoints(tc.endpoint)
+			time.Sleep(100 * time.Millisecond) // Give queue time to process (huh?)
+			got := c.syncqueue.Workqueue.Len()
+			assert.Equal(t, tc.expected, got)
+		})
+	}
+}
+
+func TestEndpointMetrics(t *testing.T) {
+	for _, tc := range endpointTests {
+		t.Run(tc.name, func(t *testing.T) {
+
+			metrics := localmetrics.NewMetrics("backendtype", "backend")
+			metrics.RegisterPrometheus(false)
+
+			c := getDefaultController(metrics)
+
+			c.writeEndpointsMetrics(tc.endpoint)
+
+			gatherers := prometheus.Gatherers{
+				metrics.Registry,
+				prometheus.DefaultGatherer,
+			}
+
+			gathering, err := gatherers.Gather()
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			replicatedEndpoints := float64(-1)
+			for _, mf := range gathering {
+				if mf.GetName() == localmetrics.DiscovererUpstreamEndpointsGauge {
+					replicatedEndpoints = mf.Metric[0].Gauge.GetValue()
+				}
+			}
+
+			assert.Equal(t, float64(tc.expectedEndpointsCount), replicatedEndpoints)
+		})
+	}
+}
+func TestServicesMetrics(t *testing.T) {
+	for _, tc := range serviceTests {
+		t.Run(tc.name, func(t *testing.T) {
+
+			metrics := localmetrics.NewMetrics("backendtype", "backend")
+			metrics.RegisterPrometheus(false)
+
+			client := fake.NewSimpleClientset(tc.service)
+			informer := kubeinformers.NewSharedInformerFactory(client, time.Second*0)
+
 			c := &Controller{
 				Logger: logrus.New(),
 				syncqueue: sync.Queue{
 					Logger:      logrus.New(),
 					Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
 					Threadiness: 1,
-					BackendName: "test",
+					Metrics:     metrics,
 				},
-				backendName: "test",
+				serviceLister:   informer.Core().V1().Services().Lister(),
+				endpointsLister: informer.Core().V1().Endpoints().Lister(),
+				metrics:         metrics,
 			}
 
-			c.deleteEndpoints(tc.endpoint)
-			time.Sleep(100 * time.Millisecond) // Give queue time to process (huh?)
-			got := c.syncqueue.Workqueue.Len()
-			assert.Equal(t, tc.expected, got)
+			// Call informer before starting!
+			informer.Core().V1().Services().Informer()
+
+			stopCh := make(chan struct{})
+			informer.Start(stopCh)
+			informer.WaitForCacheSync(stopCh)
+
+			c.writeServiceMetrics(tc.service)
+
+			gatherers := prometheus.Gatherers{
+				metrics.Registry,
+				prometheus.DefaultGatherer,
+			}
+
+			gathering, err := gatherers.Gather()
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			replicatedServices := float64(-1)
+			for _, mf := range gathering {
+				if mf.GetName() == localmetrics.DiscovererUpstreamServicesGauge {
+					replicatedServices = mf.Metric[0].Gauge.GetValue()
+				}
+			}
+
+			assert.Equal(t, float64(tc.expectedServicesCount), replicatedServices)
 		})
+	}
+}
+
+func getDefaultController(metrics localmetrics.DiscovererMetrics) *Controller {
+	client := fake.NewSimpleClientset()
+	informer := kubeinformers.NewSharedInformerFactory(client, time.Second*0)
+	return &Controller{
+		Logger: logrus.New(),
+		syncqueue: sync.Queue{
+			Logger:      logrus.New(),
+			Workqueue:   workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "syncqueue"),
+			Threadiness: 1,
+			Metrics:     metrics,
+		},
+		serviceLister:   informer.Core().V1().Services().Lister(),
+		endpointsLister: informer.Core().V1().Endpoints().Lister(),
+		metrics:         metrics,
 	}
 }

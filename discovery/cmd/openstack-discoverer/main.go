@@ -52,6 +52,7 @@ var (
 	log                               *logrus.Logger
 	gimbalKubeClientQPS               float64
 	gimbalKubeClientBurst             int
+	resyncInterval                    time.Duration
 )
 
 const (
@@ -71,6 +72,7 @@ func init() {
 	flag.IntVar(&prometheusListenPort, "prometheus-listen-address", 8080, "The address to listen on for Prometheus HTTP requests")
 	flag.Float64Var(&gimbalKubeClientQPS, "gimbal-client-qps", 5, "The maximum queries per second (QPS) that can be performed on the Gimbal Kubernetes API server")
 	flag.IntVar(&gimbalKubeClientBurst, "gimbal-client-burst", 10, "The maximum number of queries that can be performed on the Gimbal Kubernetes API server during a burst")
+	flag.DurationVar(&resyncInterval, "resync-interval", time.Minute*30, "Default resync period for watcher to refresh")
 	flag.Parse()
 }
 
@@ -98,8 +100,11 @@ func main() {
 	log.Infof("Gimbal kubernetes client burst: %d", gimbalKubeClientBurst)
 
 	// Init prometheus metrics
-	discovererMetrics = localmetrics.NewMetrics()
-	discovererMetrics.RegisterPrometheus()
+	discovererMetrics = localmetrics.NewMetrics("openstack", backendName)
+	discovererMetrics.RegisterPrometheus(true)
+
+	// Log info metric
+	discovererMetrics.DiscovererInfoMetric(buildinfo.Version)
 
 	// Validate cluster name
 	if util.IsInvalidBackendName(backendName) {
@@ -144,7 +149,6 @@ func main() {
 		RoundTripper: http.DefaultTransport,
 		Log:          log,
 		BackendName:  backendName,
-		ClusterType:  clusterType,
 		Metrics:      &discovererMetrics,
 	}
 
@@ -194,7 +198,7 @@ func main() {
 
 	go func() {
 		// Expose the registered metrics via HTTP.
-		http.Handle("/metrics", promhttp.Handler())
+		http.Handle("/metrics", promhttp.HandlerFor(discovererMetrics.Registry, promhttp.HandlerOpts{}))
 		srv := &http.Server{Addr: fmt.Sprintf(":%d", prometheusListenPort)}
 		log.Info("Listening for Prometheus metrics on port: ", prometheusListenPort)
 		if err := srv.ListenAndServe(); err != nil {

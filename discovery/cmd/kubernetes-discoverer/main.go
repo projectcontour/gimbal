@@ -81,8 +81,11 @@ func main() {
 	log.Infof("Gimbal kubernetes client burst: %d", gimbalKubeClientBurst)
 
 	// Init prometheus metrics
-	discovererMetrics = localmetrics.NewMetrics()
-	discovererMetrics.RegisterPrometheus()
+	discovererMetrics = localmetrics.NewMetrics("kubernetes", backendName)
+	discovererMetrics.RegisterPrometheus(true)
+
+	// Log info metric
+	discovererMetrics.DiscovererInfoMetric(buildinfo.Version)
 
 	if debug {
 		log.Level = logrus.DebugLevel
@@ -126,7 +129,7 @@ func main() {
 
 	go func() {
 		// Expose the registered metrics via HTTP.
-		http.Handle("/metrics", promhttp.Handler())
+		http.Handle("/metrics", promhttp.HandlerFor(discovererMetrics.Registry, promhttp.HandlerOpts{}))
 		srv := &http.Server{Addr: fmt.Sprintf(":%d", prometheusListenPort)}
 		log.Info("Listening for Prometheus metrics on port: ", prometheusListenPort)
 		if err := srv.ListenAndServe(); err != nil {
