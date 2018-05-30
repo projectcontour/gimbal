@@ -2023,7 +2023,7 @@ data:
       "templating": {
         "list": [
           {
-            "allValue": ".*",
+            "allValue": "",
             "current": {},
             "datasource": "prometheus",
             "hide": 0,
@@ -2043,7 +2043,7 @@ data:
             "useTags": false
           },
           {
-            "allValue": ".*",
+            "allValue": "",
             "current": {},
             "datasource": "prometheus",
             "hide": 0,
