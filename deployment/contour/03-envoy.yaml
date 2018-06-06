@@ -6,6 +6,10 @@ metadata:
   name: envoy
   namespace: gimbal-contour
 spec:
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 10%
   selector:
     matchLabels:
       app: envoy
