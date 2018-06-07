@@ -29,7 +29,7 @@ const (
 	actionAdd       = "add"
 	actionUpdate    = "update"
 	actionDelete    = "delete"
-	queueMaxRetries = 5
+	queueMaxRetries = 3
 )
 
 // Queue syncs resources with the Gimbal cluster by working through a queue of

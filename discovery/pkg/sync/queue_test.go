@@ -39,7 +39,7 @@ func TestQueueStopsRetryingAfterSuccess(t *testing.T) {
 	var createAttempts int
 	client.PrependReactor("create", "services", func(action k8stesting.Action) (bool, runtime.Object, error) {
 		err := errors.New("fake error")
-		if createAttempts == 2 {
+		if createAttempts == 1 {
 			err = nil
 		}
 		createAttempts++
@@ -59,8 +59,8 @@ func TestQueueStopsRetryingAfterSuccess(t *testing.T) {
 	time.Sleep(1 * time.Second)
 	close(stop)
 
-	// Assert that we tried three times
-	assert.Equal(t, 3, createAttempts)
+	// Assert that we tried twice
+	assert.Equal(t, 2, createAttempts)
 	assert.Equal(t, 0, q.Workqueue.Len())
 }
 
