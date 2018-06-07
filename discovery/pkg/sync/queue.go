@@ -127,8 +127,9 @@ func (sq *Queue) processNextWorkItem() bool {
 
 	// If there was an error handling the item, we will retry up to
 	// queueMaxRetries times.
-	if sq.Workqueue.NumRequeues(obj) < queueMaxRetries {
-		sq.Logger.Infof("Error handling %s: %v. Requeuing.", action, err)
+	numRequeues := sq.Workqueue.NumRequeues(obj)
+	if numRequeues < queueMaxRetries {
+		sq.Logger.Errorf("Error handling %s: %v. Number of requeues: %d. Requeuing.", action, err, numRequeues)
 		sq.Workqueue.AddRateLimited(obj)
 		sq.Metrics.QueueSizeGaugeMetric(sq.BackendName, sq.ClusterType, sq.Workqueue.Len())
 		return true
