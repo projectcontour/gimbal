@@ -14,7 +14,6 @@
 package sync
 
 import (
-	"fmt"
 	"time"
 
 	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
@@ -27,9 +26,10 @@ import (
 )
 
 const (
-	actionAdd    = "add"
-	actionUpdate = "update"
-	actionDelete = "delete"
+	actionAdd       = "add"
+	actionUpdate    = "update"
+	actionDelete    = "delete"
+	queueMaxRetries = 3
 )
 
 // Queue syncs resources with the Gimbal cluster by working through a queue of
@@ -103,38 +103,42 @@ func (sq *Queue) processNextWorkItem() bool {
 		return false
 	}
 
-	// We wrap this block in a func so we can defer sq.workqueue.Done.
-	err := func(obj interface{}) error {
-		// We call Done here so the workqueue knows we have finished processing
-		// this item. We also must remember to call Forget if we do not want
-		// this work item being re-queued. For example, we do not call Forget if
-		// a transient error occurs, instead the item is put back on the
-		// workqueue and attempted again after a back-off period.
-		defer sq.Workqueue.Done(obj)
+	// Tell the queue that we are done with processing this key. This unblocks
+	// the key for other workers.
+	defer sq.Workqueue.Done(obj)
 
-		action, ok := obj.(Action)
-		if !ok {
-			sq.Workqueue.Forget(obj)
-			sq.Metrics.QueueSizeGaugeMetric(sq.BackendName, sq.ClusterType, sq.Workqueue.Len())
-			return fmt.Errorf("ignoring unknown item of type %T in queue", obj)
-		}
-
-		err := action.Sync(sq.KubeClient, sq.Metrics, sq.BackendName)
-		if err != nil {
-			return err
-		}
-		sq.Logger.Infof("Successfully handled: %s", action)
-
-		// Finally, if no error occurs we Forget this item so it does not
-		// get queued again until another change happens.
+	action, ok := obj.(Action)
+	if !ok {
 		sq.Workqueue.Forget(obj)
 		sq.Metrics.QueueSizeGaugeMetric(sq.BackendName, sq.ClusterType, sq.Workqueue.Len())
-		return nil
-	}(obj)
-
-	if err != nil {
-		sq.Logger.Error(err)
+		sq.Logger.Errorf("got an unknown item of type %T in the queue", obj)
 		return true
 	}
+
+	err := action.Sync(sq.KubeClient, sq.Metrics, sq.BackendName)
+
+	// We successfully handled the action, so we can forget the item and keep going.
+	if err == nil {
+		sq.Workqueue.Forget(obj)
+		sq.Metrics.QueueSizeGaugeMetric(sq.BackendName, sq.ClusterType, sq.Workqueue.Len())
+		sq.Logger.Infof("Successfully handled: %s", action)
+		return true
+	}
+
+	// If there was an error handling the item, we will retry up to
+	// queueMaxRetries times.
+	numRequeues := sq.Workqueue.NumRequeues(obj)
+	if numRequeues < queueMaxRetries {
+		sq.Logger.Errorf("Error handling %s: %v. Number of requeues: %d. Requeuing.", action, err, numRequeues)
+		sq.Workqueue.AddRateLimited(obj)
+		sq.Metrics.QueueSizeGaugeMetric(sq.BackendName, sq.ClusterType, sq.Workqueue.Len())
+		return true
+	}
+
+	// We tried `queueMaxRetries` times but still failed. Dropping the item from
+	// the queue.
+	sq.Workqueue.Forget(obj)
+	sq.Logger.Errorf("Dropping %s out of the queue because we failed to handle the item %d times: %v", action, queueMaxRetries, err)
+	sq.Metrics.QueueSizeGaugeMetric(sq.BackendName, sq.ClusterType, sq.Workqueue.Len())
 	return true
 }
