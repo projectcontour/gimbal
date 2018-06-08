@@ -103,7 +103,7 @@ func (r *Reconciler) reconcile() {
 	start := time.Now()
 
 	log := r.Logger
-	log.Debugln("reconciling openstack load balancers")
+	log.Info("reconciling load balancers")
 	// Get all the openstack tenants that must be synced
 	projects, err := r.ProjectLister.ListProjects()
 	if err != nil {
