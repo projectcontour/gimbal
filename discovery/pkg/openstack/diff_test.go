@@ -140,6 +140,73 @@ func TestDiffServices(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "order doesn't matter for update",
+			current: []v1.Service{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Namespace: "finance",
+						Name:      "service1",
+					},
+					Spec: v1.ServiceSpec{
+						Ports: []v1.ServicePort{
+							{
+								Name:     "http",
+								Port:     80,
+								Protocol: "TCP",
+							},
+						},
+					},
+				},
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Namespace: "finance",
+						Name:      "service2",
+					},
+					Spec: v1.ServiceSpec{
+						Ports: []v1.ServicePort{
+							{
+								Name:     "http",
+								Port:     80,
+								Protocol: "TCP",
+							},
+						},
+					},
+				},
+			},
+			desired: []v1.Service{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Namespace: "finance",
+						Name:      "service2",
+					},
+					Spec: v1.ServiceSpec{
+						Ports: []v1.ServicePort{
+							{
+								Name:     "http",
+								Port:     80,
+								Protocol: "TCP",
+							},
+						},
+					},
+				},
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Namespace: "finance",
+						Name:      "service1",
+					},
+					Spec: v1.ServiceSpec{
+						Ports: []v1.ServicePort{
+							{
+								Name:     "http",
+								Port:     80,
+								Protocol: "TCP",
+							},
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, tc := range tests {
@@ -285,6 +352,101 @@ func TestDiffEndpoints(t *testing.T) {
 					ObjectMeta: metav1.ObjectMeta{
 						Namespace: "finance",
 						Name:      "production",
+					},
+					Subsets: []v1.EndpointSubset{
+						{
+							Addresses: []v1.EndpointAddress{
+								{
+									IP: "1.2.3.4",
+								},
+							},
+							Ports: []v1.EndpointPort{
+								{
+									Name:     "svc1",
+									Port:     80,
+									Protocol: v1.ProtocolTCP,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+		{
+			name: "order doesn't matter for update",
+			current: []v1.Endpoints{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Namespace: "finance",
+						Name:      "endpoints1",
+					},
+					Subsets: []v1.EndpointSubset{
+						{
+							Addresses: []v1.EndpointAddress{
+								{
+									IP: "1.2.3.4",
+								},
+							},
+							Ports: []v1.EndpointPort{
+								{
+									Name:     "svc1",
+									Port:     80,
+									Protocol: v1.ProtocolTCP,
+								},
+							},
+						},
+					},
+				},
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Namespace: "finance",
+						Name:      "endpoints2",
+					},
+					Subsets: []v1.EndpointSubset{
+						{
+							Addresses: []v1.EndpointAddress{
+								{
+									IP: "1.2.3.4",
+								},
+							},
+							Ports: []v1.EndpointPort{
+								{
+									Name:     "svc1",
+									Port:     80,
+									Protocol: v1.ProtocolTCP,
+								},
+							},
+						},
+					},
+				},
+			},
+			desired: []v1.Endpoints{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Namespace: "finance",
+						Name:      "endpoints2",
+					},
+					Subsets: []v1.EndpointSubset{
+						{
+							Addresses: []v1.EndpointAddress{
+								{
+									IP: "1.2.3.4",
+								},
+							},
+							Ports: []v1.EndpointPort{
+								{
+									Name:     "svc1",
+									Port:     80,
+									Protocol: v1.ProtocolTCP,
+								},
+							},
+						},
+					},
+				},
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Namespace: "finance",
+						Name:      "endpoints1",
 					},
 					Subsets: []v1.EndpointSubset{
 						{

@@ -23,6 +23,7 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/pools"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 func TestKubeServices(t *testing.T) {
@@ -168,9 +169,10 @@ func TestKubeServices(t *testing.T) {
 						"gimbal.heptio.com/load-balancer-name": "stocks"},
 					[]v1.ServicePort{
 						{
-							Name:     "port-80",
-							Port:     80,
-							Protocol: v1.ProtocolTCP,
+							Name:       "port-80",
+							Port:       80,
+							TargetPort: intstr.FromInt(80),
+							Protocol:   v1.ProtocolTCP,
 						},
 					}),
 			},
@@ -191,9 +193,10 @@ func TestKubeServices(t *testing.T) {
 						"gimbal.heptio.com/load-balancer-name": "stocks"},
 					[]v1.ServicePort{
 						{
-							Name:     "port-80",
-							Port:     80,
-							Protocol: v1.ProtocolTCP,
+							Name:       "port-80",
+							Port:       80,
+							TargetPort: intstr.FromInt(80),
+							Protocol:   v1.ProtocolTCP,
 						},
 					}),
 			},
@@ -214,14 +217,16 @@ func TestKubeServices(t *testing.T) {
 						"gimbal.heptio.com/load-balancer-name": "stocks"},
 					[]v1.ServicePort{
 						{
-							Name:     "port-80",
-							Port:     80,
-							Protocol: v1.ProtocolTCP,
+							Name:       "port-80",
+							Port:       80,
+							TargetPort: intstr.FromInt(80),
+							Protocol:   v1.ProtocolTCP,
 						},
 						{
-							Name:     "port-443",
-							Port:     443,
-							Protocol: v1.ProtocolTCP,
+							Name:       "port-443",
+							Port:       443,
+							TargetPort: intstr.FromInt(443),
+							Protocol:   v1.ProtocolTCP,
 						},
 					}),
 			},
@@ -242,14 +247,16 @@ func TestKubeServices(t *testing.T) {
 						"gimbal.heptio.com/load-balancer-name": ""},
 					[]v1.ServicePort{
 						{
-							Name:     "port-80",
-							Port:     80,
-							Protocol: v1.ProtocolTCP,
+							Name:       "port-80",
+							Port:       80,
+							TargetPort: intstr.FromInt(80),
+							Protocol:   v1.ProtocolTCP,
 						},
 						{
-							Name:     "port-443",
-							Port:     443,
-							Protocol: v1.ProtocolTCP,
+							Name:       "port-443",
+							Port:       443,
+							TargetPort: intstr.FromInt(443),
+							Protocol:   v1.ProtocolTCP,
 						},
 					}),
 			},

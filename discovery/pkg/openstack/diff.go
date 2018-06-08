@@ -36,8 +36,11 @@ func diffServices(desired, current []v1.Service) (add, update, del []v1.Service)
 
 	for _, currentSvc := range current {
 		for _, desiredSvc := range desired {
-			if !serviceEqualsDetail(&currentSvc, &desiredSvc) {
-				update = append(update, desiredSvc)
+			if serviceEquals(&currentSvc, &desiredSvc) {
+				if !serviceEqualsDetail(&currentSvc, &desiredSvc) {
+					update = append(update, desiredSvc)
+				}
+				break
 			}
 		}
 	}
@@ -59,8 +62,11 @@ func diffEndpoints(desired, current []v1.Endpoints) (add, update, del []v1.Endpo
 
 	for _, currentEp := range current {
 		for _, desiredEp := range desired {
-			if !endpointEqualsDetail(&currentEp, &desiredEp) {
-				update = append(update, desiredEp)
+			if endpointEquals(&currentEp, &desiredEp) {
+				if !endpointEqualsDetail(&currentEp, &desiredEp) {
+					update = append(update, desiredEp)
+				}
+				break
 			}
 		}
 	}
