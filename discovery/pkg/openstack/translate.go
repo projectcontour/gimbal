@@ -24,6 +24,7 @@ import (
 	"github.com/heptio/gimbal/discovery/pkg/translator"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
 // returns a kubernetes service for each load balancer in the slice
@@ -116,9 +117,14 @@ func serviceName(lb loadbalancers.LoadBalancer) string {
 func servicePort(listener *listeners.Listener) v1.ServicePort {
 	pn := portName(listener)
 	return v1.ServicePort{
-		Name:     pn,
-		Port:     int32(listener.ProtocolPort),
-		Protocol: v1.ProtocolTCP, // only support TCP
+		Name: pn,
+		Port: int32(listener.ProtocolPort),
+		// The K8s API server sets this field on service creation. By setting
+		// this ourselves, we prevent the discoverer from thinking it needs to
+		// perform an update every time it compares the translated object with
+		// the one that exists in gimbal.
+		TargetPort: intstr.FromInt(listener.ProtocolPort),
+		Protocol:   v1.ProtocolTCP, // only support TCP
 	}
 }
 
