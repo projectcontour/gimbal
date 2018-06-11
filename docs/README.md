@@ -1,6 +1,6 @@
 # Documentation
 
-See the root-level README for an introduction, and the [deployment directory](../deployment/README.md) to get started with setting up and and deploying Gimbal.
+See the root-level README for an introduction, and the [deployment directory](../deployment/README.md) to get started with setting up and deploying Gimbal.
 
 Here you can dig into the details of how Gimbal works, and explore more advanced topics for operators and users.
 

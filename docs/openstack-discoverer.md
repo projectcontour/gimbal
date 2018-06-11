@@ -47,6 +47,9 @@ Arguments are available to customize the discoverer, most have defaults but othe
 | reconciliation-period | 30s | The interval of time between reconciliation loop runs 
 | http-client-timeout | 5s | The HTTP client request timeout
 | openstack-certificate-authority | "" | Path to cert file of the OpenStack API certificate authority
+| prometheus-listen-address | 8080 | The address to listen on for Prometheus HTTP requests
+| gimbal-client-qps | 5 | The maximum queries per second (QPS) that can be performed on the Gimbal Kubernetes API server
+| gimbal-client-burst | 10 | The maximum number of queries that can be performed on the Gimbal Kubernetes API server during a burst
 
 ### Credentials
 

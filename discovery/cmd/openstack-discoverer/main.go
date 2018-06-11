@@ -50,6 +50,8 @@ var (
 	prometheusListenPort              int
 	discovererMetrics                 localmetrics.DiscovererMetrics
 	log                               *logrus.Logger
+	gimbalKubeClientQPS               float64
+	gimbalKubeClientBurst             int
 )
 
 const (
@@ -67,6 +69,8 @@ func init() {
 	flag.DurationVar(&httpClientTimeout, "http-client-timeout", 5*time.Second, "The HTTP client request timeout.")
 	flag.StringVar(&openstackCertificateAuthorityFile, "openstack-certificate-authority", "", "Path to cert file of the OpenStack API certificate authority.")
 	flag.IntVar(&prometheusListenPort, "prometheus-listen-address", 8080, "The address to listen on for Prometheus HTTP requests")
+	flag.Float64Var(&gimbalKubeClientQPS, "gimbal-client-qps", 5, "The maximum queries per second (QPS) that can be performed on the Gimbal Kubernetes API server")
+	flag.IntVar(&gimbalKubeClientBurst, "gimbal-client-burst", 10, "The maximum number of queries that can be performed on the Gimbal Kubernetes API server during a burst")
 	flag.Parse()
 }
 
@@ -86,6 +90,12 @@ func main() {
 	}
 
 	log.Info("Gimbal OpenStack Discoverer Starting up...")
+	log.Infof("Version: %s", buildinfo.Version)
+	log.Infof("Backend name: %s", backendName)
+	log.Infof("Number of queue worker threads: %d", numProcessThreads)
+	log.Infof("Reconciliation period: %v", reconciliationPeriod)
+	log.Infof("Gimbal kubernetes client QPS: %v", gimbalKubeClientQPS)
+	log.Infof("Gimbal kubernetes client burst: %d", gimbalKubeClientBurst)
 
 	// Init prometheus metrics
 	discovererMetrics = localmetrics.NewMetrics()
@@ -97,7 +107,7 @@ func main() {
 	}
 	log.Infof("BackendName is: %s", backendName)
 
-	gimbalKubeClient, err := k8s.NewClient(gimbalKubeCfgFile, log)
+	gimbalKubeClient, err := k8s.NewClientWithQPS(gimbalKubeCfgFile, log, float32(gimbalKubeClientQPS), gimbalKubeClientBurst)
 	if err != nil {
 		log.Fatal("Failed to create kubernetes client", err)
 	}

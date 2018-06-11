@@ -42,6 +42,8 @@ var (
 	debug                 bool
 	prometheusListenPort  int
 	discovererMetrics     localmetrics.DiscovererMetrics
+	gimbalKubeClientQPS   float64
+	gimbalKubeClientBurst int
 )
 
 func init() {
@@ -53,6 +55,8 @@ func init() {
 	flag.DurationVar(&resyncInterval, "resync-interval", time.Minute*30, "Default resync period for watcher to refresh")
 	flag.BoolVar(&debug, "debug", false, "Enable debug logging.")
 	flag.IntVar(&prometheusListenPort, "prometheus-listen-address", 8080, "The address to listen on for Prometheus HTTP requests")
+	flag.Float64Var(&gimbalKubeClientQPS, "gimbal-client-qps", 5, "The maximum queries per second (QPS) that can be performed on the Gimbal Kubernetes API server")
+	flag.IntVar(&gimbalKubeClientBurst, "gimbal-client-burst", 10, "The maximum number of queries that can be performed on the Gimbal Kubernetes API server during a burst")
 	flag.Parse()
 }
 
@@ -69,6 +73,12 @@ func main() {
 	}
 
 	log.Info("Gimbal Kubernetes Discoverer Starting up...")
+	log.Infof("Version: %s", buildinfo.Version)
+	log.Infof("Backend name: %s", backendName)
+	log.Infof("Number of queue worker threads: %d", numProcessThreads)
+	log.Infof("Resync interval: %v", resyncInterval)
+	log.Infof("Gimbal kubernetes client QPS: %v", gimbalKubeClientQPS)
+	log.Infof("Gimbal kubernetes client burst: %d", gimbalKubeClientBurst)
 
 	// Init prometheus metrics
 	discovererMetrics = localmetrics.NewMetrics()
@@ -90,7 +100,7 @@ func main() {
 	}
 
 	// Init
-	gimbalKubeClient, err := k8s.NewClient(gimbalKubeCfgFile, log)
+	gimbalKubeClient, err := k8s.NewClientWithQPS(gimbalKubeCfgFile, log, float32(gimbalKubeClientQPS), gimbalKubeClientBurst)
 	if err != nil {
 		log.Fatal("Could not init k8sclient! ", err)
 	}

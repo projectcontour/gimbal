@@ -31,6 +31,19 @@ func NewClient(kubeCfgFile string, logger *logrus.Logger) (kubernetes.Interface,
 	return kubernetes.NewForConfig(config)
 }
 
+// NewClientWithQPS returns a Kubernetes client using the given configuration
+// and rate limiting parameters. If no config is provided, assumes it is running
+// inside a Kubernetes cluster and uses the in-cluster config.
+func NewClientWithQPS(kubeCfgFile string, logger *logrus.Logger, qps float32, burst int) (kubernetes.Interface, error) {
+	config, err := buildConfig(kubeCfgFile, logger)
+	if err != nil {
+		return nil, err
+	}
+	config.QPS = qps
+	config.Burst = burst
+	return kubernetes.NewForConfig(config)
+}
+
 func buildConfig(kubeCfgFile string, logger *logrus.Logger) (*rest.Config, error) {
 	if kubeCfgFile != "" {
 		logger.Infof("Using OutOfCluster k8s config with kubeConfigFile: %s", kubeCfgFile)
