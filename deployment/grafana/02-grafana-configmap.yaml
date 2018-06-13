@@ -61,7 +61,7 @@ data:
       "gnetId": null,
       "graphTooltip": 0,
       "id": null,
-      "iteration": 1528400955916,
+      "iteration": 1528906914777,
       "links": [],
       "panels": [
         {
@@ -507,7 +507,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "sum(gimbal_discoverer_replicated_services_total{namespace=~\"$Namespace\",backendname=~\"$Backend\"}) by (backendname)",
+              "expr": "avg(gimbal_discoverer_replicated_services_total{namespace=~\"$Namespace\",backendname=~\"$Backend\"}) by (backendname)",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "Backend: {{ backendname }} ",
@@ -647,7 +647,7 @@ data:
             "x": 12,
             "y": 4
           },
-          "id": 4,
+          "id": 22,
           "legend": {
             "alignAsTable": true,
             "avg": true,
@@ -675,7 +675,7 @@ data:
               "expr": "sum(gimbal_discoverer_replicated_endpoints_total{namespace=~\"$Namespace\",backendname=~\"$Backend\"}) by (backendname)",
               "format": "time_series",
               "intervalFactor": 1,
-              "legendFormat": "Backend: {{ backendname }}",
+              "legendFormat": "{{ backendname }}",
               "refId": "A"
             }
           ],
@@ -805,13 +805,340 @@ data:
           "dashLength": 10,
           "dashes": false,
           "datasource": "prometheus",
+          "fill": 1,
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 0,
+            "y": 12
+          },
+          "id": 24,
+          "legend": {
+            "alignAsTable": true,
+            "avg": false,
+            "current": true,
+            "max": true,
+            "min": true,
+            "show": true,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "sum(gimbal_discoverer_replicated_services_total{namespace=~\"$Namespace\",backendname=~\"$Backend\"}) by (namespace)",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "Namespace: {{ namespace }} ",
+              "refId": "B"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Replicated Services by Namespace",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "prometheus",
+          "fill": 1,
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 6,
+            "y": 12
+          },
+          "id": 23,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "max": false,
+            "min": true,
+            "show": true,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "sum(gimbal_discoverer_replicated_endpoints_total{namespace=~\"$Namespace\",backendname=~\"$Backend\"}) by (servicename)",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{ servicename }}",
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Replicated Endpoints by Service",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "prometheus",
+          "fill": 1,
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 12,
+            "y": 12
+          },
+          "id": 4,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "max": false,
+            "min": true,
+            "show": true,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "sum(gimbal_discoverer_replicated_endpoints_total{namespace=~\"$Namespace\",backendname=~\"$Backend\"}) by (backendname, servicename)",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{ servicename }} / {{ backendname }}",
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Replicated Endpoints by Service & Backend",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "prometheus",
+          "fill": 1,
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 18,
+            "y": 12
+          },
+          "id": 21,
+          "legend": {
+            "alignAsTable": true,
+            "avg": true,
+            "current": true,
+            "max": false,
+            "min": true,
+            "rightSide": false,
+            "show": true,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "sum(gimbal_discoverer_replicated_endpoints_total{namespace=~\"$Namespace\",backendname=~\"$Backend\"}) by (servicename, backendname) / sum(gimbal_discoverer_upstream_endpoints_total{namespace=~\"$Namespace\",backendname=~\"$Backend\"}) by (servicename, backendname)",
+              "format": "time_series",
+              "hide": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "{{servicename}} / {{backendname}}",
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Endpoint replication success rate",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "percentunit",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": "0",
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "prometheus",
           "description": "Size the event processing queue",
           "fill": 1,
           "gridPos": {
             "h": 7,
             "w": 6,
             "x": 0,
-            "y": 12
+            "y": 20
           },
           "id": 9,
           "legend": {
@@ -895,7 +1222,7 @@ data:
             "h": 7,
             "w": 6,
             "x": 6,
-            "y": 12
+            "y": 20
           },
           "id": 13,
           "legend": {
@@ -979,7 +1306,7 @@ data:
             "h": 7,
             "w": 6,
             "x": 12,
-            "y": 12
+            "y": 20
           },
           "id": 11,
           "legend": {
@@ -1132,7 +1459,7 @@ data:
       "timezone": "",
       "title": "Gimbal Discovery",
       "uid": "ex4WqmZmk",
-      "version": 12
+      "version": 21
     }
   envoy.json: |
     {
