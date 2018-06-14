@@ -92,6 +92,15 @@ Credentials to the backend OpenStack cluster can be updated at any time if neces
 4. Verify the discoverer is up and running.
 5. Delete the old secret, or rollback the deployment if the discoverer failed to start.
 
+### Configuring the Gimbal Kubernetes client rate limiting
+
+The discoverer has two configuration parameters that control the request rate limiter of the Kubernetes client used to sync services and endpoints to the Gimbal cluster:
+
+* Queries per second (QPS): Number of requests per second that can be sent to the Gimbal API server. Set using the `--gimbal-client-qps` command-line flag.
+* Burst size: Number of requests that can be sent during a burst period. A burst is a period of time in which the number of requests can exceed the configured QPS, while still maintaining a smoothed QPS rate over time. Set using the `--gimbal-client-burst` command-line flag.
+
+These configuration parameters are dependent on your requirements and the hardware running the Gimbal cluster. If services and endpoints in your environment undergo a high rate of change, increase the QPS and burst parameters, but make sure that the Gimbal API server and etcd cluster can handle the increased load.
+
 ### Data flow
 
 Data flows from the remote cluster into the Gimbal cluster. The steps on how they replicate are as follows:
