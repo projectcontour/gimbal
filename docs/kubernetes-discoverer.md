@@ -4,7 +4,7 @@
 
 The Kubernetes discoverer provides service discovery for a Kubernetes cluster. It does this by monitoring available Services and Endpoints for a single Kubernetes cluster and synchronizing them into the host Gimbal cluster.
 
-The Discoverer will leverage the watch feature of the Kubernetes API to receive changes dynamically, rather than having to poll the API. All available services & endpoints will be synchronized to the the same namespace matching the source system.
+The Discoverer will leverage the watch feature of the Kubernetes API to receive changes dynamically, rather than having to poll the API. All available services & endpoints will be synchronized to the same namespace matching the source system.
 
 The discoverer will only be responsible for monitoring a single cluster at a time. If multiple clusters are required to be watched, then multiple discoverers will need to be deployed.
 
@@ -26,10 +26,13 @@ Arguments are available to customize the discoverer, most have defaults but othe
 | discover-kubecfg-file | ""  | Location of kubecfg file for access to remote Kubernetes cluster to watch for services / endpoints 
 | backend-name  | ""  |   Name of cluster scraping for services & endpoints (Cannot start or end with a hyphen and must be lowercase alpha-numeric)
 | debug | false | Enable debug logging 
+| prometheus-listen-address | 8080 | The address to listen on for Prometheus HTTP requests
+| gimbal-client-qps | 5 | The maximum queries per second (QPS) that can be performed on the Gimbal Kubernetes API server
+| gimbal-client-burst | 10 | The maximum number of queries that can be performed on the Gimbal Kubernetes API server during a burst
 
 ### Credentials
 
-A valid [Kubernetes config file](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/) is required to access the remote cluster. This config file is stored as a Kubernetes secret in the Gimbal cluster. 
+A valid [Kubernetes config file](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/) is required to access the remote cluster. This config file is stored as a Kubernetes secret in the Gimbal cluster.
 
 The following example creates a secret from a file locally and places it in the namespace `gimbal-discovery`. **_NOTE: Path to `config file` as well as `backend-name` will need to be customized._**
 
@@ -74,6 +77,15 @@ Credentials to the backend Kubernetes cluster can be updated at any time if nece
 4. Verify the discoverer is up and running.
 5. Delete the old secret, or rollback the deployment if the discoverer failed to start.
 
+### Configuring the Gimbal Kubernetes client rate limiting
+
+The discoverer has two configuration parameters that control the request rate limiter of the Kubernetes client used to sync services and endpoints to the Gimbal cluster:
+
+* Queries per second (QPS): Number of requests per second that can be sent to the Gimbal API server. Set using the `--gimbal-client-qps` command-line flag.
+* Burst size: Number of requests that can be sent during a burst period. A burst is a period of time in which the number of requests can exceed the configured QPS, while still maintaining a smoothed QPS rate over time. Set using the `--gimbal-client-burst` command-line flag.
+
+These configuration parameters are dependent on your requirements and the hardware running the Gimbal cluster. If services and endpoints in your environment undergo a high rate of change, increase the QPS and burst parameters, but make sure that the Gimbal API server and etcd cluster can handle the increased load.
+
 ### Data flow
 
 Data flows from the remote cluster into the Gimbal cluster. The steps on how they replicate are as follows:
@@ -85,6 +97,7 @@ Data flows from the remote cluster into the Gimbal cluster. The steps on how the
 #### Ignored Objects
 
 An exception to the flow outlined previously are objects that are ignored when synchronizing. The following rules determine if an object is ignored during sync:
+
 - Any service or endpoint in the `kube-system` namespace
 - Any service or endpoint named `kubernetes` in the `default` namespace
 
