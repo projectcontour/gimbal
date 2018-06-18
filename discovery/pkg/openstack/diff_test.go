@@ -221,249 +221,282 @@ func TestDiffServices(t *testing.T) {
 func TestDiffEndpoints(t *testing.T) {
 	tests := []struct {
 		name           string
-		current        []v1.Endpoints
-		desired        []v1.Endpoints
-		expectedAdd    []v1.Endpoints
-		expectedUpdate []v1.Endpoints
-		expectedDel    []v1.Endpoints
+		current        []Endpoints
+		desired        []Endpoints
+		expectedAdd    []Endpoints
+		expectedUpdate []Endpoints
+		expectedDel    []Endpoints
 	}{
 		{
 			name: "new endpoint",
-			desired: []v1.Endpoints{
+			desired: []Endpoints{
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "finance",
-						Name:      "production-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+					endpoints: v1.Endpoints{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "finance",
+							Name:      "production-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						},
 					},
+					upstreamName: "upname",
 				},
 			},
-			expectedAdd: []v1.Endpoints{
+			expectedAdd: []Endpoints{
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "finance",
-						Name:      "production-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+					endpoints: v1.Endpoints{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "finance",
+							Name:      "production-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						},
 					},
+					upstreamName: "upname",
 				},
 			},
 		},
 		{
 			name: "updated endpoint",
-			current: []v1.Endpoints{
+			current: []Endpoints{
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "finance",
-						Name:      "production",
-					},
-					Subsets: []v1.EndpointSubset{
-						{
-							Addresses: []v1.EndpointAddress{
-								{
-									IP: "5.6.7.8",
+					endpoints: v1.Endpoints{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "finance",
+							Name:      "production",
+						},
+						Subsets: []v1.EndpointSubset{
+							{
+								Addresses: []v1.EndpointAddress{
+									{
+										IP: "5.6.7.8",
+									},
 								},
-							},
-							Ports: []v1.EndpointPort{
-								{
-									Name:     "svc2",
-									Port:     443,
-									Protocol: v1.ProtocolTCP,
+								Ports: []v1.EndpointPort{
+									{
+										Name:     "svc2",
+										Port:     443,
+										Protocol: v1.ProtocolTCP,
+									},
 								},
 							},
 						},
 					},
+					upstreamName: "upname",
 				},
 			},
-			desired: []v1.Endpoints{
+			desired: []Endpoints{
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "finance",
-						Name:      "production",
-					},
-					Subsets: []v1.EndpointSubset{
-						{
-							Addresses: []v1.EndpointAddress{
-								{
-									IP: "1.2.3.4",
+					endpoints: v1.Endpoints{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "finance",
+							Name:      "production",
+						},
+						Subsets: []v1.EndpointSubset{
+							{
+								Addresses: []v1.EndpointAddress{
+									{
+										IP: "1.2.3.4",
+									},
 								},
-							},
-							Ports: []v1.EndpointPort{
-								{
-									Name:     "svc1",
-									Port:     80,
-									Protocol: v1.ProtocolTCP,
+								Ports: []v1.EndpointPort{
+									{
+										Name:     "svc1",
+										Port:     80,
+										Protocol: v1.ProtocolTCP,
+									},
 								},
 							},
 						},
 					},
+					upstreamName: "upname",
 				},
 			},
-			expectedUpdate: []v1.Endpoints{
+			expectedUpdate: []Endpoints{
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "finance",
-						Name:      "production",
-					},
-					Subsets: []v1.EndpointSubset{
-						{
-							Addresses: []v1.EndpointAddress{
-								{
-									IP: "1.2.3.4",
+					endpoints: v1.Endpoints{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "finance",
+							Name:      "production",
+						},
+						Subsets: []v1.EndpointSubset{
+							{
+								Addresses: []v1.EndpointAddress{
+									{
+										IP: "1.2.3.4",
+									},
 								},
-							},
-							Ports: []v1.EndpointPort{
-								{
-									Name:     "svc1",
-									Port:     80,
-									Protocol: v1.ProtocolTCP,
+								Ports: []v1.EndpointPort{
+									{
+										Name:     "svc1",
+										Port:     80,
+										Protocol: v1.ProtocolTCP,
+									},
 								},
 							},
 						},
 					},
+					upstreamName: "upname",
 				},
 			},
 		},
 		{
 			name: "deleted service",
-			current: []v1.Endpoints{
+			current: []Endpoints{
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "finance",
-						Name:      "production",
-					},
-					Subsets: []v1.EndpointSubset{
-						{
-							Addresses: []v1.EndpointAddress{
-								{
-									IP: "1.2.3.4",
+					endpoints: v1.Endpoints{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "finance",
+							Name:      "production",
+						},
+						Subsets: []v1.EndpointSubset{
+							{
+								Addresses: []v1.EndpointAddress{
+									{
+										IP: "1.2.3.4",
+									},
 								},
-							},
-							Ports: []v1.EndpointPort{
-								{
-									Name:     "svc1",
-									Port:     80,
-									Protocol: v1.ProtocolTCP,
+								Ports: []v1.EndpointPort{
+									{
+										Name:     "svc1",
+										Port:     80,
+										Protocol: v1.ProtocolTCP,
+									},
 								},
 							},
 						},
 					},
+					upstreamName: "upname",
 				},
 			},
-			expectedDel: []v1.Endpoints{
+			expectedDel: []Endpoints{
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "finance",
-						Name:      "production",
-					},
-					Subsets: []v1.EndpointSubset{
-						{
-							Addresses: []v1.EndpointAddress{
-								{
-									IP: "1.2.3.4",
+					endpoints: v1.Endpoints{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "finance",
+							Name:      "production",
+						},
+						Subsets: []v1.EndpointSubset{
+							{
+								Addresses: []v1.EndpointAddress{
+									{
+										IP: "1.2.3.4",
+									},
 								},
-							},
-							Ports: []v1.EndpointPort{
-								{
-									Name:     "svc1",
-									Port:     80,
-									Protocol: v1.ProtocolTCP,
+								Ports: []v1.EndpointPort{
+									{
+										Name:     "svc1",
+										Port:     80,
+										Protocol: v1.ProtocolTCP,
+									},
 								},
 							},
 						},
 					},
+					upstreamName: "upname",
 				},
 			},
 		},
 		{
 			name: "order doesn't matter for update",
-			current: []v1.Endpoints{
+			current: []Endpoints{
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "finance",
-						Name:      "endpoints1",
-					},
-					Subsets: []v1.EndpointSubset{
-						{
-							Addresses: []v1.EndpointAddress{
-								{
-									IP: "1.2.3.4",
+					endpoints: v1.Endpoints{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "finance",
+							Name:      "endpoints1",
+						},
+						Subsets: []v1.EndpointSubset{
+							{
+								Addresses: []v1.EndpointAddress{
+									{
+										IP: "1.2.3.4",
+									},
 								},
-							},
-							Ports: []v1.EndpointPort{
-								{
-									Name:     "svc1",
-									Port:     80,
-									Protocol: v1.ProtocolTCP,
+								Ports: []v1.EndpointPort{
+									{
+										Name:     "svc1",
+										Port:     80,
+										Protocol: v1.ProtocolTCP,
+									},
 								},
 							},
 						},
 					},
+					upstreamName: "",
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "finance",
-						Name:      "endpoints2",
-					},
-					Subsets: []v1.EndpointSubset{
-						{
-							Addresses: []v1.EndpointAddress{
-								{
-									IP: "1.2.3.4",
+					endpoints: v1.Endpoints{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "finance",
+							Name:      "endpoints2",
+						},
+						Subsets: []v1.EndpointSubset{
+							{
+								Addresses: []v1.EndpointAddress{
+									{
+										IP: "1.2.3.4",
+									},
 								},
-							},
-							Ports: []v1.EndpointPort{
-								{
-									Name:     "svc1",
-									Port:     80,
-									Protocol: v1.ProtocolTCP,
+								Ports: []v1.EndpointPort{
+									{
+										Name:     "svc1",
+										Port:     80,
+										Protocol: v1.ProtocolTCP,
+									},
 								},
 							},
 						},
 					},
+					upstreamName: "upname",
 				},
 			},
-			desired: []v1.Endpoints{
+			desired: []Endpoints{
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "finance",
-						Name:      "endpoints2",
-					},
-					Subsets: []v1.EndpointSubset{
-						{
-							Addresses: []v1.EndpointAddress{
-								{
-									IP: "1.2.3.4",
+					endpoints: v1.Endpoints{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "finance",
+							Name:      "endpoints2",
+						},
+						Subsets: []v1.EndpointSubset{
+							{
+								Addresses: []v1.EndpointAddress{
+									{
+										IP: "1.2.3.4",
+									},
 								},
-							},
-							Ports: []v1.EndpointPort{
-								{
-									Name:     "svc1",
-									Port:     80,
-									Protocol: v1.ProtocolTCP,
+								Ports: []v1.EndpointPort{
+									{
+										Name:     "svc1",
+										Port:     80,
+										Protocol: v1.ProtocolTCP,
+									},
 								},
 							},
 						},
 					},
+					upstreamName: "upname",
 				},
 				{
-					ObjectMeta: metav1.ObjectMeta{
-						Namespace: "finance",
-						Name:      "endpoints1",
-					},
-					Subsets: []v1.EndpointSubset{
-						{
-							Addresses: []v1.EndpointAddress{
-								{
-									IP: "1.2.3.4",
+					endpoints: v1.Endpoints{
+						ObjectMeta: metav1.ObjectMeta{
+							Namespace: "finance",
+							Name:      "endpoints1",
+						},
+						Subsets: []v1.EndpointSubset{
+							{
+								Addresses: []v1.EndpointAddress{
+									{
+										IP: "1.2.3.4",
+									},
 								},
-							},
-							Ports: []v1.EndpointPort{
-								{
-									Name:     "svc1",
-									Port:     80,
-									Protocol: v1.ProtocolTCP,
+								Ports: []v1.EndpointPort{
+									{
+										Name:     "svc1",
+										Port:     80,
+										Protocol: v1.ProtocolTCP,
+									},
 								},
 							},
 						},
 					},
+					upstreamName: "upname",
 				},
 			},
 		},

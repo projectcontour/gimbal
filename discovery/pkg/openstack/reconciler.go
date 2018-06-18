@@ -60,19 +60,25 @@ type Reconciler struct {
 	Metrics localmetrics.DiscovererMetrics
 }
 
+// Endpoints represents a v1.Endpoints + upstream name to facilicate metrics
+type Endpoints struct {
+	endpoints    v1.Endpoints
+	upstreamName string
+}
+
 // NewReconciler returns an OpenStack reconciler
 func NewReconciler(backendName, clusterType string, gimbalKubeClient kubernetes.Interface, syncPeriod time.Duration, lbLister LoadBalancerLister,
 	projectLister ProjectLister, log *logrus.Logger, queueWorkers int, metrics localmetrics.DiscovererMetrics) Reconciler {
+
 	return Reconciler{
 		BackendName:        backendName,
-		ClusterType:        clusterType,
 		GimbalKubeClient:   gimbalKubeClient,
 		SyncPeriod:         syncPeriod,
 		LoadBalancerLister: lbLister,
 		ProjectLister:      projectLister,
 		Logger:             log,
 		Metrics:            metrics,
-		syncqueue:          sync.NewQueue(log, backendName, clusterType, gimbalKubeClient, queueWorkers, metrics),
+		syncqueue:          sync.NewQueue(log, gimbalKubeClient, queueWorkers, metrics),
 	}
 }
 
@@ -107,7 +113,7 @@ func (r *Reconciler) reconcile() {
 	// Get all the openstack tenants that must be synced
 	projects, err := r.ProjectLister.ListProjects()
 	if err != nil {
-		r.Metrics.GenericMetricError(r.BackendName, "ListProjects")
+		r.Metrics.GenericMetricError("ListProjects")
 		log.Errorf("error listing OpenStack projects: %v", err)
 		return
 	}
@@ -117,36 +123,43 @@ func (r *Reconciler) reconcile() {
 		// Get load balancers that are defined in the project
 		loadbalancers, err := r.ListLoadBalancers(project.ID)
 		if err != nil {
-			r.Metrics.GenericMetricError(r.BackendName, "ListLoadBalancers")
+			r.Metrics.GenericMetricError("ListLoadBalancers")
 			log.Errorf("error reconciling project %q: %v", projectName, err)
 			continue
 		}
 
+		totalUpstreamServices := len(loadbalancers)
 		loadbalancers = r.skipInvalidLoadBalancers(projectName, loadbalancers)
+		totalInvalidServices := totalUpstreamServices - len(loadbalancers)
 
 		// Get all pools defined in the project
 		pools, err := r.ListPools(project.ID)
 		if err != nil {
-			r.Metrics.GenericMetricError(r.BackendName, "ListPools")
+			r.Metrics.GenericMetricError("ListPools")
 			log.Errorf("error reconciling project %q: %v", projectName, err)
 			continue
 		}
 
-		// Get all services and endpoints that exist in the corresponding
-		// namespace
+		// Get all services and endpoints that exist in the corresponding namespace
 		clusterLabelSelector := fmt.Sprintf("%s=%s", translator.GimbalLabelBackend, r.BackendName)
 		currentServices, err := r.GimbalKubeClient.CoreV1().Services(projectName).List(metav1.ListOptions{LabelSelector: clusterLabelSelector})
 		if err != nil {
-			r.Metrics.GenericMetricError(r.BackendName, "ListServicesInNamespace")
+			r.Metrics.GenericMetricError("ListServicesInNamespace")
 			log.Errorf("error listing services in namespace %q: %v", projectName, err)
 			continue
 		}
 
-		currentEndpoints, err := r.GimbalKubeClient.CoreV1().Endpoints(projectName).List(metav1.ListOptions{LabelSelector: clusterLabelSelector})
+		currentk8sEndpoints, err := r.GimbalKubeClient.CoreV1().Endpoints(projectName).List(metav1.ListOptions{LabelSelector: clusterLabelSelector})
 		if err != nil {
-			r.Metrics.GenericMetricError(r.BackendName, "ListEndpointsInNamespace")
+			r.Metrics.GenericMetricError("ListEndpointsInNamespace")
 			log.Errorf("error listing endpoints in namespace:%q: %v", projectName, err)
 			continue
+		}
+
+		// Convert the k8s list to type []Endpoints so make comparison easier
+		currentEndpoints := []Endpoints{}
+		for _, v := range currentk8sEndpoints.Items {
+			currentEndpoints = append(currentEndpoints, Endpoints{endpoints: v, upstreamName: ""})
 		}
 
 		// Reconcile current state with desired state
@@ -154,11 +167,20 @@ func (r *Reconciler) reconcile() {
 		r.reconcileSvcs(desiredSvcs, currentServices.Items)
 
 		desiredEndpoints := kubeEndpoints(r.BackendName, projectName, loadbalancers, pools)
-		r.reconcileEndpoints(desiredEndpoints, currentEndpoints.Items)
+		r.reconcileEndpoints(desiredEndpoints, currentEndpoints)
+
+		// Log upstream /invalid services to prometheus
+		r.Metrics.DiscovererUpstreamServicesMetric(projectName, totalUpstreamServices)
+		r.Metrics.DiscovererInvalidServicesMetric(projectName, totalInvalidServices)
+
+		for _, ep := range desiredEndpoints {
+			totalUpstreamEndpoints := sync.SumEndpoints(&ep.endpoints)
+			r.Metrics.DiscovererUpstreamEndpointsMetric(projectName, ep.upstreamName, totalUpstreamEndpoints)
+		}
 	}
 
 	// Log to Prometheus the cycle duration
-	r.Metrics.CycleDurationMetric(r.BackendName, r.ClusterType, time.Now().Sub(start))
+	r.Metrics.CycleDurationMetric(time.Now().Sub(start))
 }
 
 // skip any load balancer that has invalid characters, according to the
@@ -170,7 +192,7 @@ func (r *Reconciler) skipInvalidLoadBalancers(projectName string, lbs []loadbala
 	valid := []loadbalancers.LoadBalancer{}
 	for _, lb := range lbs {
 		if lb.Name != "" && !validName.MatchString(lb.Name) {
-			r.Metrics.GenericMetricError(r.BackendName, "InvalidLoadBalancerName")
+			r.Metrics.GenericMetricError("InvalidLoadBalancerName")
 			r.Logger.Warningf("skipping load balancer '%s' in project '%s' as it has an invalid name '%s'", lb.ID, projectName, lb.Name)
 			continue
 		}
@@ -181,32 +203,26 @@ func (r *Reconciler) skipInvalidLoadBalancers(projectName string, lbs []loadbala
 
 func (r *Reconciler) reconcileSvcs(desiredSvcs, currentSvcs []v1.Service) {
 	add, up, del := diffServices(desiredSvcs, currentSvcs)
-	for _, s := range add {
-		svc := s
+	for _, svc := range add {
 		r.syncqueue.Enqueue(sync.AddServiceAction(&svc))
 	}
-	for _, s := range up {
-		svc := s
+	for _, svc := range up {
 		r.syncqueue.Enqueue(sync.UpdateServiceAction(&svc))
 	}
-	for _, s := range del {
-		svc := s
+	for _, svc := range del {
 		r.syncqueue.Enqueue(sync.DeleteServiceAction(&svc))
 	}
 }
 
-func (r *Reconciler) reconcileEndpoints(desired, current []v1.Endpoints) {
+func (r *Reconciler) reconcileEndpoints(desired []Endpoints, current []Endpoints) {
 	add, up, del := diffEndpoints(desired, current)
-	for _, e := range add {
-		ep := e
-		r.syncqueue.Enqueue(sync.AddEndpointsAction(&ep))
+	for _, ep := range add {
+		r.syncqueue.Enqueue(sync.AddEndpointsAction(&ep.endpoints, ep.upstreamName))
 	}
-	for _, e := range up {
-		ep := e
-		r.syncqueue.Enqueue(sync.UpdateEndpointsAction(&ep))
+	for _, ep := range up {
+		r.syncqueue.Enqueue(sync.UpdateEndpointsAction(&ep.endpoints, ep.upstreamName))
 	}
-	for _, e := range del {
-		ep := e
-		r.syncqueue.Enqueue(sync.DeleteEndpointsAction(&ep))
+	for _, ep := range del {
+		r.syncqueue.Enqueue(sync.DeleteEndpointsAction(&ep.endpoints, ep.upstreamName))
 	}
 }

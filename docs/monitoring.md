@@ -9,7 +9,7 @@
         - [Envoy](#envoy)
         - [Gimbal Discoverer](#gimbal-discoverer)
     - [Alerts](#alerts)
-        - [Alert Rules](#alert-rules)
+        - [Alert rules](#alert-rules)
 
 <!-- /TOC -->
 
@@ -71,38 +71,68 @@ Detailed documentation on stats within Envoy is available on their site: https:/
     - namespace
     - backendname
     - name
+    - backendtype
   - **gimbal_endpoints_event_timestamp (gauge):** Timestamp last endpoints event was processed with following labels:
     - namespace
     - backendname
     - name
+    - backendtype
   - **gimbal_service_error_total (counter):** Number of errors encountered while processing services, with the following labels:
     - namespace
     - backendname
     - name
     - errortype: type of error encountered
+    - backendtype
   - **gimbal_endpoints_error_total (counter):** Number of errors encountered while processing endpoints, with the following labels:
     - namespace
     - backendname
     - name
     - errortype: type of error encountered
+    - backendtype
   - **gimbal_queuesize (gauge):** Number of items in process queue with the following labels:
     - backendname
-    - clustertype
+    - backendtype
   - **gimbal_discoverer_api_latency_ms (gauge):** The milliseconds it takes for requests to return from a remote discoverer api (for example Openstack)
     - backendname
-    - clustertype
+    - backendtype
     - path: API request path
   - **gimbal_discoverer_cycle_duration_ms (gauge):** The milliseconds it takes for all objects to be synced from a remote discoverer api (for example Openstack)
     - backendname
-    - clustertype
+    - backendtype
   - **gimbal_discoverer_api_error_total (counter):** Number of errors that have occurred when accessing the OpenStack API
     - backendname
     - errortype: type of error encountered
-    - clustertype
+    - backendtype
     - operationtype: operation that was being performed (for example listing projects, listing LBs, listing pool members, getting pool member info)
   - **gimbal_discoverer_error_total (counter):** Number of errors that have occurred in the Discoverer
     - backendname
     - errortype: type of error encountered
+    - backendtype
+  - **gimbal_discoverer_upstream_services_total (gauge):** Total number of services in the upstream backend cluster
+    - backendname
+    - namespace
+    - backendtype
+  - **gimbal_discoverer_replicated_services_total (gauge):** Total number of services replicated/synced
+    - backendname
+    - namespace
+    - backendtype
+  - **gimbal_discoverer_invalid_services_total (gauge):** Total count of services that are unable to be replicated/synced
+    - backendname
+    - namespace
+  - **gimbal_discoverer_upstream_endpoints_total (gauge):** Total number of endpoints - meaning IP:Port - in the upstream backend cluster
+    - backendname
+    - service
+    - namespace
+    - backendtype
+  - **gimbal_discoverer_replicated_endpoints_total (gauge):** Total number of endpoints - meaning IP:Port replicated/synced
+    - backendname
+    - service
+    - namespace
+    - backendtype
+  - **gimbal_discoverer_info (gauge):** Describes discoverer environment version information
+    - backendname
+    - version
+    - backendtype
 
 ## Alerts
 

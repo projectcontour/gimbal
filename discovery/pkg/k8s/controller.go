@@ -21,9 +21,11 @@ import (
 	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
 	"github.com/heptio/gimbal/discovery/pkg/sync"
 	"k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	kubeinformers "k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
+	listers "k8s.io/client-go/listers/core/v1"
 	"k8s.io/client-go/tools/cache"
 )
 
@@ -36,10 +38,15 @@ const (
 // Controller receives notifications from the Kubernetes API and translates those
 // objects into additions and removals entries of services / endpoints
 type Controller struct {
-	Logger          *logrus.Logger
-	syncqueue       sync.Queue
-	servicesSynced  cache.InformerSynced
-	endpointsSynced cache.InformerSynced
+	Logger                *logrus.Logger
+	syncqueue             sync.Queue
+	servicesSynced        cache.InformerSynced
+	endpointsSynced       cache.InformerSynced
+	gimbalServicesSynced  cache.InformerSynced
+	gimbalEndpointsSynced cache.InformerSynced
+	serviceLister         listers.ServiceLister
+	endpointsLister       listers.EndpointsLister
+	metrics               localmetrics.DiscovererMetrics
 
 	backendName string
 }
@@ -54,10 +61,13 @@ func NewController(log *logrus.Logger, gimbalKubeClient kubernetes.Interface, ku
 
 	c := &Controller{
 		Logger:          log,
-		syncqueue:       sync.NewQueue(log, backendName, clusterType, gimbalKubeClient, threadiness, metrics),
+		syncqueue:       sync.NewQueue(log, gimbalKubeClient, threadiness, metrics),
 		servicesSynced:  serviceInformer.Informer().HasSynced,
 		endpointsSynced: endpointsInformer.Informer().HasSynced,
 		backendName:     backendName,
+		serviceLister:   serviceInformer.Lister(),
+		endpointsLister: endpointsInformer.Lister(),
+		metrics:         metrics,
 	}
 
 	// Set up an event handler for when Service resources change.
@@ -93,6 +103,7 @@ func (c *Controller) addService(service *v1.Service) {
 	if !skipProcessing(service.GetName(), service.GetNamespace()) {
 		svc := translateService(service, c.backendName)
 		c.syncqueue.Enqueue(sync.AddServiceAction(svc))
+		c.writeServiceMetrics(service)
 	}
 }
 
@@ -100,6 +111,7 @@ func (c *Controller) updateService(service *v1.Service) {
 	if !skipProcessing(service.GetName(), service.GetNamespace()) {
 		svc := translateService(service, c.backendName)
 		c.syncqueue.Enqueue(sync.UpdateServiceAction(svc))
+		c.writeServiceMetrics(service)
 	}
 }
 
@@ -107,27 +119,31 @@ func (c *Controller) deleteService(service *v1.Service) {
 	if !skipProcessing(service.GetName(), service.GetNamespace()) {
 		svc := translateService(service, c.backendName)
 		c.syncqueue.Enqueue(sync.DeleteServiceAction(svc))
+		c.writeServiceMetrics(service)
 	}
 }
 
 func (c *Controller) addEndpoints(endpoints *v1.Endpoints) {
 	if !skipProcessing(endpoints.GetName(), endpoints.GetNamespace()) {
-		svc := translateEndpoints(endpoints, c.backendName)
-		c.syncqueue.Enqueue(sync.AddEndpointsAction(svc))
+		ep := translateEndpoints(endpoints, c.backendName)
+		c.syncqueue.Enqueue(sync.AddEndpointsAction(ep, endpoints.GetName()))
+		c.writeEndpointsMetrics(endpoints)
 	}
 }
 
 func (c *Controller) updateEndpoints(endpoints *v1.Endpoints) {
 	if !skipProcessing(endpoints.GetName(), endpoints.GetNamespace()) {
-		svc := translateEndpoints(endpoints, c.backendName)
-		c.syncqueue.Enqueue(sync.UpdateEndpointsAction(svc))
+		ep := translateEndpoints(endpoints, c.backendName)
+		c.syncqueue.Enqueue(sync.UpdateEndpointsAction(ep, endpoints.GetName()))
+		c.writeEndpointsMetrics(endpoints)
 	}
 }
 
 func (c *Controller) deleteEndpoints(endpoints *v1.Endpoints) {
 	if !skipProcessing(endpoints.GetName(), endpoints.GetNamespace()) {
-		svc := translateEndpoints(endpoints, c.backendName)
-		c.syncqueue.Enqueue(sync.DeleteEndpointsAction(svc))
+		ep := translateEndpoints(endpoints, c.backendName)
+		c.syncqueue.Enqueue(sync.DeleteEndpointsAction(ep, endpoints.GetName()))
+		c.writeEndpointsMetrics(endpoints)
 	}
 }
 
@@ -139,6 +155,19 @@ func skipProcessing(name, namespace string) bool {
 	return false
 }
 
+func (c *Controller) writeServiceMetrics(svc *v1.Service) {
+	upstreamServices, err := c.serviceLister.Services(svc.GetNamespace()).List(labels.Everything())
+	if err != nil {
+		c.Logger.Error("Could not get service metrics: ", err)
+		return
+	}
+	c.metrics.DiscovererUpstreamServicesMetric(svc.GetNamespace(), len(upstreamServices))
+}
+
+func (c *Controller) writeEndpointsMetrics(ep *v1.Endpoints) {
+	c.metrics.DiscovererUpstreamEndpointsMetric(ep.GetNamespace(), ep.GetName(), sync.SumEndpoints(ep))
+}
+
 // Run gets the party started
 func (c *Controller) Run(stopCh <-chan struct{}) error {
 	defer runtime.HandleCrash()
@@ -147,13 +176,13 @@ func (c *Controller) Run(stopCh <-chan struct{}) error {
 	c.Logger.Infof("Starting k8s controller")
 
 	// Wait for the caches to be synced before starting workers
-	c.Logger.Infof("Waiting for services informer caches to sync")
+	c.Logger.Infof("Waiting for backend services informer caches to sync")
 	if ok := cache.WaitForCacheSync(stopCh, c.servicesSynced); !ok {
-		return fmt.Errorf("failed to wait for service caches to sync")
+		return fmt.Errorf("failed to wait for backend service caches to sync")
 	}
-	c.Logger.Infof("Waiting for services informer caches to sync")
+	c.Logger.Infof("Waiting for backend endpoints informer caches to sync")
 	if ok := cache.WaitForCacheSync(stopCh, c.endpointsSynced); !ok {
-		return fmt.Errorf("failed to wait for endpoints caches to sync")
+		return fmt.Errorf("failed to wait for backend endpoints caches to sync")
 	}
 
 	// Start the sync queue

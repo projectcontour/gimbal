@@ -16,11 +16,14 @@ package sync
 import (
 	"fmt"
 	"testing"
+	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
+	"github.com/sirupsen/logrus"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -86,7 +89,7 @@ func TestServiceActions(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			client := fake.NewSimpleClientset(&tc.existingService)
 			a := serviceAction{kind: tc.actionKind, service: &tc.service}
-			err := a.Sync(client, localmetrics.NewMetrics(), "testnode")
+			err := a.Sync(client, logrus.New())
 
 			if !tc.expectErr {
 				require.NoError(t, err)
@@ -136,7 +139,146 @@ func TestUpdateService(t *testing.T) {
 		},
 	}
 	expectedPatch := `{"spec":{"$setElementOrder/ports":[{"port":8080}],"ports":[{"port":8080,"targetPort":0},{"$patch":"delete","port":80}]}}`
-	err := updateService(client, &newService, localmetrics.NewMetrics(), "testnode")
+	err := updateService(client, &newService)
 	require.NoError(t, err)
 	assert.Equal(t, expectedPatch, string(gotPatchBytes))
+}
+
+func TestDiscovererServiceMetrics(t *testing.T) {
+	backendName := "backend"
+	backendType := "backtype"
+	tests := []struct {
+		name              string
+		actionKind        string
+		service           v1.Service
+		existingservice   v1.Service
+		expectErr         bool
+		expectedCount     float64
+		expectedTimestamp float64
+		expectedLabels    map[string]string
+	}{
+		{
+			name:       "add new service resource",
+			actionKind: actionAdd,
+			service: v1.Service{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "foo",
+					Name:      "bar",
+					Labels: map[string]string{
+						"gimbal.heptio.com/backend": backendName,
+					},
+				},
+			},
+			existingservice:   v1.Service{},
+			expectedCount:     float64(1),
+			expectedTimestamp: 9.467208e+08,
+			expectedLabels: map[string]string{
+				"backendname": backendName,
+				"backendtype": backendType,
+				"namespace":   "foo",
+			},
+		},
+		{
+			name:       "add new service resource with existing",
+			actionKind: actionAdd,
+			service: v1.Service{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "foo",
+					Name:      "bar",
+					Labels: map[string]string{
+						"gimbal.heptio.com/backend": backendName,
+					},
+				},
+			},
+			existingservice: v1.Service{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "foo",
+					Name:      "existing",
+					Labels: map[string]string{
+						"gimbal.heptio.com/backend": backendName,
+					},
+				},
+			},
+			expectedCount:     float64(2),
+			expectedTimestamp: 9.467208e+08,
+			expectedLabels: map[string]string{
+				"backendname": backendName,
+				"backendtype": backendType,
+				"namespace":   "foo",
+			},
+		},
+		{
+			name:       "add new service resource with existing non-gimbal",
+			actionKind: actionAdd,
+			service: v1.Service{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "foo",
+					Name:      "bar",
+					Labels: map[string]string{
+						"gimbal.heptio.com/backend": backendName,
+					},
+				},
+			},
+			existingservice: v1.Service{
+				ObjectMeta: metav1.ObjectMeta{
+					Namespace: "foo",
+					Name:      "existing",
+					Labels: map[string]string{
+						"key": "value",
+					},
+				},
+			},
+			expectedCount:     float64(1),
+			expectedTimestamp: 9.467208e+08,
+			expectedLabels: map[string]string{
+				"backendname": backendName,
+				"backendtype": backendType,
+				"namespace":   "foo",
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			nowFunc = func() time.Time {
+				return time.Date(2000, 1, 1, 10, 0, 00, 0, time.UTC)
+			}
+			client := fake.NewSimpleClientset(&tc.existingservice)
+			metrics := localmetrics.NewMetrics(backendType, backendName)
+			metrics.RegisterPrometheus(false)
+			a := serviceAction{kind: tc.actionKind, service: &tc.service}
+
+			err := a.Sync(client, logrus.New())
+
+			if !tc.expectErr {
+				require.NoError(t, err)
+			}
+
+			a.SetMetrics(client, metrics, logrus.New())
+
+			gatherers := prometheus.Gatherers{
+				metrics.Registry,
+				prometheus.DefaultGatherer,
+			}
+
+			gathering, err := gatherers.Gather()
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			replicatedServices := float64(-1)
+			timestamp := float64(-1)
+			for _, mf := range gathering {
+				if mf.GetName() == localmetrics.DiscovererReplicatedServicesGauge {
+					replicatedServices = mf.Metric[0].Gauge.GetValue()
+				} else if mf.GetName() == localmetrics.ServiceEventTimestampGauge {
+					timestamp = mf.Metric[0].Gauge.GetValue()
+				}
+			}
+
+			assert.Equal(t, tc.expectedCount, replicatedServices)
+			assert.Equal(t, tc.expectedTimestamp, timestamp)
+		})
+	}
+
 }
