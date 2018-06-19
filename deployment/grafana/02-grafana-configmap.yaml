@@ -287,7 +287,7 @@ data:
           "tableColumn": "",
           "targets": [
             {
-              "expr": "sum(gimbal_discover_info{backendtype=\"openstack\"})",
+              "expr": "sum(gimbal_discoverer_info{backendtype=\"openstack\"})",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "",
@@ -1178,7 +1178,7 @@ data:
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Kubernetes Process Queue Size",
+          "title": "Gimbal Replication Queue Size",
           "tooltip": {
             "shared": true,
             "sort": 0,
