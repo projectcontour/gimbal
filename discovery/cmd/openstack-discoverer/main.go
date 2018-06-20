@@ -52,7 +52,6 @@ var (
 	log                               *logrus.Logger
 	gimbalKubeClientQPS               float64
 	gimbalKubeClientBurst             int
-	resyncInterval                    time.Duration
 )
 
 const (
@@ -72,7 +71,6 @@ func init() {
 	flag.IntVar(&prometheusListenPort, "prometheus-listen-address", 8080, "The address to listen on for Prometheus HTTP requests")
 	flag.Float64Var(&gimbalKubeClientQPS, "gimbal-client-qps", 5, "The maximum queries per second (QPS) that can be performed on the Gimbal Kubernetes API server")
 	flag.IntVar(&gimbalKubeClientBurst, "gimbal-client-burst", 10, "The maximum number of queries that can be performed on the Gimbal Kubernetes API server during a burst")
-	flag.DurationVar(&resyncInterval, "resync-interval", time.Minute*30, "Default resync period for watcher to refresh")
 	flag.Parse()
 }
 
