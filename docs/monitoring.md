@@ -142,4 +142,41 @@ Gimbal leverages Alertmanager, an open source tool for managing alerts including
 
 Alert rules are a collection of Prometheus queries where you can set thresholds and decide when to fire off an alert. These alert rules are evaluated by Prometheus, so the rules config file must be attached to the Prometheus deployment.
 
-To update alert rules, add new rules config values to the `prometheus-alert-rules` [configmap](../deployment/prometheus/02-prometheus-alertrules-configmap.yaml) in the `gimbal-monitoring` namespace. 
+To update alert rules, add new rules config values to the `prometheus-alert-rules` [configmap](../deployment/prometheus/02-prometheus-alertrules-configmap.yaml) in the `gimbal-monitoring` namespace.
+
+### Sample Alerting Rules
+
+The following are example alerts that can be configured to monitor Gimbal. Feel
+free to customize them to fit your requirements.
+
+```yaml
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-alert-rules
+  namespace: gimbal-monitoring
+data:
+  alert.rules: |-
+    groups:
+    # Alerts for the Gimbal discovery components
+    - name: discovery-rules
+      rules:
+      - alert: LowServiceReplicationSuccessRate
+        expr: avg((gimbal_discoverer_replicated_services_total / gimbal_discoverer_upstream_services_total) * 100) by (backendname) < 100
+        for: 1m
+        labels:
+          severity: page
+        annotations:
+          summary: "Service replication success rate below 100%"
+          description: "The discoverer for backend {{ $labels.backendname }} reported a service replication success rate of {{ $value }}% for more than 1 minute."
+      - alert: LowEndpointsReplicationSuccessRate
+        expr: round((sum(gimbal_discoverer_replicated_endpoints_total) by (backendname) / sum(gimbal_discoverer_upstream_endpoints_total) by (backendname)) * 100, 0.01) < 100
+        for: 1m
+        labels:
+          severity: page
+        annotations:
+          summary: "Endpoints replication success rate below 100%"
+          description: "The discoverer for backend {{ $labels.backendname }} reported an endpoints replication success rate of {{ $value }}% for more than 1 minute."
+```
+
