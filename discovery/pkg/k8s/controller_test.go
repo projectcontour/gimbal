@@ -85,7 +85,7 @@ var serviceTests = []struct {
 			},
 		},
 		expected:              0,
-		expectedServicesCount: 1,
+		expectedServicesCount: 0,
 	},
 	{
 		name: "kubernetes service diff namespace",

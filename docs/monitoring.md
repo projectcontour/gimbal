@@ -108,7 +108,7 @@ Detailed documentation on stats within Envoy is available on their site: https:/
     - backendname
     - errortype: type of error encountered
     - backendtype
-  - **gimbal_discoverer_upstream_services_total (gauge):** Total number of services in the upstream backend cluster
+  - **gimbal_discoverer_upstream_services_total (gauge):** Total number of services in the backend cluster (Kubernetes: The default kubernetes service is not counted).
     - backendname
     - namespace
     - backendtype
