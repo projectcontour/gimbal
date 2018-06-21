@@ -114,11 +114,6 @@ A sample deployment of Prometheus and Alertmanager is provided that uses tempora
 ```sh
 # Deploy 
 $ kubectl apply -f prometheus
-
-# Deploy kube-state-metrics to gather cluster information
-$ git clone https://github.com/kubernetes/kube-state-metrics.git
-$ cd kube-state-metrics
-$ kubectl apply -f kubernetes/
 ```
 
 ### Access the Prometheus web UI
