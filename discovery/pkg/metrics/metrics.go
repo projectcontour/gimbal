@@ -30,21 +30,21 @@ type DiscovererMetrics struct {
 }
 
 const (
-	ServiceEventTimestampGauge         = "gimbal_service_event_timestamp"
-	EndpointsEventTimestampGauge       = "gimbal_endpoints_event_timestamp"
-	ServiceErrorTotalCounter           = "gimbal_service_error_total"
-	EndpointsErrorTotalCounter         = "gimbal_endpoints_error_total"
-	QueueSizeGauge                     = "gimbal_queuesize"
-	DiscovererAPILatencyMSGauge        = "gimbal_discoverer_api_latency_ms"
-	DiscovererCycleDurationMSGauge     = "gimbal_discoverer_cycle_duration_ms"
-	DiscovererErrorTotal               = "gimbal_discoverer_error_total"
-	DiscovererUpstreamServicesGauge    = "gimbal_discoverer_upstream_services_total"
-	DiscovererReplicatedServicesGauge  = "gimbal_discoverer_replicated_services_total"
-	DiscovererInvalidServicesGauge     = "gimbal_discoverer_invalid_services_total"
-	DiscovererUpstreamEndpointsGauge   = "gimbal_discoverer_upstream_endpoints_total"
-	DiscovererReplicatedEndpointsGauge = "gimbal_discoverer_replicated_endpoints_total"
-	DiscovererInvalidEndpointsGauge    = "gimbal_discoverer_invalid_endpoints_total"
-	DiscovererInfoGauge                = "gimbal_discoverer_info"
+	ServiceEventTimestampGauge              = "gimbal_service_event_timestamp"
+	EndpointsEventTimestampGauge            = "gimbal_endpoints_event_timestamp"
+	ServiceErrorTotalCounter                = "gimbal_service_error_total"
+	EndpointsErrorTotalCounter              = "gimbal_endpoints_error_total"
+	QueueSizeGauge                          = "gimbal_queuesize"
+	DiscovererAPILatencyMsHistogram         = "gimbal_discoverer_api_latency_milliseconds"
+	DiscovererCycleDurationSecondsHistogram = "gimbal_discoverer_cycle_duration_seconds"
+	DiscovererErrorTotal                    = "gimbal_discoverer_error_total"
+	DiscovererUpstreamServicesGauge         = "gimbal_discoverer_upstream_services_total"
+	DiscovererReplicatedServicesGauge       = "gimbal_discoverer_replicated_services_total"
+	DiscovererInvalidServicesGauge          = "gimbal_discoverer_invalid_services_total"
+	DiscovererUpstreamEndpointsGauge        = "gimbal_discoverer_upstream_endpoints_total"
+	DiscovererReplicatedEndpointsGauge      = "gimbal_discoverer_replicated_endpoints_total"
+	DiscovererInvalidEndpointsGauge         = "gimbal_discoverer_invalid_endpoints_total"
+	DiscovererInfoGauge                     = "gimbal_discoverer_info"
 )
 
 // NewMetrics returns a map of Prometheus metrics
@@ -89,17 +89,19 @@ func NewMetrics(BackendType, BackendName string) DiscovererMetrics {
 				},
 				[]string{"backendname", "backendtype"},
 			),
-			DiscovererAPILatencyMSGauge: prometheus.NewGaugeVec(
-				prometheus.GaugeOpts{
-					Name: DiscovererAPILatencyMSGauge,
-					Help: "The milliseconds it takes for requests to return from a remote discoverer api",
+			DiscovererAPILatencyMsHistogram: prometheus.NewHistogramVec(
+				prometheus.HistogramOpts{
+					Name:    DiscovererAPILatencyMsHistogram,
+					Help:    "The milliseconds it takes for requests to return from a remote discoverer api",
+					Buckets: []float64{20, 50, 100, 250, 500, 1000, 2000, 5000, 10000, 20000, 50000, 120000}, // milliseconds. largest bucket is 2 minutes.
 				},
 				[]string{"backendname", "backendtype", "path"},
 			),
-			DiscovererCycleDurationMSGauge: prometheus.NewGaugeVec(
-				prometheus.GaugeOpts{
-					Name: DiscovererCycleDurationMSGauge,
-					Help: "The milliseconds it takes for all objects to be synced from a remote discoverer api",
+			DiscovererCycleDurationSecondsHistogram: prometheus.NewHistogramVec(
+				prometheus.HistogramOpts{
+					Name:    DiscovererCycleDurationSecondsHistogram,
+					Help:    "The seconds it takes for all objects to be synced from a remote backend",
+					Buckets: prometheus.LinearBuckets(60, 60, 10), // 10 buckets, each 30 wide
 				},
 				[]string{"backendname", "backendtype"},
 			),
@@ -228,17 +230,17 @@ func (d *DiscovererMetrics) QueueSizeGaugeMetric(size int) {
 
 // CycleDurationMetric formats a cycle duration gauge prometheus metric
 func (d *DiscovererMetrics) CycleDurationMetric(duration time.Duration) {
-	m, ok := d.Metrics[DiscovererCycleDurationMSGauge].(*prometheus.GaugeVec)
+	m, ok := d.Metrics[DiscovererCycleDurationSecondsHistogram].(*prometheus.HistogramVec)
 	if ok {
-		m.WithLabelValues(d.BackendName, d.BackendType).Set(math.Floor(duration.Seconds() * 1e3))
+		m.WithLabelValues(d.BackendName, d.BackendType).Observe(math.Floor(duration.Seconds()))
 	}
 }
 
 // APILatencyMetric formats a cycle duration gauge prometheus metric
 func (d *DiscovererMetrics) APILatencyMetric(path string, duration time.Duration) {
-	m, ok := d.Metrics[DiscovererAPILatencyMSGauge].(*prometheus.GaugeVec)
+	m, ok := d.Metrics[DiscovererAPILatencyMsHistogram].(*prometheus.HistogramVec)
 	if ok {
-		m.WithLabelValues(d.BackendName, d.BackendType, path).Set(math.Floor(duration.Seconds() * 1e3))
+		m.WithLabelValues(d.BackendName, d.BackendType, path).Observe(math.Floor(duration.Seconds() * 1e3))
 	}
 }
 

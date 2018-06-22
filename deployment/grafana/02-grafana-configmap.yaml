@@ -61,7 +61,7 @@ data:
       "gnetId": null,
       "graphTooltip": 0,
       "id": null,
-      "iteration": 1528906914777,
+      "iteration": 1529672072587,
       "links": [],
       "panels": [
         {
@@ -1224,6 +1224,111 @@ data:
             "x": 6,
             "y": 20
           },
+          "id": 25,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": true,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.5, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*loadbalancers.*\"}[5m])) by (le, kubernetes_pod_name))",
+              "format": "time_series",
+              "hide": false,
+              "intervalFactor": 1,
+              "legendFormat": "{{kubernetes_pod_name}} 50%",
+              "refId": "A"
+            },
+            {
+              "expr": "histogram_quantile(0.75, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*loadbalancers.*\"}[5m])) by (le, kubernetes_pod_name))",
+              "format": "time_series",
+              "hide": false,
+              "intervalFactor": 1,
+              "legendFormat": "{{kubernetes_pod_name}} 75%",
+              "refId": "D"
+            },
+            {
+              "expr": "histogram_quantile(0.9, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*loadbalancers.*\"}[5m])) by (le, kubernetes_pod_name))",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{kubernetes_pod_name}} 90% ",
+              "refId": "B"
+            },
+            {
+              "expr": "histogram_quantile(1, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*loadbalancers.*\"}[5m])) by (le, kubernetes_pod_name))",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{kubernetes_pod_name}} 100% ",
+              "refId": "C"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Openstack API Latency: Load Balancers Endpoint",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "ms",
+              "label": "",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "prometheus",
+          "fill": 1,
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 12,
+            "y": 20
+          },
           "id": 13,
           "legend": {
             "alignAsTable": false,
@@ -1250,18 +1355,147 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "avg(gimbal_discoverer_api_latency_ms{backendname=~\"$Backend\"}) by (backendname)",
+              "expr": "histogram_quantile(0.5, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*pools.*\"}[5m])) by (le, kubernetes_pod_name))",
               "format": "time_series",
               "hide": false,
               "intervalFactor": 1,
-              "legendFormat": "{{backendname}}",
+              "legendFormat": "{{kubernetes_pod_name}} 50%",
               "refId": "A"
+            },
+            {
+              "expr": "histogram_quantile(0.75, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*pools.*\"}[5m])) by (le, kubernetes_pod_name))",
+              "format": "time_series",
+              "hide": false,
+              "intervalFactor": 1,
+              "legendFormat": "{{kubernetes_pod_name}} 75%",
+              "refId": "D"
+            },
+            {
+              "expr": "histogram_quantile(0.95, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*pools.*\"}[5m])) by (le, kubernetes_pod_name))",
+              "format": "time_series",
+              "hide": false,
+              "intervalFactor": 1,
+              "legendFormat": "{{kubernetes_pod_name}} 90%",
+              "refId": "B"
+            },
+            {
+              "expr": "histogram_quantile(1, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*pools.*\"}[5m])) by (le, kubernetes_pod_name))",
+              "format": "time_series",
+              "hide": false,
+              "intervalFactor": 1,
+              "legendFormat": "{{kubernetes_pod_name}} 100%",
+              "refId": "C"
             }
           ],
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Openstack API Latency",
+          "title": "Openstack API Latency: Pools Endpoint",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "ms",
+              "label": "",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "prometheus",
+          "fill": 1,
+          "gridPos": {
+            "h": 7,
+            "w": 6,
+            "x": 18,
+            "y": 20
+          },
+          "id": 26,
+          "legend": {
+            "alignAsTable": false,
+            "avg": false,
+            "current": true,
+            "max": false,
+            "min": false,
+            "rightSide": false,
+            "show": true,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "histogram_quantile(0.5, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*listeners.*\"}[5m])) by (le, kubernetes_pod_name))",
+              "format": "time_series",
+              "hide": false,
+              "intervalFactor": 1,
+              "legendFormat": "{{kubernetes_pod_name}} 50%",
+              "refId": "A"
+            },
+            {
+              "expr": "histogram_quantile(0.75, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*listeners.*\"}[5m])) by (le, kubernetes_pod_name))",
+              "format": "time_series",
+              "hide": false,
+              "intervalFactor": 1,
+              "legendFormat": "{{kubernetes_pod_name}} 75%",
+              "refId": "D"
+            },
+            {
+              "expr": "histogram_quantile(0.9, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*listeners.*\"}[5m])) by (le, kubernetes_pod_name))",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{kubernetes_pod_name}} 90% ",
+              "refId": "B"
+            },
+            {
+              "expr": "histogram_quantile(1, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*listeners.*\"}[5m])) by (le, kubernetes_pod_name))",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{kubernetes_pod_name}} 100% ",
+              "refId": "C"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Openstack API Latency: Listeners",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -1305,8 +1539,8 @@ data:
           "gridPos": {
             "h": 7,
             "w": 6,
-            "x": 12,
-            "y": 20
+            "x": 0,
+            "y": 27
           },
           "id": 11,
           "legend": {
@@ -1333,13 +1567,34 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "gimbal_discoverer_cycle_duration_ms{backendname=~\"$Backend\"} ",
+              "expr": "histogram_quantile(0.5, sum(rate(gimbal_discoverer_cycle_duration_seconds_bucket{backendname=~\"$Backend\"}[5m])) by (le, kubernetes_pod_name))",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{kubernetes_pod_name}} 50%",
+              "refId": "B"
+            },
+            {
+              "expr": "histogram_quantile(0.75, sum(rate(gimbal_discoverer_cycle_duration_seconds_bucket{backendname=~\"$Backend\"}[5m])) by (le, kubernetes_pod_name))",
               "format": "time_series",
               "hide": false,
               "interval": "",
               "intervalFactor": 1,
-              "legendFormat": "{{backendname}}",
+              "legendFormat": "{{kubernetes_pod_name}} 75%",
               "refId": "A"
+            },
+            {
+              "expr": "histogram_quantile(0.90, sum(rate(gimbal_discoverer_cycle_duration_seconds_bucket{backendname=~\"$Backend\"}[5m])) by (le, kubernetes_pod_name))",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{kubernetes_pod_name}} 90%",
+              "refId": "C"
+            },
+            {
+              "expr": "histogram_quantile(1, sum(rate(gimbal_discoverer_cycle_duration_seconds_bucket{backendname=~\"$Backend\"}[5m])) by (le, kubernetes_pod_name))",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{kubernetes_pod_name}} 100%",
+              "refId": "D"
             }
           ],
           "thresholds": [],
@@ -1361,7 +1616,7 @@ data:
           },
           "yaxes": [
             {
-              "format": "ms",
+              "format": "s",
               "label": null,
               "logBase": 1,
               "max": null,
@@ -1459,7 +1714,7 @@ data:
       "timezone": "",
       "title": "Gimbal Discovery",
       "uid": "ex4WqmZmk",
-      "version": 21
+      "version": 4
     }
   envoy.json: |
     {
