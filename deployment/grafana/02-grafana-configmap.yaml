@@ -61,7 +61,7 @@ data:
       "gnetId": null,
       "graphTooltip": 0,
       "id": null,
-      "iteration": 1529672072587,
+      "iteration": 1529959091609,
       "links": [],
       "panels": [
         {
@@ -1226,8 +1226,8 @@ data:
           },
           "id": 25,
           "legend": {
-            "alignAsTable": false,
-            "avg": false,
+            "alignAsTable": true,
+            "avg": true,
             "current": true,
             "max": false,
             "min": false,
@@ -1252,32 +1252,16 @@ data:
             {
               "expr": "histogram_quantile(0.5, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*loadbalancers.*\"}[5m])) by (le, kubernetes_pod_name))",
               "format": "time_series",
-              "hide": false,
               "intervalFactor": 1,
               "legendFormat": "{{kubernetes_pod_name}} 50%",
               "refId": "A"
             },
             {
-              "expr": "histogram_quantile(0.75, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*loadbalancers.*\"}[5m])) by (le, kubernetes_pod_name))",
-              "format": "time_series",
-              "hide": false,
-              "intervalFactor": 1,
-              "legendFormat": "{{kubernetes_pod_name}} 75%",
-              "refId": "D"
-            },
-            {
-              "expr": "histogram_quantile(0.9, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*loadbalancers.*\"}[5m])) by (le, kubernetes_pod_name))",
+              "expr": "histogram_quantile(0.99, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*loadbalancers.*\"}[5m])) by (le, kubernetes_pod_name))",
               "format": "time_series",
               "intervalFactor": 1,
-              "legendFormat": "{{kubernetes_pod_name}} 90% ",
+              "legendFormat": "{{kubernetes_pod_name}} 99%",
               "refId": "B"
-            },
-            {
-              "expr": "histogram_quantile(1, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*loadbalancers.*\"}[5m])) by (le, kubernetes_pod_name))",
-              "format": "time_series",
-              "intervalFactor": 1,
-              "legendFormat": "{{kubernetes_pod_name}} 100% ",
-              "refId": "C"
             }
           ],
           "thresholds": [],
@@ -1331,8 +1315,8 @@ data:
           },
           "id": 13,
           "legend": {
-            "alignAsTable": false,
-            "avg": false,
+            "alignAsTable": true,
+            "avg": true,
             "current": true,
             "max": false,
             "min": false,
@@ -1357,34 +1341,16 @@ data:
             {
               "expr": "histogram_quantile(0.5, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*pools.*\"}[5m])) by (le, kubernetes_pod_name))",
               "format": "time_series",
-              "hide": false,
               "intervalFactor": 1,
               "legendFormat": "{{kubernetes_pod_name}} 50%",
               "refId": "A"
             },
             {
-              "expr": "histogram_quantile(0.75, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*pools.*\"}[5m])) by (le, kubernetes_pod_name))",
+              "expr": "histogram_quantile(0.99, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*pools.*\"}[5m])) by (le, kubernetes_pod_name))",
               "format": "time_series",
-              "hide": false,
               "intervalFactor": 1,
-              "legendFormat": "{{kubernetes_pod_name}} 75%",
-              "refId": "D"
-            },
-            {
-              "expr": "histogram_quantile(0.95, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*pools.*\"}[5m])) by (le, kubernetes_pod_name))",
-              "format": "time_series",
-              "hide": false,
-              "intervalFactor": 1,
-              "legendFormat": "{{kubernetes_pod_name}} 90%",
+              "legendFormat": "{{kubernetes_pod_name}} 99%",
               "refId": "B"
-            },
-            {
-              "expr": "histogram_quantile(1, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*pools.*\"}[5m])) by (le, kubernetes_pod_name))",
-              "format": "time_series",
-              "hide": false,
-              "intervalFactor": 1,
-              "legendFormat": "{{kubernetes_pod_name}} 100%",
-              "refId": "C"
             }
           ],
           "thresholds": [],
@@ -1438,8 +1404,8 @@ data:
           },
           "id": 26,
           "legend": {
-            "alignAsTable": false,
-            "avg": false,
+            "alignAsTable": true,
+            "avg": true,
             "current": true,
             "max": false,
             "min": false,
@@ -1464,32 +1430,16 @@ data:
             {
               "expr": "histogram_quantile(0.5, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*listeners.*\"}[5m])) by (le, kubernetes_pod_name))",
               "format": "time_series",
-              "hide": false,
               "intervalFactor": 1,
               "legendFormat": "{{kubernetes_pod_name}} 50%",
               "refId": "A"
             },
             {
-              "expr": "histogram_quantile(0.75, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*listeners.*\"}[5m])) by (le, kubernetes_pod_name))",
-              "format": "time_series",
-              "hide": false,
-              "intervalFactor": 1,
-              "legendFormat": "{{kubernetes_pod_name}} 75%",
-              "refId": "D"
-            },
-            {
-              "expr": "histogram_quantile(0.9, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*listeners.*\"}[5m])) by (le, kubernetes_pod_name))",
+              "expr": "histogram_quantile(0.99, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*listeners.*\"}[5m])) by (le, kubernetes_pod_name))",
               "format": "time_series",
               "intervalFactor": 1,
-              "legendFormat": "{{kubernetes_pod_name}} 90% ",
+              "legendFormat": "{{kubernetes_pod_name}} 99%",
               "refId": "B"
-            },
-            {
-              "expr": "histogram_quantile(1, sum(rate(gimbal_discoverer_api_latency_milliseconds_bucket{path=~\".*listeners.*\"}[5m])) by (le, kubernetes_pod_name))",
-              "format": "time_series",
-              "intervalFactor": 1,
-              "legendFormat": "{{kubernetes_pod_name}} 100% ",
-              "refId": "C"
             }
           ],
           "thresholds": [],
@@ -1545,7 +1495,7 @@ data:
           "id": 11,
           "legend": {
             "alignAsTable": true,
-            "avg": false,
+            "avg": true,
             "current": true,
             "max": false,
             "min": false,
@@ -1571,30 +1521,14 @@ data:
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "{{kubernetes_pod_name}} 50%",
-              "refId": "B"
-            },
-            {
-              "expr": "histogram_quantile(0.75, sum(rate(gimbal_discoverer_cycle_duration_seconds_bucket{backendname=~\"$Backend\"}[5m])) by (le, kubernetes_pod_name))",
-              "format": "time_series",
-              "hide": false,
-              "interval": "",
-              "intervalFactor": 1,
-              "legendFormat": "{{kubernetes_pod_name}} 75%",
               "refId": "A"
             },
             {
-              "expr": "histogram_quantile(0.90, sum(rate(gimbal_discoverer_cycle_duration_seconds_bucket{backendname=~\"$Backend\"}[5m])) by (le, kubernetes_pod_name))",
+              "expr": "histogram_quantile(0.99, sum(rate(gimbal_discoverer_cycle_duration_seconds_bucket{backendname=~\"$Backend\"}[5m])) by (le, kubernetes_pod_name))",
               "format": "time_series",
               "intervalFactor": 1,
-              "legendFormat": "{{kubernetes_pod_name}} 90%",
-              "refId": "C"
-            },
-            {
-              "expr": "histogram_quantile(1, sum(rate(gimbal_discoverer_cycle_duration_seconds_bucket{backendname=~\"$Backend\"}[5m])) by (le, kubernetes_pod_name))",
-              "format": "time_series",
-              "intervalFactor": 1,
-              "legendFormat": "{{kubernetes_pod_name}} 100%",
-              "refId": "D"
+              "legendFormat": "{{kubernetes_pod_name}} 99%",
+              "refId": "B"
             }
           ],
           "thresholds": [],
@@ -1714,7 +1648,7 @@ data:
       "timezone": "",
       "title": "Gimbal Discovery",
       "uid": "ex4WqmZmk",
-      "version": 4
+      "version": 2
     }
   envoy.json: |
     {
