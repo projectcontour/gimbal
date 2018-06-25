@@ -161,7 +161,13 @@ func (c *Controller) writeServiceMetrics(svc *v1.Service) {
 		c.Logger.Error("Could not get service metrics: ", err)
 		return
 	}
-	c.metrics.DiscovererUpstreamServicesMetric(svc.GetNamespace(), len(upstreamServices))
+	upstreamServicesCount := len(upstreamServices)
+	// The discoverer does not replicate the kubernetes service in the default namespace.
+	// Thus, don't count it as a service that is a "candidate" for replication.
+	if svc.GetNamespace() == "default" && containsService("kubernetes", upstreamServices) {
+		upstreamServicesCount--
+	}
+	c.metrics.DiscovererUpstreamServicesMetric(svc.GetNamespace(), upstreamServicesCount)
 }
 
 func (c *Controller) writeEndpointsMetrics(ep *v1.Endpoints) {
@@ -193,4 +199,13 @@ func (c *Controller) Run(stopCh <-chan struct{}) error {
 	c.Logger.Infof("Shutting down workers")
 
 	return nil
+}
+
+func containsService(name string, services []*v1.Service) bool {
+	for _, s := range services {
+		if s.Name == name {
+			return true
+		}
+	}
+	return false
 }
