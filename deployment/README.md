@@ -156,31 +156,9 @@ $ kubectl port-forward $(kubectl get pods -l app=grafana -n gimbal-monitoring -o
 
 then go to [http://localhost:3000](http://localhost:3000) in your browser. The username is `admin`.
 
-### Configure Grafana
-
-Grafana requires some configuration after it's deployed.
-
-#### Configure datasource
-
-1. On the main Grafana page, click **Add Datasource**
-2. For **Name** enter _prometheus_
-3. In the **Type** selector, choose _Prometheus_ 
-4. For the URL, enter `http://prometheus:9090`
-5. Click **Save & Test**
-6. Look for the message box _Data source is working_
-
 #### Configure dashboards
 
 Dashboards for Envoy and the Discovery components are included as part of the sample Grafana deployment.
-
-##### Add Sample Kubernetes Dashboard
-
-Add a sample dashboard to validate that the data source is collecting data:
-
-1. On the main page, click the plus icon and choose **Import dashboard**
-2. Enter _1621_ in the first box
-3. In the **prometheus** section, choose the datasource that you just created
-4. Click **Import**
 
 ## Validation
 
@@ -209,7 +187,7 @@ NAME            READY     STATUS    RESTARTS   AGE
 contour-lq6mm   2/2       Running   0          5h
 
 # Verify discovered services
-$ kubectl get svc -l gimbal.heptio.com/backend=node02 
+$ kubectl get svc -l gimbal.heptio.com/backend
 NAME                TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
 nginx-node02        ClusterIP   None         <none>        80/TCP    17m
 kuard-node02        ClusterIP   None         <none>        80/TCP    17m
