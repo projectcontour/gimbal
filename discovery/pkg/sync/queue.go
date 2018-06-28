@@ -115,18 +115,18 @@ func (sq *Queue) processNextWorkItem() bool {
 	}
 
 	err := action.Sync(sq.KubeClient, sq.Logger)
-	if err != nil {
-		action.SetMetricError(sq.Metrics)
-	}
-	action.SetMetrics(sq.KubeClient, sq.Metrics, sq.Logger)
 
 	// We successfully handled the action, so we can forget the item and keep going.
 	if err == nil {
 		sq.Workqueue.Forget(obj)
+		action.SetMetrics(sq.KubeClient, sq.Metrics, sq.Logger)
 		sq.Metrics.QueueSizeGaugeMetric(sq.Workqueue.Len())
 		sq.Logger.Infof("Successfully handled: %s", action)
 		return true
 	}
+
+	// An error ocurred. Set the error metrics.
+	action.SetMetricError(sq.Metrics)
 
 	// If there was an error handling the item, we will retry up to
 	// queueMaxRetries times.

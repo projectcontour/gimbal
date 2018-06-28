@@ -5,6 +5,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/stretchr/testify/require"
+
 	"github.com/heptio/gimbal/discovery/pkg/metrics"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -88,4 +91,138 @@ func TestQueueMaxRetries(t *testing.T) {
 	// Assert that we tried five times and that we finally dropped it
 	assert.Equal(t, queueMaxRetries, createAttempts)
 	assert.Equal(t, 0, q.Workqueue.Len())
+}
+
+func TestQueueServicesMetrics(t *testing.T) {
+	now := time.Date(2000, 1, 1, 10, 0, 00, 0, time.UTC)
+	tests := []struct {
+		name                   string
+		apiServerError         error
+		expectedTimestampGauge float64
+		expectedErrorCounter   float64
+	}{
+		{
+			name: "successfull replication",
+			expectedTimestampGauge: float64(now.Unix()),
+			expectedErrorCounter:   float64(-1), // no error, so error counter is not initialized
+		},
+		{
+			name: "failed to replicate service",
+			expectedTimestampGauge: float64(-1), // failed to sync resource, so timestamp is not initialized
+			expectedErrorCounter:   float64(queueMaxRetries),
+			apiServerError:         errors.New("api server error"),
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			nowFunc = func() time.Time {
+				return now
+			}
+			client := fake.NewSimpleClientset()
+			client.PrependReactor("create", "services", func(action k8stesting.Action) (bool, runtime.Object, error) {
+				return true, nil, test.apiServerError
+			})
+			m := metrics.NewMetrics("test", "backend")
+			m.RegisterPrometheus(false)
+			q := NewQueue(logrus.New(), client, 1, m)
+
+			stop := make(chan struct{})
+			go q.Run(stop)
+
+			s := v1.Service{}
+			s.Name = "foo"
+			s.Namespace = "default"
+			q.Enqueue(AddServiceAction(&s))
+
+			time.Sleep(500 * time.Millisecond)
+			close(stop)
+
+			assertGaugeEqual(t, test.expectedTimestampGauge, metrics.ServiceEventTimestampGauge, m.Registry)
+			assertCounterEqual(t, test.expectedErrorCounter, metrics.ServiceErrorTotalCounter, m.Registry)
+		})
+	}
+}
+
+func TestQueueEndpointsMetrics(t *testing.T) {
+	now := time.Date(2000, 1, 1, 10, 0, 00, 0, time.UTC)
+
+	tests := []struct {
+		name                             string
+		apiServerError                   error
+		expectedTimestampGauge           float64
+		expectedErrorCounter             float64
+		expectedReplicatedEndpointsGauge float64
+	}{
+		{
+			name: "successfull replication",
+			expectedTimestampGauge:           float64(now.Unix()),
+			expectedErrorCounter:             float64(-1), // no error, so error counter is not initialized
+			expectedReplicatedEndpointsGauge: float64(2),
+		},
+		{
+			name: "failed to replicate endpoints resource",
+			expectedTimestampGauge:           float64(-1), // failed to sync resource, so timestamp is not initialized
+			expectedErrorCounter:             float64(queueMaxRetries),
+			expectedReplicatedEndpointsGauge: float64(-1), // failed to replicate, so gauge is not initialized
+			apiServerError:                   errors.New("api server error"),
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			nowFunc = func() time.Time {
+				return now
+			}
+			client := fake.NewSimpleClientset()
+			client.PrependReactor("create", "endpoints", func(action k8stesting.Action) (bool, runtime.Object, error) {
+				return true, nil, test.apiServerError
+			})
+			m := metrics.NewMetrics("test", "backend")
+			m.RegisterPrometheus(false)
+			q := NewQueue(logrus.New(), client, 1, m)
+
+			stop := make(chan struct{})
+			go q.Run(stop)
+
+			ep := v1.Endpoints{}
+			ep.Namespace = "default"
+			ep.Name = "foo"
+			ep.Subsets = []v1.EndpointSubset{{
+				Addresses: []v1.EndpointAddress{{IP: "10.0.0.1"}, {IP: "10.0.0.2"}},
+			}}
+			q.Enqueue(AddEndpointsAction(&ep, "upstream"))
+
+			time.Sleep(500 * time.Millisecond)
+			close(stop)
+
+			assertGaugeEqual(t, test.expectedTimestampGauge, metrics.EndpointsEventTimestampGauge, m.Registry)
+			assertCounterEqual(t, test.expectedErrorCounter, metrics.EndpointsErrorTotalCounter, m.Registry)
+			assertGaugeEqual(t, test.expectedReplicatedEndpointsGauge, metrics.DiscovererReplicatedEndpointsGauge, m.Registry)
+		})
+	}
+}
+
+func assertGaugeEqual(t *testing.T, expected float64, metricName string, reg *prometheus.Registry) {
+	mf, err := reg.Gather()
+	require.NoError(t, err, "gathering metrics")
+	v := float64(-1)
+	for _, m := range mf {
+		if m.GetName() == metricName {
+			v = m.GetMetric()[0].GetGauge().GetValue()
+		}
+	}
+	assert.Equal(t, expected, v)
+}
+
+func assertCounterEqual(t *testing.T, expected float64, metricName string, reg *prometheus.Registry) {
+	mf, err := reg.Gather()
+	require.NoError(t, err, "gathering metrics")
+	v := float64(-1)
+	for _, m := range mf {
+		if m.GetName() == metricName {
+			v = m.GetMetric()[0].GetCounter().GetValue()
+		}
+	}
+	assert.Equal(t, expected, v)
 }
