@@ -92,11 +92,11 @@ Detailed documentation on stats within Envoy is available on their site: https:/
   - **gimbal_queuesize (gauge):** Number of items in process queue with the following labels:
     - backendname
     - backendtype
-  - **gimbal_discoverer_api_latency_ms (gauge):** The milliseconds it takes for requests to return from a remote discoverer api (for example Openstack)
+  - **gimbal_discoverer_api_latency_milliseconds (histogram):** The milliseconds it takes for requests to return from a remote discoverer api (for example OpenStack)
     - backendname
     - backendtype
     - path: API request path
-  - **gimbal_discoverer_cycle_duration_ms (gauge):** The milliseconds it takes for all objects to be synced from a remote discoverer api (for example Openstack)
+  - **gimbal_discoverer_cycle_duration_seconds (histogram):** The seconds it takes for all objects to be synced from a remote backend (for example OpenStack)
     - backendname
     - backendtype
   - **gimbal_discoverer_api_error_total (counter):** Number of errors that have occurred when accessing the OpenStack API
