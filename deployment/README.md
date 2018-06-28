@@ -15,10 +15,6 @@
     - [Deploy Grafana](#deploy-grafana)
         - [Quick start](#quick-start-1)
         - [Access the Grafana UI](#access-the-grafana-ui)
-        - [Configure Grafana](#configure-grafana)
-            - [Configure datasource](#configure-datasource)
-            - [Dashboards](#dashboards)
-                - [Add Sample Kubernetes Dashboard](#add-sample-kubernetes-dashboard)
     - [Validation](#validation)
         - [Discovery cluster](#discovery-cluster)
         - [Gimbal cluster](#gimbal-cluster)
@@ -154,11 +150,7 @@ $ kubectl create secret generic grafana -n gimbal-monitoring \
 $ kubectl port-forward $(kubectl get pods -l app=grafana -n gimbal-monitoring -o jsonpath='{.items[0].metadata.name}') 3000 -n gimbal-monitoring
 ```
 
-then go to [http://localhost:3000](http://localhost:3000) in your browser. The username is `admin`.
-
-#### Configure dashboards
-
-Dashboards for Envoy and the Discovery components are included as part of the sample Grafana deployment.
+then go to [http://localhost:3000](http://localhost:3000) in your browser. The username and password are from when you defined the Grafana secret in the previous step.
 
 ## Validation
 
