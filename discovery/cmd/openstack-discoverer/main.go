@@ -104,9 +104,13 @@ func main() {
 	// Log info metric
 	discovererMetrics.DiscovererInfoMetric(buildinfo.Version)
 
-	// Validate cluster name
+	// Validate cluster name present
+	if backendName == "" {
+		log.Fatalf("The Kubernetes cluster name must be provided using the `--backend-name` flag")
+	}
+	// Validate cluster name format
 	if util.IsInvalidBackendName(backendName) {
-		log.Fatalf("The Kubernetes cluster name must be provided using the `--backend-name` flag or the one passed is invalid")
+		log.Fatalf("The Kubernetes cluster name is invalid.  Valid names must contain only lowercase letters, numbers, and hyphens ('-').  They must start with a letter, and must not end with a hyphen")
 	}
 	log.Infof("BackendName is: %s", backendName)
 

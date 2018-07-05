@@ -46,17 +46,27 @@ func TestTranslateService(t *testing.T) {
 			expected:    true,
 		},
 		{
-			name:        "multiple underscores",
+			name:        "ends with number",
+			backendName: "mycluster1",
+			expected:    false,
+		},
+		{
+			name:        "multiple hyphens",
 			backendName: "my----cluster",
 			expected:    false,
 		},
 		{
-			name:        "can't start with underscores",
+			name:        "can't start with hyphen",
 			backendName: "-mycluster",
 			expected:    true,
 		},
 		{
-			name:        "can't end with underscores",
+			name:        "can't start with number",
+			backendName: "0mycluster",
+			expected:    true,
+		},
+		{
+			name:        "can't end with hyphen",
 			backendName: "mycluster-",
 			expected:    true,
 		},
