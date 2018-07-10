@@ -50,7 +50,9 @@ spec:
                 - RoundRobin
                 - WeightedLeastRequest
                 - Random
-            lbHealthCheck:
+                - RingHash
+                - Maglev
+            healthCheck:
               type: object
               required:
                 - path
@@ -60,7 +62,7 @@ spec:
                   pattern: ^\/.*$
                 intervalSeconds:
                   type: integer
-                timeoutSeconds:
+                timeoutSeconds: 
                   type: integer
                 unhealthyThresholdCount:
                   type: integer
@@ -97,7 +99,7 @@ spec:
                         name:
                           type: string
                           pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?$ # DNS-1123
-                        port:
+                        port: 
                           type: integer
                         weight:
                           type: integer
@@ -107,7 +109,9 @@ spec:
                             - RoundRobin
                             - WeightedLeastRequest
                             - Random
-                        lbHealthCheck:
+                            - RingHash
+                            - Maglev
+                        healthCheck:
                           type: object
                           required:
                             - path
@@ -117,7 +121,7 @@ spec:
                               pattern: ^\/.*$
                             intervalSeconds:
                               type: integer
-                            timeoutSeconds:
+                            timeoutSeconds: 
                               type: integer
                             unhealthyThresholdCount:
                               type: integer
