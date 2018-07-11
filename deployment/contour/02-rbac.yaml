@@ -55,3 +55,6 @@ rules:
   - get
   - list
   - watch
+  - put
+  - post
+  - patch
