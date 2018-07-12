@@ -21,7 +21,7 @@ These guides describe how the components of Gimbal function and how they interac
 
 ## User Topics
 
-- [Route Specification](route.md)
+- [IngressRoute Management](route.md)
 - [Dashboards / Monitoring / Alerting](monitoring.md)
 
 ## Data Flow
