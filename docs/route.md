@@ -1,6 +1,6 @@
 # Route Specification
 
-The core of Gimbal is Ingressroutes, which allow traffic to be routed into one or more applications. This section will discuss how to utilize [Contour IngressRoute](https://github.com/heptio/contour/blob/master/docs/ingressroute.md) objects to create these definitions.
+The core of Gimbal is IngressRoutes, which allow traffic to be routed into one or more applications. This section will discuss how to utilize [Contour IngressRoute](https://github.com/heptio/contour/blob/master/docs/ingressroute.md) objects to create these definitions.
 
 Before beginning it is important to understand how service discovery functions within Gimbal. The Discoverer components should be deployed per upstream cluster. Once synchronized, services will show up in your team namespace with the cluster name appended.
 
