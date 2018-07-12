@@ -4,9 +4,9 @@ The core of Gimbal is IngressRoutes, which allow traffic to be routed into one o
 
 Before beginning it is important to understand how service discovery functions within Gimbal. The Discoverer components should be deployed per upstream cluster. Once synchronized, services will show up in your team namespace with the cluster name appended.
 
-For example, if a Kubernetes cluster is being discovered and there was a service named `s1` which existed in the namespace `team1`, in the cluster `node02`, once synchronized the service in the Gimbal cluster would be named `s1-node02`.
+For example, if a Kubernetes cluster is being discovered and there was a service named `s1` which existed in the namespace `team1`, in the cluster `cluster1`, once synchronized, the service in the Gimbal cluster would be named `cluster1-s1` and it would be in the `team` namespace.
 
-## Basic Route
+## Basic Routex
 
 Following is a basic IngressRoute which routes any request to `foo.bar.com` and proxies to a service named `s1` on the remote cluster `node02` over port `80`.
 
