@@ -37,11 +37,6 @@ Documentation for all the Gimbal components can be found in the [docs directory]
 * Upstream Kubernetes Pods and OpenStack VMs must be routable from the Gimbal load balancing cluster.
   * Support is not available for Kubernetes clusters with overlay networks.
   * We are looking for community feedback on design requirements for a solution. A possible option is one GRE tunnel per upstream cluster. [Feedback welcome here](https://github.com/heptio/gimbal/issues/39)!
-* The Kubernetes Ingress API is limited and insecure.
-  * Provides only one backend per route.
-  * Anyone can modify route rules for a domain.
-  * More complex load balancing features like weighting and strategy are not supported.
-  * Gimbal & Contour will provide a solution with a [new IngressRoute CRD](https://github.com/heptio/contour/blob/master/design/ingressroute-design.md).
 
 ## Troubleshooting
 
