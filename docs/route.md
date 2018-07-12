@@ -6,7 +6,7 @@ Before beginning it is important to understand how service discovery functions w
 
 For example, if a Kubernetes cluster is being discovered and there was a service named `s1` which existed in the namespace `team1`, in the cluster `cluster1`, once synchronized, the service in the Gimbal cluster would be named `cluster1-s1` and it would be in the `team1` namespace.
 
-## Basic Routex
+## Basic Route
 
 Following is a basic IngressRoute which routes any request to `foo.bar.com` and proxies to a service named `s1` on the remote cluster `node02` over port `80`.
 
