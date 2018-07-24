@@ -12,6 +12,9 @@ spec:
       app: contour
   template:
     metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
       labels:
         app: contour
     spec:
@@ -34,6 +37,8 @@ spec:
         - $(CONTOUR_SERVICE_PORT)
         - --envoy-http-port
         - "80"
+        - --http-address
+        - "0.0.0.0"
         command: ["contour"]
         image: gcr.io/heptio-images/contour:v0.6.0-beta.1
         imagePullPolicy: Always
@@ -41,6 +46,9 @@ spec:
         ports:
         - containerPort: 8001
           name: xds
+          protocol: TCP
+        - containerPort: 8000
+          name: debug
           protocol: TCP
       dnsPolicy: ClusterFirst
       serviceAccountName: contour
