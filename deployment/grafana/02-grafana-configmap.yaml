@@ -1699,7 +1699,7 @@ data:
       "gnetId": null,
       "graphTooltip": 0,
       "id": null,
-      "iteration": 1532463276789,
+      "iteration": 1532525331664,
       "links": [],
       "panels": [
         {
@@ -2221,6 +2221,100 @@ data:
           "gridPos": {
             "h": 9,
             "w": 12,
+            "x": 0,
+            "y": 27
+          },
+          "id": 11,
+          "legend": {
+            "avg": false,
+            "current": true,
+            "max": false,
+            "min": false,
+            "show": false,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "envoy_http_rds_ingress_http_update_success",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "{{kubernetes_pod_name}} (Success)",
+              "refId": "A"
+            },
+            {
+              "expr": "envoy_http_rds_ingress_http_update_failure",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "{{kubernetes_pod_name}} (Failure)",
+              "refId": "B"
+            },
+            {
+              "expr": "envoy_http_rds_ingress_http_update_rejected",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "{{kubernetes_pod_name}} (Rejected)",
+              "refId": "C"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Contour RDS Updates",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "prometheus",
+          "fill": 1,
+          "gridPos": {
+            "h": 9,
+            "w": 12,
             "x": 12,
             "y": 27
           },
@@ -2306,6 +2400,7 @@ data:
           ]
         }
       ],
+      "refresh": false,
       "schemaVersion": 16,
       "style": "dark",
       "tags": [],
@@ -2354,8 +2449,8 @@ data:
         ]
       },
       "time": {
-        "from": "now-30m",
-        "to": "now"
+        "from": "2018-07-25T13:35:37.851Z",
+        "to": "2018-07-25T13:52:29.530Z"
       },
       "timepicker": {
         "refresh_intervals": [
@@ -2385,7 +2480,7 @@ data:
       "timezone": "",
       "title": "Contour",
       "uid": "KYcCfvKik",
-      "version": 2
+      "version": 1
     }
   envoy.json: |
     {
