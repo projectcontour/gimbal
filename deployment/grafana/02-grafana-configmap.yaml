@@ -2531,7 +2531,7 @@ data:
       "gnetId": null,
       "graphTooltip": 0,
       "id": null,
-      "iteration": 1532478799317,
+      "iteration": 1532528321662,
       "links": [],
       "panels": [
         {
@@ -3091,11 +3091,18 @@ data:
           "steppedLine": false,
           "targets": [
             {
+              "expr": "histogram_quantile(0.99, sum(rate(envoy_cluster_upstream_rq_time_bucket{service=~\"$Service\",namespace=~\"$Namespace\"}[1m])) by (le, service, namespace))",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{namespace}}/{{service}} 99%",
+              "refId": "A"
+            },
+            {
               "expr": "histogram_quantile(0.9, sum(rate(envoy_cluster_upstream_rq_time_bucket{service=~\"$Service\",namespace=~\"$Namespace\"}[1m])) by (le, service, namespace))",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "{{namespace}}/{{service}} 90%",
-              "refId": "A"
+              "refId": "C"
             },
             {
               "expr": "histogram_quantile(0.5, sum(rate(envoy_cluster_upstream_rq_time_bucket{service=~\"$Service\",namespace=~\"$Namespace\"}[1m])) by (le, service, namespace))",
@@ -3648,7 +3655,7 @@ data:
       "timezone": "",
       "title": "Envoy Metrics",
       "uid": "khVnG8iiz",
-      "version": 2
+      "version": 1
     }
 
 ---
