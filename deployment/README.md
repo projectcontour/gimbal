@@ -187,8 +187,8 @@ kuard-node02        ClusterIP   None         <none>        80/TCP    17m
 # Deploy an Ingress route
 $ kubectl apply -f example-workload/ingressroute.yaml
 
-# Port forward to the Contour pod
-$ kubectl port-forward $(kubectl get pods -n gimbal-contour -l app=contour -o jsonpath='{.items[0].metadata.name}') 9000:80 -n gimbal-contour
+# Port forward to the Envoy pod
+$ kubectl port-forward $(kubectl get pods -n gimbal-contour -l app=envoy -o jsonpath='{.items[0].metadata.name}') 9000:80 -n gimbal-contour
 
 # Make a request to Gimbal cluster which will proxy traffic to the secondary cluster
 # The curl should respond with the kuard and nginx alternating between requests
