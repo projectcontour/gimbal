@@ -1695,11 +1695,11 @@ data:
           }
         ]
       },
-      "editable": true,
+      "editable": false,
       "gnetId": null,
       "graphTooltip": 0,
       "id": null,
-      "iteration": 1532525331664,
+      "iteration": 1532630524651,
       "links": [],
       "panels": [
         {
@@ -1710,8 +1710,8 @@ data:
           "datasource": "prometheus",
           "fill": 1,
           "gridPos": {
-            "h": 9,
-            "w": 12,
+            "h": 8,
+            "w": 6,
             "x": 0,
             "y": 0
           },
@@ -1793,12 +1793,12 @@ data:
           "datasource": "prometheus",
           "fill": 1,
           "gridPos": {
-            "h": 9,
-            "w": 12,
-            "x": 12,
+            "h": 8,
+            "w": 6,
+            "x": 6,
             "y": 0
           },
-          "id": 5,
+          "id": 6,
           "legend": {
             "alignAsTable": true,
             "avg": false,
@@ -1823,7 +1823,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "avg(contour_ingressroute_root_total{namespace=~\"$Namespace\"}) by (namespace)",
+              "expr": "avg(contour_ingressroute_orphaned_total{namespace=~\"$Namespace\"}) by (namespace)",
               "format": "time_series",
               "interval": "",
               "intervalFactor": 1,
@@ -1834,7 +1834,7 @@ data:
           "thresholds": [],
           "timeFrom": null,
           "timeShift": null,
-          "title": "Root IngressRoutes",
+          "title": "Orphaned IngressRoutes",
           "tooltip": {
             "shared": true,
             "sort": 0,
@@ -1876,10 +1876,10 @@ data:
           "datasource": "prometheus",
           "fill": 1,
           "gridPos": {
-            "h": 9,
-            "w": 12,
-            "x": 0,
-            "y": 9
+            "h": 8,
+            "w": 6,
+            "x": 12,
+            "y": 0
           },
           "id": 4,
           "legend": {
@@ -1959,10 +1959,10 @@ data:
           "datasource": "prometheus",
           "fill": 1,
           "gridPos": {
-            "h": 9,
-            "w": 12,
-            "x": 12,
-            "y": 9
+            "h": 8,
+            "w": 6,
+            "x": 18,
+            "y": 0
           },
           "id": 3,
           "legend": {
@@ -2042,10 +2042,93 @@ data:
           "datasource": "prometheus",
           "fill": 1,
           "gridPos": {
-            "h": 9,
-            "w": 12,
+            "h": 8,
+            "w": 6,
             "x": 0,
-            "y": 18
+            "y": 8
+          },
+          "id": 5,
+          "legend": {
+            "alignAsTable": true,
+            "avg": false,
+            "current": false,
+            "max": false,
+            "min": false,
+            "show": true,
+            "total": false,
+            "values": false
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "avg(contour_ingressroute_root_total{namespace=~\"$Namespace\"}) by (namespace)",
+              "format": "time_series",
+              "interval": "",
+              "intervalFactor": 1,
+              "legendFormat": "Namespace: {{ namespace }}",
+              "refId": "A"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Root IngressRoutes",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "decimals": 0,
+              "format": "short",
+              "label": "",
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "prometheus",
+          "fill": 1,
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 6,
+            "y": 8
           },
           "id": 10,
           "legend": {
@@ -2136,187 +2219,10 @@ data:
           "datasource": "prometheus",
           "fill": 1,
           "gridPos": {
-            "h": 9,
-            "w": 12,
+            "h": 8,
+            "w": 6,
             "x": 12,
-            "y": 18
-          },
-          "id": 6,
-          "legend": {
-            "alignAsTable": true,
-            "avg": false,
-            "current": false,
-            "max": false,
-            "min": false,
-            "show": true,
-            "total": false,
-            "values": false
-          },
-          "lines": true,
-          "linewidth": 1,
-          "links": [],
-          "nullPointMode": "null",
-          "percentage": false,
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
-          "targets": [
-            {
-              "expr": "avg(contour_ingressroute_orphaned_total{namespace=~\"$Namespace\"}) by (namespace)",
-              "format": "time_series",
-              "interval": "",
-              "intervalFactor": 1,
-              "legendFormat": "Namespace: {{ namespace }}",
-              "refId": "A"
-            }
-          ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "Orphaned IngressRoutes",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "decimals": 0,
-              "format": "short",
-              "label": "",
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            },
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            }
-          ]
-        },
-        {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": "prometheus",
-          "fill": 1,
-          "gridPos": {
-            "h": 9,
-            "w": 12,
-            "x": 0,
-            "y": 27
-          },
-          "id": 11,
-          "legend": {
-            "avg": false,
-            "current": true,
-            "max": false,
-            "min": false,
-            "show": false,
-            "total": false,
-            "values": true
-          },
-          "lines": true,
-          "linewidth": 1,
-          "links": [],
-          "nullPointMode": "null",
-          "percentage": false,
-          "pointradius": 5,
-          "points": false,
-          "renderer": "flot",
-          "seriesOverrides": [],
-          "spaceLength": 10,
-          "stack": false,
-          "steppedLine": false,
-          "targets": [
-            {
-              "expr": "envoy_http_rds_ingress_http_update_success",
-              "format": "time_series",
-              "intervalFactor": 2,
-              "legendFormat": "{{kubernetes_pod_name}} (Success)",
-              "refId": "A"
-            },
-            {
-              "expr": "envoy_http_rds_ingress_http_update_failure",
-              "format": "time_series",
-              "intervalFactor": 2,
-              "legendFormat": "{{kubernetes_pod_name}} (Failure)",
-              "refId": "B"
-            },
-            {
-              "expr": "envoy_http_rds_ingress_http_update_rejected",
-              "format": "time_series",
-              "intervalFactor": 2,
-              "legendFormat": "{{kubernetes_pod_name}} (Rejected)",
-              "refId": "C"
-            }
-          ],
-          "thresholds": [],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "Contour RDS Updates",
-          "tooltip": {
-            "shared": true,
-            "sort": 0,
-            "value_type": "individual"
-          },
-          "type": "graph",
-          "xaxis": {
-            "buckets": null,
-            "mode": "time",
-            "name": null,
-            "show": true,
-            "values": []
-          },
-          "yaxes": [
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            },
-            {
-              "format": "short",
-              "label": null,
-              "logBase": 1,
-              "max": null,
-              "min": null,
-              "show": true
-            }
-          ]
-        },
-        {
-          "aliasColors": {},
-          "bars": false,
-          "dashLength": 10,
-          "dashes": false,
-          "datasource": "prometheus",
-          "fill": 1,
-          "gridPos": {
-            "h": 9,
-            "w": 12,
-            "x": 12,
-            "y": 27
+            "y": 8
           },
           "id": 8,
           "legend": {
@@ -2398,9 +2304,103 @@ data:
               "show": true
             }
           ]
+        },
+        {
+          "aliasColors": {},
+          "bars": false,
+          "dashLength": 10,
+          "dashes": false,
+          "datasource": "prometheus",
+          "fill": 1,
+          "gridPos": {
+            "h": 8,
+            "w": 6,
+            "x": 18,
+            "y": 8
+          },
+          "id": 11,
+          "legend": {
+            "avg": false,
+            "current": true,
+            "max": false,
+            "min": false,
+            "show": false,
+            "total": false,
+            "values": true
+          },
+          "lines": true,
+          "linewidth": 1,
+          "links": [],
+          "nullPointMode": "null",
+          "percentage": false,
+          "pointradius": 5,
+          "points": false,
+          "renderer": "flot",
+          "seriesOverrides": [],
+          "spaceLength": 10,
+          "stack": false,
+          "steppedLine": false,
+          "targets": [
+            {
+              "expr": "envoy_http_rds_ingress_http_update_success",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "{{kubernetes_pod_name}} (Success)",
+              "refId": "A"
+            },
+            {
+              "expr": "envoy_http_rds_ingress_http_update_failure",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "{{kubernetes_pod_name}} (Failure)",
+              "refId": "B"
+            },
+            {
+              "expr": "envoy_http_rds_ingress_http_update_rejected",
+              "format": "time_series",
+              "intervalFactor": 2,
+              "legendFormat": "{{kubernetes_pod_name}} (Rejected)",
+              "refId": "C"
+            }
+          ],
+          "thresholds": [],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "Contour RDS Updates",
+          "tooltip": {
+            "shared": true,
+            "sort": 0,
+            "value_type": "individual"
+          },
+          "type": "graph",
+          "xaxis": {
+            "buckets": null,
+            "mode": "time",
+            "name": null,
+            "show": true,
+            "values": []
+          },
+          "yaxes": [
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            },
+            {
+              "format": "short",
+              "label": null,
+              "logBase": 1,
+              "max": null,
+              "min": null,
+              "show": true
+            }
+          ]
         }
       ],
-      "refresh": false,
+      "refresh": "10s",
       "schemaVersion": 16,
       "style": "dark",
       "tags": [],
