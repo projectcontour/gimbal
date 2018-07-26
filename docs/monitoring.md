@@ -39,8 +39,7 @@ The Contour Dashboard shows an overview of the updates happening to Envoy's RDS,
 - **Total IngressRoutes:**  Number of `Invalid` IngressRoute objects tagged by namespace and vhost
 - **Contour Updates:** These metrics show the number of Successful, Failed, and Rejected updates to the Envoy cluster discovery service (CDS), listener discovery service (LDS), and the route discovery service (RDS)
 
-![ContourDashboard01](images/dashboard-contour01.png)
-![ContourDashboard02](images/dashboard-contour02.png)
+![ContourDashboard](images/dashboard-contour.png)
 
 ### Envoy
 
