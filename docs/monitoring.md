@@ -2,20 +2,22 @@
 
 - [Monitoring](#monitoring)
     - [Dashboards](#dashboards)
-        - [Grafana](#grafana)
-            - [Envoy Dashboard](#envoy-dashboard)
-            - [Gimbal Dashboard](#gimbal-dashboard)
-    - [Metrics](#metrics)
+        - [Contour](#contour)
         - [Envoy](#envoy)
+        - [Gimbal Discoverers](#gimbal-discoverers)
+        - [Grafana](#grafana)
+    - [Metrics](#metrics)
+        - [Envoy](#envoy-1)
         - [Gimbal Discoverer](#gimbal-discoverer)
     - [Alerts](#alerts)
         - [Alert rules](#alert-rules)
+        - [Sample Alerting Rules](#sample-alerting-rules)
 
 <!-- /TOC -->
 
 # Monitoring
 
-Perhaps one of the most essential components of the entire system is the monitoring suite.  Each Gimbal system component exposes a Prometheus-compatible /metrics route to provide health status and essential metrics.  These metrics are scraped by Prometheus, which then aggregates and stores them for real-time monitoring and alerting. 
+Perhaps one of the most essential components of the entire system is the monitoring suite.  Each Gimbal system component exposes a Prometheus-compatible /metrics route to provide health status and essential metrics.  These metrics are scraped by Prometheus, which then aggregates and stores them for real-time monitoring and alerting.
 
 Open-source tools:
 - Prometheus: [https://prometheus.io/](https://prometheus.io/)
@@ -24,7 +26,34 @@ Open-source tools:
 
 ## Dashboards
 
-Administrators and teams can gain real-time insights into the health, performance, and configuration of Contour using one or more Dashboards. These web-based dashboards are built using an open-source analytics and monitoring platform called Grafana. To access Grafana, check with your Gimbal administrator to see if it is already exposed from the cluster. 
+Administrators and teams can gain real-time insights into the health, performance, and configuration of Contour using one or more Dashboards. These web-based dashboards are built using an open-source analytics and monitoring platform called Grafana. To access Grafana, check with your Gimbal administrator to see if it is already exposed from the cluster.
+
+### Contour
+
+The Contour Dashboard shows an overview of the updates happening to Envoy's RDS, CDS, and LDS components as well as the status of IngressRoutes in the cluster.
+
+- **Total IngressRoutes:** Total number of IngressRoutes objects that exist regardless of status (i.e. Valid / Invalid / Orphaned, etc) tagged by namespace. This metric should match the sum of `Orphaned` + `Valid` + `Invalid` IngressRoutes
+- **Orphaned IngressRoutes:**  Number of `Orphaned` IngressRoute objects which have no root delegating to them tagged by namespace
+- **Root IngressRoutes:**  Number of `Root` IngressRoute objects (Note: There will only be a single `Root` IngressRoute per vhost) tagged by namespace
+- **Valid IngressRoutes:**  Number of `Valid` IngressRoute objects tagged by namespace and vhost
+- **Total IngressRoutes:**  Number of `Invalid` IngressRoute objects tagged by namespace and vhost
+- **Contour Updates:** These metrics show the number of Successful, Failed, and Rejected updates to the Envoy cluster discovery service (CDS), listener discovery service (LDS), and the route discovery service (RDS)
+
+![ContourDashboard](images/dashboard-contour.png)
+
+### Envoy
+
+The Envoy dashboard shows an overview of upstream as well as downstream metrics emitted from Envoy. 
+
+See docs for more information: [https://www.envoyproxy.io/docs/envoy/latest/configuration/cluster_manager/cluster_stats](https://www.envoyproxy.io/docs/envoy/latest/configuration/cluster_manager/cluster_stats)
+
+![EnvoyDashboard](images/dashboard-envoy.png)
+
+### Gimbal Discoverers
+
+The Discoverers emit metrics relating to the type of backend it is discovering (e.g. Kubernetes or OpenStack):
+
+![GimbalDashboard](images/dashboard-discoverer.png)
 
 ### Grafana
 
@@ -37,14 +66,6 @@ $ kubectl port-forward $(kubectl get pods -l app=grafana -n gimbal-monitoring -o
 Access Grafana at http://localhost:3000 in your browser. The default username is `admin` and the password is `admin`. However, your Gimbal administrator may set these to different values. 
 
 Some dashboards are loaded into Grafana with the Gimbal installation:
-
-#### Envoy Dashboard
-
-![Envoy Dashboard](images/envoy-dashboard.png)
-
-#### Gimbal Dashboard
-
-![Envoy Dashboard](images/gimbal-dashboard.png)
 
 ## Metrics
 
