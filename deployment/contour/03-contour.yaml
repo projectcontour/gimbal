@@ -40,7 +40,7 @@ spec:
         - --http-address
         - "0.0.0.0"
         command: ["contour"]
-        image: gcr.io/heptio-images/contour:v0.6.0-beta.1
+        image: gcr.io/heptio-images/contour:v0.6.0-beta.2
         imagePullPolicy: Always
         name: contour
         ports:
