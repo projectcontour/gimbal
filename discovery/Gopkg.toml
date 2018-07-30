@@ -33,26 +33,26 @@ required = [
 
 [[constraint]]
   name = "github.com/sirupsen/logrus"
-  version = "1.0.4"
+  version = "1.0.5"
 
 [[constraint]]
-  branch = "release-1.9"
+  branch = "release-1.10"
   name = "k8s.io/api"
 
 [[constraint]]
-  branch = "release-1.9"
+  branch = "release-1.10"
   name = "k8s.io/apimachinery"
 
 [[constraint]]
   name = "k8s.io/client-go"
-  version="~6.0"
+  version="v7.0.0"
 
 [[constraint]]
   name = "k8s.io/kubernetes"
-  version = "~1.9"
+  version = "~1.10"
 
 [[constraint]]
-  branch = "release-1.9"
+  branch = "release-1.10"
   name = "k8s.io/code-generator"
 
 [[constraint]]
@@ -60,5 +60,9 @@ required = [
   name = "k8s.io/gengo"
 
 [[constraint]]
-  branch = "master"
+  revision = "f8826f28e31a2f66e771939532bcae910ed2420f"
   name = "github.com/gophercloud/gophercloud"
+
+[[override]]
+  name = "github.com/json-iterator/go"
+  revision = "f2b4162afba35581b6d4a50d3b8f34e33c144682"
