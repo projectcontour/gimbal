@@ -8,6 +8,8 @@ import (
 	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/acceptance/tools"
 	"github.com/gophercloud/gophercloud/openstack/imageservice/v2/images"
+	"github.com/gophercloud/gophercloud/openstack/imageservice/v2/tasks"
+	th "github.com/gophercloud/gophercloud/testhelper"
 )
 
 // CreateEmptyImage will create an image, but with no actual image data.
@@ -31,6 +33,7 @@ func CreateEmptyImage(t *testing.T, client *gophercloud.ServiceClient) (*images.
 		Properties: map[string]string{
 			"architecture": "x86_64",
 		},
+		Tags: []string{"foo", "bar", "baz"},
 	}
 
 	image, err := images.Create(client, createOpts).Extract()
@@ -38,8 +41,16 @@ func CreateEmptyImage(t *testing.T, client *gophercloud.ServiceClient) (*images.
 		return image, err
 	}
 
-	t.Logf("Created image %s: %#v", name, image)
-	return image, nil
+	newImage, err := images.Get(client, image.ID).Extract()
+	if err != nil {
+		return image, err
+	}
+
+	t.Logf("Created image %s: %#v", name, newImage)
+
+	th.CheckEquals(t, newImage.Name, name)
+	th.CheckEquals(t, newImage.Properties["architecture"], "x86_64")
+	return newImage, nil
 }
 
 // DeleteImage deletes an image.
@@ -52,4 +63,35 @@ func DeleteImage(t *testing.T, client *gophercloud.ServiceClient, image *images.
 	}
 
 	t.Logf("Deleted image: %s", image.ID)
+}
+
+// ImportImageURL contains an URL of a test image that can be imported.
+const ImportImageURL = "http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img"
+
+// CreateTask will create a task to import the CirrOS image.
+// An error will be returned if a task couldn't be created.
+func CreateTask(t *testing.T, client *gophercloud.ServiceClient, imageURL string) (*tasks.Task, error) {
+	t.Logf("Attempting to create an Imageservice import task with image: %s", imageURL)
+	opts := tasks.CreateOpts{
+		Type: "import",
+		Input: map[string]interface{}{
+			"image_properties": map[string]interface{}{
+				"container_format": "bare",
+				"disk_format":      "raw",
+			},
+			"import_from_format": "raw",
+			"import_from":        imageURL,
+		},
+	}
+	task, err := tasks.Create(client, opts).Extract()
+	if err != nil {
+		return nil, err
+	}
+
+	newTask, err := tasks.Get(client, task.ID).Extract()
+	if err != nil {
+		return nil, err
+	}
+
+	return newTask, nil
 }
