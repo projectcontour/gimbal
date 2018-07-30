@@ -507,7 +507,7 @@ data:
           "steppedLine": false,
           "targets": [
             {
-              "expr": "avg(gimbal_discoverer_replicated_services_total{namespace=~\"$Namespace\",backendname=~\"$Backend\"}) by (backendname)",
+              "expr": "sum(gimbal_discoverer_replicated_services_total{namespace=~\"$Namespace\",backendname=~\"$Backend\"}) by (backendname)",
               "format": "time_series",
               "intervalFactor": 1,
               "legendFormat": "Backend: {{ backendname }} ",
