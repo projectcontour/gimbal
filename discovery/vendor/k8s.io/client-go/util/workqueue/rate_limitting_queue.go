@@ -55,7 +55,7 @@ type rateLimitingType struct {
 	rateLimiter RateLimiter
 }
 
-// Limited AddAfter's the item based on the time when the rate limiter says its ok
+// AddRateLimited AddAfter's the item based on the time when the rate limiter says its ok
 func (q *rateLimitingType) AddRateLimited(item interface{}) {
 	q.DelayingInterface.AddAfter(item, q.rateLimiter.When(item))
 }
