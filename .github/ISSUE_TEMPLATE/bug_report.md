@@ -1,13 +1,19 @@
+---
+name: Bug report
+about: Tell us about a problem you are experiencing
 
-**Is this a BUG REPORT, PERFORMANCE REPORT or FEATURE REQUEST?**:
+---
 
-**What happened**:
+**What steps did you take and what happened:**
+[A clear and concise description of what the bug is.]
 
-**What you expected to happen**:
 
-**How to reproduce it (as minimally and precisely as possible)**:
+**What did you expect to happen:**
 
-**Anything else we need to know?**:
+
+**Anything else you would like to add:**
+[Miscellaneous information that will assist in solving the issue.]
+
 
 **Environment**:
 
