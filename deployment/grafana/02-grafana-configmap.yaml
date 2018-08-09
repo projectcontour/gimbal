@@ -2531,7 +2531,7 @@ data:
       "gnetId": null,
       "graphTooltip": 0,
       "id": null,
-      "iteration": 1532528321662,
+      "iteration": 1533835806222,
       "links": [],
       "panels": [
         {
@@ -2755,6 +2755,13 @@ data:
               "intervalFactor": 1,
               "legendFormat": "{{kubernetes_pod_name}} 50% ",
               "refId": "B"
+            },
+            {
+              "expr": "histogram_quantile(0.99, sum(rate(envoy_http_downstream_rq_time_bucket[1m])) by (le, kubernetes_pod_name))",
+              "format": "time_series",
+              "intervalFactor": 1,
+              "legendFormat": "{{kubernetes_pod_name}} 99%",
+              "refId": "C"
             }
           ],
           "thresholds": [],
@@ -3655,7 +3662,7 @@ data:
       "timezone": "",
       "title": "Envoy Metrics",
       "uid": "khVnG8iiz",
-      "version": 1
+      "version": 2
     }
 
 ---
