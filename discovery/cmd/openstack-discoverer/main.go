@@ -54,6 +54,8 @@ var (
 	gimbalKubeClientBurst             int
 )
 
+var reconciler openstack.Reconciler
+
 const (
 	clusterType           = "openstack"
 	defaultUserDomainName = "Default"
@@ -185,7 +187,7 @@ func main() {
 		log.Fatalf("Failed to create Network V2 API client: %v", err)
 	}
 
-	reconciler := openstack.NewReconciler(
+	reconciler = openstack.NewReconciler(
 		backendName,
 		clusterType,
 		gimbalKubeClient,
@@ -218,8 +220,27 @@ func main() {
 	log.Info("Starting reconciler")
 	go reconciler.Run(stopCh)
 
+	go func() {
+		http.HandleFunc("/healthz", healthzHandler)
+		log.Fatal(http.ListenAndServe("127.0.0.1:8080", nil))
+		<-stopCh
+		log.Info("Shutting down healthz endpoint...")
+	}()
+
 	<-stopCh
 	log.Info("Stopped OpenStack discoverer")
+}
+
+func healthzHandler(w http.ResponseWriter, r *http.Request) {
+	_, err := reconciler.ProjectLister.ListProjects()
+	if err != nil {
+		w.WriteHeader(http.StatusServiceUnavailable)
+		fmt.Fprintf(w, "FAIL")
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "OK")
 }
 
 func httpTransportWithCA(log *logrus.Logger, caFile string) http.RoundTripper {
