@@ -1,0 +1,61 @@
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  labels:
+    app: contour
+  name: contour
+  namespace: heptio-contour
+spec:
+  selector:
+    matchLabels:
+      app: contour
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: contour
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9001"
+        prometheus.io/path: "/stats"
+        prometheus.io/format: "prometheus"
+    spec:
+      hostNetwork: true
+      containers:
+      - image: gcr.io/heptio-images/contour:master
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+          name: contour
+        name: contour
+        command: ["contour"]
+        args: ["serve", "--incluster"]
+      - image: docker.io/envoyproxy/envoy-alpine:v1.6.0
+        name: envoy
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 8443
+          name: https
+        command: ["envoy"]
+        args: ["-c", "/config/contour.yaml", "--service-cluster", "cluster0", "--service-node", "node0", "-l", "info", "--v2-config-only"]
+        volumeMounts:
+        - name: contour-config
+          mountPath: /config
+      initContainers:
+      - image: gcr.io/heptio-images/contour:master
+        imagePullPolicy: Always
+        name: envoy-initconfig
+        command: ["contour"]
+        args: ["bootstrap", "/config/contour.yaml"]
+        volumeMounts:
+        - name: contour-config
+          mountPath: /config
+      volumes:
+      - name: contour-config
+        emptyDir: {}
+      dnsPolicy: ClusterFirst
+      serviceAccountName: contour
+      terminationGracePeriodSeconds: 30
+---
