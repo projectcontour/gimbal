@@ -37,12 +37,6 @@ spec:
         - name: discover-kubecfg
           readOnly: true
           mountPath: "/etc/remote-discover-kubecfg"
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: 8080
-          initialDelaySeconds: 30
-          periodSeconds: 60
       volumes:
       - name: discover-kubecfg
         secret:
