@@ -15,18 +15,12 @@ package main
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"flag"
 	"fmt"
-	"io/ioutil"
-	"net"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/gophercloud/gophercloud"
-	gopheropenstack "github.com/gophercloud/gophercloud/openstack"
 	"github.com/heptio/gimbal/discovery/pkg/buildinfo"
 	"github.com/heptio/gimbal/discovery/pkg/k8s"
 	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
@@ -143,46 +137,17 @@ func main() {
 		userDomainName = defaultUserDomainName
 	}
 
-	// Create and configure client
-	osClient, err := gopheropenstack.NewClient(identityEndpoint)
-	if err != nil {
-		log.Fatalf("Failed to create OpenStack client: %v", err)
-	}
+	openstackAuth := openstack.NewOpenstackAuth(identityEndpoint, backendName, openstackCertificateAuthorityFile,
+		username, password, userDomainName, tenantName, &discovererMetrics, httpClientTimeout, log)
 
-	transport := &openstack.LogRoundTripper{
-		RoundTripper: http.DefaultTransport,
-		Log:          log,
-		BackendName:  backendName,
-		Metrics:      &discovererMetrics,
-	}
+	openstackAuth.Authenticate()
 
-	if openstackCertificateAuthorityFile != "" {
-		transport.RoundTripper = httpTransportWithCA(log, openstackCertificateAuthorityFile)
-	}
-
-	osClient.HTTPClient = http.Client{
-		Transport: transport,
-		Timeout:   httpClientTimeout,
-	}
-
-	osAuthOptions := gophercloud.AuthOptions{
-		IdentityEndpoint: identityEndpoint,
-		Username:         username,
-		Password:         password,
-		DomainName:       userDomainName,
-		TenantName:       tenantName,
-	}
-
-	if err := gopheropenstack.Authenticate(osClient, osAuthOptions); err != nil {
-		log.Fatalf("Failed to authenticate with OpenStack: %v", err)
-	}
-
-	identity, err := openstack.NewIdentityV3(osClient)
+	identity, err := openstack.NewIdentityV3(openstackAuth.ProviderClient)
 	if err != nil {
 		log.Fatalf("Failed to create Identity V3 API client: %v", err)
 	}
 
-	lbv2, err := openstack.NewLoadBalancerV2(osClient)
+	lbv2, err := openstack.NewLoadBalancerV2(openstackAuth.ProviderClient)
 	if err != nil {
 		log.Fatalf("Failed to create Network V2 API client: %v", err)
 	}
@@ -241,32 +206,4 @@ func healthzHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, "OK")
-}
-
-func httpTransportWithCA(log *logrus.Logger, caFile string) http.RoundTripper {
-	ca, err := ioutil.ReadFile(caFile)
-	if err != nil {
-		log.Fatalf("Error reading certificate authority for OpenStack: %v", err)
-	}
-	pool := x509.NewCertPool()
-	if ok := pool.AppendCertsFromPEM(ca); !ok {
-		log.Fatalf("Failed to add certificate authority to CA pool. Verify certificate is a valid, PEM-encoded certificate.")
-	}
-	// Use default transport with CA
-	// TODO(abrand): Is there a better way to do this?
-	return &http.Transport{
-		Proxy: http.ProxyFromEnvironment,
-		DialContext: (&net.Dialer{
-			Timeout:   30 * time.Second,
-			KeepAlive: 30 * time.Second,
-			DualStack: true,
-		}).DialContext,
-		MaxIdleConns:          100,
-		IdleConnTimeout:       90 * time.Second,
-		TLSHandshakeTimeout:   10 * time.Second,
-		ExpectContinueTimeout: 1 * time.Second,
-		TLSClientConfig: &tls.Config{
-			RootCAs: pool,
-		},
-	}
 }

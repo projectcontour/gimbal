@@ -14,7 +14,16 @@
 package openstack
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net"
+	"net/http"
+	"time"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/gophercloud/gophercloud"
 	gopheropenstack "github.com/gophercloud/gophercloud/openstack"
@@ -22,7 +31,14 @@ import (
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/listeners"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/loadbalancers"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/pools"
+	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
 )
+
+type OpenstackAuth struct {
+	*gophercloud.ProviderClient
+	gophercloud.AuthOptions
+	log *logrus.Logger
+}
 
 // IdentityV3Client is a client of the OpenStack Keystone v3 API
 type IdentityV3Client struct {
@@ -36,6 +52,55 @@ func NewIdentityV3(provider *gophercloud.ProviderClient) (*IdentityV3Client, err
 		return nil, err
 	}
 	return &IdentityV3Client{c}, nil
+}
+
+// NewOpenstackAuth returns an Openstack Auth Client
+func NewOpenstackAuth(identityEndpoint, backendName, openstackCertificateAuthorityFile, username, password,
+	userDomainName, tenantName string, discovererMetrics *localmetrics.DiscovererMetrics,
+	httpClientTimeout time.Duration, log *logrus.Logger) OpenstackAuth {
+
+	// Create and configure client
+	osClient, err := gopheropenstack.NewClient(identityEndpoint)
+	if err != nil {
+		log.Fatalf("Failed to create OpenStack client: %v", err)
+	}
+
+	transport := &LogRoundTripper{
+		RoundTripper: http.DefaultTransport,
+		Log:          log,
+		BackendName:  backendName,
+		Metrics:      discovererMetrics,
+	}
+
+	if openstackCertificateAuthorityFile != "" {
+		transport.RoundTripper = httpTransportWithCA(log, openstackCertificateAuthorityFile)
+	}
+
+	osClient.HTTPClient = http.Client{
+		Transport: transport,
+		Timeout:   httpClientTimeout,
+	}
+
+	osAuthOptions := gophercloud.AuthOptions{
+		IdentityEndpoint: identityEndpoint,
+		Username:         username,
+		Password:         password,
+		DomainName:       userDomainName,
+		TenantName:       tenantName,
+	}
+
+	return OpenstackAuth{
+		ProviderClient: osClient,
+		AuthOptions:    osAuthOptions,
+		log:            log,
+	}
+}
+
+// Authenticate authenticates with an Openstack Cluster
+func (o *OpenstackAuth) Authenticate() {
+	if err := gopheropenstack.Authenticate(o.ProviderClient, o.AuthOptions); err != nil {
+		log.Fatalf("Failed to authenticate with OpenStack: %v", err)
+	}
 }
 
 // ListProjects returns the list of projects that are available to the user
@@ -126,4 +191,32 @@ func (c LoadBalancerV2Client) ListPools(projectID string) ([]pools.Pool, error) 
 	}
 
 	return ps, nil
+}
+
+func httpTransportWithCA(log *logrus.Logger, caFile string) http.RoundTripper {
+	ca, err := ioutil.ReadFile(caFile)
+	if err != nil {
+		log.Fatalf("Error reading certificate authority for OpenStack: %v", err)
+	}
+	pool := x509.NewCertPool()
+	if ok := pool.AppendCertsFromPEM(ca); !ok {
+		log.Fatalf("Failed to add certificate authority to CA pool. Verify certificate is a valid, PEM-encoded certificate.")
+	}
+	// Use default transport with CA
+	// TODO(abrand): Is there a better way to do this?
+	return &http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+			DualStack: true,
+		}).DialContext,
+		MaxIdleConns:          100,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
+		TLSClientConfig: &tls.Config{
+			RootCAs: pool,
+		},
+	}
 }

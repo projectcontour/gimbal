@@ -18,6 +18,7 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/loadbalancers"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/pools"
@@ -58,6 +59,8 @@ type Reconciler struct {
 	syncqueue  sync.Queue
 
 	Metrics localmetrics.DiscovererMetrics
+
+	gophercloud.AuthOptions
 }
 
 // Endpoints represents a v1.Endpoints + upstream name to facilicate metrics
