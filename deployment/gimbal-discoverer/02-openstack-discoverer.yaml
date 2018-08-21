@@ -57,6 +57,12 @@ spec:
           - name: discover-openstack-config
             readOnly: true
             mountPath: "/etc/remote-openstack-config"
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 60
       volumes:
         - name: discover-openstack-config
           secret:
