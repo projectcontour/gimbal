@@ -63,7 +63,7 @@ func init() {
 	flag.IntVar(&numProcessThreads, "num-threads", 2, "Specify number of threads to use when processing queue items.")
 	flag.BoolVar(&debug, "debug", false, "Enable debug logging.")
 	flag.DurationVar(&reconciliationPeriod, "reconciliation-period", 30*time.Second, "The interval of time between reconciliation loop runs.")
-	flag.DurationVar(&authTokenRefreshPeriod, "auth-token-refresh-period", 60*time.Second, "The interval of time to refresh the Authentication token with Openstack.")
+	flag.DurationVar(&authTokenRefreshPeriod, "auth-token-refresh-period", 60*time.Minute, "The interval of time to refresh the Authentication token with Openstack.")
 	flag.DurationVar(&httpClientTimeout, "http-client-timeout", 5*time.Second, "The HTTP client request timeout.")
 	flag.StringVar(&openstackCertificateAuthorityFile, "openstack-certificate-authority", "", "Path to cert file of the OpenStack API certificate authority.")
 	flag.IntVar(&prometheusListenPort, "prometheus-listen-address", 8080, "The address to listen on for Prometheus HTTP requests")
