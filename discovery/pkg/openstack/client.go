@@ -101,6 +101,7 @@ func (o *OpenstackAuth) Authenticate() {
 	if err := gopheropenstack.Authenticate(o.ProviderClient, o.AuthOptions); err != nil {
 		log.Fatalf("Failed to authenticate with OpenStack: %v", err)
 	}
+	o.log.Info("Success Authenticating with Openstack!")
 }
 
 // ListProjects returns the list of projects that are available to the user
