@@ -1,7 +1,9 @@
 package openstack
 
 import (
+	"fmt"
 	"testing"
+	"time"
 
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/loadbalancers"
 	"github.com/sirupsen/logrus"
@@ -85,4 +87,69 @@ func TestSkipInvalidLoadBalancers(t *testing.T) {
 			assert.Equal(t, tc.expected, r.skipInvalidLoadBalancers("projectname", tc.lbs))
 		})
 	}
+}
+
+func TestShouldRefreshAuthToken(t *testing.T) {
+	tests := []struct {
+		name             string
+		refreshDuration  time.Duration
+		now              string
+		lastTokenRefresh string
+		expected         bool
+	}{
+		{
+			name:             "should not refresh",
+			refreshDuration:  time.Second * 30,
+			now:              "Mon, 02 Jan 2006 15:04:05 EST",
+			lastTokenRefresh: "Mon, 02 Jan 2006 15:04:05 EST",
+			expected:         false,
+		},
+		{
+			name:             "should not refresh",
+			refreshDuration:  time.Second * 30,
+			now:              "Mon, 02 Jan 2006 15:04:15 EST",
+			lastTokenRefresh: "Mon, 02 Jan 2006 15:04:05 EST",
+			expected:         false,
+		},
+		{
+			name:             "should refresh",
+			refreshDuration:  time.Second * 30,
+			now:              "Mon, 02 Jan 2006 15:04:05 EST",
+			lastTokenRefresh: "Mon, 02 Jan 2006 15:03:05 EST",
+			expected:         true,
+		},
+		{
+			name:             "should not refresh",
+			refreshDuration:  0,
+			now:              "Mon, 02 Jan 2006 15:04:05 EST",
+			lastTokenRefresh: "Mon, 01 Jan 2006 15:03:05 EST",
+			expected:         false,
+		},
+	}
+
+	for _, tc := range tests {
+
+		nowParsed, err := time.Parse(time.RFC1123, tc.now)
+		if err != nil {
+			assert.Error(t, err)
+		}
+
+		lastTokenRefreshParsed, err := time.Parse(time.RFC1123, tc.lastTokenRefresh)
+		if err != nil {
+			assert.Error(t, err)
+		}
+
+		fmt.Println(lastTokenRefreshParsed.Sub(nowParsed))
+
+		r := Reconciler{
+			Logger:                 logrus.New(),
+			AuthTokenRefreshPeriod: tc.refreshDuration,
+			lastTokenRefresh:       lastTokenRefreshParsed,
+		}
+
+		t.Run(tc.name, func(t *testing.T) {
+			assert.Equal(t, tc.expected, r.shouldRefreshAuthToken(nowParsed))
+		})
+	}
+
 }

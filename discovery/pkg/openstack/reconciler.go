@@ -18,6 +18,7 @@ import (
 	"regexp"
 	"time"
 
+	"github.com/gophercloud/gophercloud"
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/loadbalancers"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/pools"
@@ -53,11 +54,17 @@ type Reconciler struct {
 	// GimbalKubeClient is the client of the Kubernetes cluster where Gimbal is running
 	GimbalKubeClient kubernetes.Interface
 	// Interval between reconciliation loops
-	SyncPeriod time.Duration
-	Logger     *logrus.Logger
-	syncqueue  sync.Queue
+	SyncPeriod             time.Duration
+	AuthTokenRefreshPeriod time.Duration
+	Logger                 *logrus.Logger
+	syncqueue              sync.Queue
 
 	Metrics localmetrics.DiscovererMetrics
+
+	gophercloud.AuthOptions
+
+	OpenstackAuth
+	lastTokenRefresh time.Time // Holds the last time the token was refreshed
 }
 
 // Endpoints represents a v1.Endpoints + upstream name to facilicate metrics
@@ -68,23 +75,29 @@ type Endpoints struct {
 
 // NewReconciler returns an OpenStack reconciler
 func NewReconciler(backendName, clusterType string, gimbalKubeClient kubernetes.Interface, syncPeriod time.Duration, lbLister LoadBalancerLister,
-	projectLister ProjectLister, log *logrus.Logger, queueWorkers int, metrics localmetrics.DiscovererMetrics) Reconciler {
+	projectLister ProjectLister, log *logrus.Logger, queueWorkers int, metrics localmetrics.DiscovererMetrics, authTokenRefreshPeriod time.Duration,
+	openstackAuth OpenstackAuth) Reconciler {
 
 	return Reconciler{
-		BackendName:        backendName,
-		GimbalKubeClient:   gimbalKubeClient,
-		SyncPeriod:         syncPeriod,
-		LoadBalancerLister: lbLister,
-		ProjectLister:      projectLister,
-		Logger:             log,
-		Metrics:            metrics,
-		syncqueue:          sync.NewQueue(log, gimbalKubeClient, queueWorkers, metrics),
+		BackendName:            backendName,
+		GimbalKubeClient:       gimbalKubeClient,
+		SyncPeriod:             syncPeriod,
+		LoadBalancerLister:     lbLister,
+		ProjectLister:          projectLister,
+		Logger:                 log,
+		Metrics:                metrics,
+		syncqueue:              sync.NewQueue(log, gimbalKubeClient, queueWorkers, metrics),
+		AuthTokenRefreshPeriod: authTokenRefreshPeriod,
+		OpenstackAuth:          openstackAuth,
 	}
 }
 
 // Run starts the reconciler
 func (r *Reconciler) Run(stop <-chan struct{}) {
 	go r.syncqueue.Run(stop)
+
+	// Assume the first run has already gotten a token
+	r.lastTokenRefresh = time.Now()
 
 	ticker := time.NewTicker(r.SyncPeriod)
 	defer ticker.Stop()
@@ -99,9 +112,23 @@ func (r *Reconciler) Run(stop <-chan struct{}) {
 			r.Logger.Info("Stopping openstack reconciler")
 			return
 		case <-ticker.C:
+			// Check if token needs refreshed
+			if r.shouldRefreshAuthToken(time.Now()) {
+				r.OpenstackAuth.Authenticate()
+			}
+
 			r.reconcile()
 		}
 	}
+}
+
+func (r *Reconciler) shouldRefreshAuthToken(now time.Time) bool {
+	if r.AuthTokenRefreshPeriod != 0 {
+		if now.After(r.lastTokenRefresh.Add(r.AuthTokenRefreshPeriod)) {
+			return true
+		}
+	}
+	return false
 }
 
 func (r *Reconciler) reconcile() {

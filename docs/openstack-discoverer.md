@@ -45,6 +45,7 @@ Arguments are available to customize the discoverer, most have defaults but othe
 | backend-name  | ""  |   Name of cluster scraping for services & endpoints (Cannot start or end with a hyphen and must be lowercase alpha-numeric)
 | debug | false | Enable debug logging 
 | reconciliation-period | 30s | The interval of time between reconciliation loop runs 
+| auth-token-refresh-period | 60m | The interval of time between Openstack Re-Authentication (Note: Setting to zero disables)
 | http-client-timeout | 5s | The HTTP client request timeout
 | openstack-certificate-authority | "" | Path to cert file of the OpenStack API certificate authority
 | prometheus-listen-address | 8080 | The address to listen on for Prometheus HTTP requests
