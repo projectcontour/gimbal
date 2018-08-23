@@ -171,6 +171,7 @@ func main() {
 		Password:         password,
 		DomainName:       userDomainName,
 		TenantName:       tenantName,
+		AllowReauth:      true,
 	}
 
 	if err := gopheropenstack.Authenticate(osClient, osAuthOptions); err != nil {
