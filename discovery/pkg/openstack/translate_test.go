@@ -59,10 +59,10 @@ func TestKubeServices(t *testing.T) {
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "stocks"),
 			},
 			expected: []v1.Service{
-				service("finance", "us-east-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+				service("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 					map[string]string{
 						"gimbal.heptio.com/backend":            "us-east",
-						"gimbal.heptio.com/service":            "stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-name": "stocks"},
 					nil),
@@ -76,10 +76,10 @@ func TestKubeServices(t *testing.T) {
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "very-long-openstack-load-balancer-name-that-is-longer-than-the-limit"),
 			},
 			expected: []v1.Service{
-				service("finance", "us-east-very-long-openstack-load-951f9d",
+				service("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 					map[string]string{
 						"gimbal.heptio.com/backend":            "us-east",
-						"gimbal.heptio.com/service":            "very-long-openstack-load-balancer-name-that-is-longer-tha951f9d",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-name": "very-long-openstack-load-balancer-name-that-is-longer-tha80b28c"},
 					nil),
@@ -93,10 +93,10 @@ func TestKubeServices(t *testing.T) {
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "1234-stocks"),
 			},
 			expected: []v1.Service{
-				service("finance", "us-east-1234-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+				service("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 					map[string]string{
 						"gimbal.heptio.com/backend":            "us-east",
-						"gimbal.heptio.com/service":            "1234-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-name": "1234-stocks"},
 					nil),
@@ -110,10 +110,10 @@ func TestKubeServices(t *testing.T) {
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "1234-STOCKS"),
 			},
 			expected: []v1.Service{
-				service("finance", "us-east-1234-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+				service("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 					map[string]string{
 						"gimbal.heptio.com/backend":            "us-east",
-						"gimbal.heptio.com/service":            "1234-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-name": "1234-STOCKS"},
 					nil),
@@ -127,10 +127,10 @@ func TestKubeServices(t *testing.T) {
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "nginx"),
 			},
 			expected: []v1.Service{
-				service("finance", "cluster-name-that-is-defib224b3-nginx-5a5c3d9e-e679-43ec-e1c9a7",
+				service("finance", "cluster-name-that-is-defib224b3-5a5c3d9e-e679-43ec-b9fc-9f5b1ae",
 					map[string]string{
 						"gimbal.heptio.com/backend":            "cluster-name-that-is-definitely-too-long-to-be-useful",
-						"gimbal.heptio.com/service":            "nginx-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-name": "nginx"},
 					nil),
@@ -144,10 +144,10 @@ func TestKubeServices(t *testing.T) {
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "very-long-openstack-load-balancer-name-that-is-longer-than-the-limit"),
 			},
 			expected: []v1.Service{
-				service("finance", "cluster-name-that-is-defib224b3-very-long-openstack-load-951f9d",
+				service("finance", "cluster-name-that-is-defib224b3-5a5c3d9e-e679-43ec-b9fc-9f5b1ae",
 					map[string]string{
 						"gimbal.heptio.com/backend":            "cluster-name-that-is-definitely-too-long-to-be-useful",
-						"gimbal.heptio.com/service":            "very-long-openstack-load-balancer-name-that-is-longer-tha951f9d",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-name": "very-long-openstack-load-balancer-name-that-is-longer-tha80b28c"},
 					nil),
@@ -161,10 +161,10 @@ func TestKubeServices(t *testing.T) {
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "stocks", listener("ls-1", "http", "tcp", "pool-1", 80)),
 			},
 			expected: []v1.Service{
-				service("finance", "us-east-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+				service("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 					map[string]string{
 						"gimbal.heptio.com/backend":            "us-east",
-						"gimbal.heptio.com/service":            "stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-name": "stocks"},
 					[]v1.ServicePort{
@@ -185,10 +185,10 @@ func TestKubeServices(t *testing.T) {
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "stocks", listener("ls-1", "http", "tcp", "pool-1", 80)),
 			},
 			expected: []v1.Service{
-				service("finance", "us-east-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+				service("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 					map[string]string{
 						"gimbal.heptio.com/backend":            "us-east",
-						"gimbal.heptio.com/service":            "stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-name": "stocks"},
 					[]v1.ServicePort{
@@ -209,10 +209,10 @@ func TestKubeServices(t *testing.T) {
 				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "stocks", listener("ls-1", "http", "tcp", "pool-1", 80), listener("ls-1", "https", "tcp", "pool-1", 443)),
 			},
 			expected: []v1.Service{
-				service("finance", "us-east-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+				service("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 					map[string]string{
 						"gimbal.heptio.com/backend":            "us-east",
-						"gimbal.heptio.com/service":            "stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-name": "stocks"},
 					[]v1.ServicePort{
@@ -292,10 +292,10 @@ func TestKubeEndpoints(t *testing.T) {
 				pool("pool-1", "HTTP", "5a5c3d9e-e679-43ec-b9fc-9bc51132541e", poolmember("10.0.0.1", 8080)),
 			},
 			expected: []v1.Endpoints{
-				endpoints("finance", "us-east-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+				endpoints("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 					map[string]string{
 						"gimbal.heptio.com/backend":            "us-east",
-						"gimbal.heptio.com/service":            "stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-name": "stocks"},
 					[]v1.EndpointSubset{
@@ -317,10 +317,10 @@ func TestKubeEndpoints(t *testing.T) {
 				pool("pool-1", "HTTP", "5a5c3d9e-e679-43ec-b9fc-9bc51132541e", poolmember("10.0.0.1", 8080)),
 			},
 			expected: []v1.Endpoints{
-				endpoints("finance", "cluster-name-that-is-defi7afb09-stocks-5a5c3d9e-e679-43ec549cd6",
+				endpoints("finance", "cluster-name-that-is-defi7afb09-5a5c3d9e-e679-43ec-b9fc-9f5b1ae",
 					map[string]string{
 						"gimbal.heptio.com/backend":            "cluster-name-that-is-definitely-too-long-to-be-useful-in-7afb09",
-						"gimbal.heptio.com/service":            "stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-name": "stocks"},
 					[]v1.EndpointSubset{
@@ -342,10 +342,10 @@ func TestKubeEndpoints(t *testing.T) {
 				pool("pool-1", "HTTP", "5a5c3d9e-e679-43ec-b9fc-9bc51132541e", poolmember("10.0.0.1", 8080)),
 			},
 			expected: []v1.Endpoints{
-				endpoints("finance", "us-east-very-long-openstack-load-951f9d",
+				endpoints("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 					map[string]string{
 						"gimbal.heptio.com/backend":            "us-east",
-						"gimbal.heptio.com/service":            "very-long-openstack-load-balancer-name-that-is-longer-tha951f9d",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-name": "very-long-openstack-load-balancer-name-that-is-longer-tha80b28c"},
 					[]v1.EndpointSubset{
@@ -361,18 +361,18 @@ func TestKubeEndpoints(t *testing.T) {
 			tenantName:  "finance",
 			backendName: "us-east",
 			lbs: []loadbalancers.LoadBalancer{
-				loadbalancer("loadbalancer-1", "stocks", listener("listener-1", "http", "tcp", "pool-1", 80), listener("listener-2", "https", "tcp", "pool-2", 443)),
+				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "stocks", listener("listener-1", "http", "tcp", "pool-1", 80), listener("listener-2", "https", "tcp", "pool-2", 443)),
 			},
 			pools: []pools.Pool{
-				pool("pool-1", "HTTP", "loadbalancer-1", poolmember("10.0.0.1", 8080), poolmember("10.0.0.2", 80), poolmember("10.0.0.3", 80), poolmember("10.0.0.4", 8080)),
-				pool("pool-2", "HTTP", "loadbalancer-1", poolmember("10.0.0.5", 443), poolmember("10.0.0.6", 443), poolmember("10.0.0.7", 8443)),
+				pool("pool-1", "HTTP", "5a5c3d9e-e679-43ec-b9fc-9bc51132541e", poolmember("10.0.0.1", 8080), poolmember("10.0.0.2", 80), poolmember("10.0.0.3", 80), poolmember("10.0.0.4", 8080)),
+				pool("pool-2", "HTTP", "5a5c3d9e-e679-43ec-b9fc-9bc51132541e", poolmember("10.0.0.5", 443), poolmember("10.0.0.6", 443), poolmember("10.0.0.7", 8443)),
 			},
 			expected: []v1.Endpoints{
-				endpoints("finance", "us-east-stocks-loadbalancer-1",
+				endpoints("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 					map[string]string{
 						"gimbal.heptio.com/backend":            "us-east",
-						"gimbal.heptio.com/service":            "stocks-loadbalancer-1",
-						"gimbal.heptio.com/load-balancer-id":   "loadbalancer-1",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						"gimbal.heptio.com/load-balancer-name": "stocks"},
 					[]v1.EndpointSubset{
 						{

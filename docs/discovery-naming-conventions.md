@@ -107,19 +107,15 @@ Service port names are copied verbatim from the backend service.
 
 - `${backend-name}`: The value of the `--backend-name` flag provided to the
   discoverer. Must begin with a lowercase letter.
-- `${service-name}`: `${name}-${id}` of the LBaaS Load Balancer. Both are
-  lowercased during the discovery process.
+- `${service-name}`: `${id}` of the LBaaS Load Balancer. Lowercased during the discovery process.
 
 Service port names are set to `port-${port-number}`.
 
-#### Why is the `${service-name}` a composite name?
+#### Why is the Load Balancer name not part of the service name?
 
-The `${service-name}` produced by the OpenStack discoverer is composed of the
-name and ID of the LBaaS Load Balancer. This is required because names are not
-guaranteed to be unique in an OpenStack project. By appending the ID, we ensure
-that we are referncing a single Load Balancer in the OpenStack cluster.
+The load balancer's name is not part of the service name because resources in
+OpenStack can be renamed. This prevents users from unintentionally renaming
+discovered services in Kubernetes and breaking IngressRoute rules.
 
-#### What happens to Load Balancers that do not have a name?
-
-Names in OpenStack are optional. In this scenario, the `${service-name}` will
-be the ID of the LBaaS Load Balancer.
+Instead, the load balancer's name is available as a label
+(`gimbal.heptio.com/load-balancer-name`) on the service.
