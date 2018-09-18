@@ -106,8 +106,7 @@ func loadbalancerLabels(lb loadbalancers.LoadBalancer) map[string]string {
 // use the load balancer ID as the service name
 // context: heptio/gimbal #216
 func serviceName(lb loadbalancers.LoadBalancer) string {
-	lbName := lb.ID
-	return strings.ToLower(lbName)
+	return strings.ToLower(lb.ID)
 }
 
 // get the lb Name or ID if name is empty
