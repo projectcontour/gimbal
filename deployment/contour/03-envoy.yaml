@@ -62,7 +62,7 @@ spec:
         volumeMounts:
             - name: statsd
               mountPath: /etc/statsd
-      dnsPolicy: ClusterFirst
+      dnsPolicy: ClusterFirstWithHostNet
       hostNetwork: true
       initContainers:
       - args:
