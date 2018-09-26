@@ -14,6 +14,7 @@
 package openstack
 
 import (
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -97,10 +98,34 @@ func kubeEndpoints(backendName, tenantName string, lbs []loadbalancers.LoadBalan
 }
 
 func loadbalancerLabels(lb loadbalancers.LoadBalancer) map[string]string {
+	// Sanitize the load balancer name according to the kubernetes label value
+	// requirements: "Valid label values must be 63 characters or less and must
+	// be empty or begin and end with an alphanumeric character ([a-z0-9A-Z])
+	// with dashes (-), underscores (_), dots (.), and alphanumerics between."
+	name := lb.Name
+	if name != "" {
+		// 1. replace unallowed chars with a dash
+		reg := regexp.MustCompile("[^a-zA-Z0-9\\-._]")
+		name = reg.ReplaceAllString(lb.Name, "-")
+
+		// 2. prepend/append a special marker if first/last char is not an alphanum
+		if !isalphanum(name[0]) {
+			name = "lb" + name
+		}
+		if !isalphanum(name[len(name)-1]) {
+			name = name + "lb"
+		}
+		// 3. shorten if necessary
+		name = translator.ShortenKubernetesLabelValue(name)
+	}
 	return map[string]string{
 		"gimbal.heptio.com/load-balancer-id":   lb.ID,
-		"gimbal.heptio.com/load-balancer-name": translator.ShortenKubernetesLabelValue(lb.Name),
+		"gimbal.heptio.com/load-balancer-name": name,
 	}
+}
+
+func isalphanum(c byte) bool {
+	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')
 }
 
 // use the load balancer ID as the service name

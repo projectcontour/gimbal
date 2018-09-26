@@ -15,7 +15,6 @@ package openstack
 
 import (
 	"fmt"
-	"regexp"
 	"time"
 
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
@@ -129,7 +128,6 @@ func (r *Reconciler) reconcile() {
 		}
 
 		totalUpstreamServices := len(loadbalancers)
-		loadbalancers = r.skipInvalidLoadBalancers(projectName, loadbalancers)
 		totalInvalidServices := totalUpstreamServices - len(loadbalancers)
 
 		// Get all pools defined in the project
@@ -181,24 +179,6 @@ func (r *Reconciler) reconcile() {
 
 	// Log to Prometheus the cycle duration
 	r.Metrics.CycleDurationMetric(time.Now().Sub(start))
-}
-
-// skip any load balancer that has invalid characters, according to the
-// characters allowed by the DNS_LABEL spec in Kubernetes.
-func (r *Reconciler) skipInvalidLoadBalancers(projectName string, lbs []loadbalancers.LoadBalancer) []loadbalancers.LoadBalancer {
-	// names can include letters, numbers or dashes.
-	// names must end with a letter or number.
-	validName := regexp.MustCompile("^[-a-zA-Z0-9]+[a-zA-Z0-9]$")
-	valid := []loadbalancers.LoadBalancer{}
-	for _, lb := range lbs {
-		if lb.Name != "" && !validName.MatchString(lb.Name) {
-			r.Metrics.GenericMetricError("InvalidLoadBalancerName")
-			r.Logger.Warningf("skipping load balancer '%s' in project '%s' as it has an invalid name '%s'", lb.ID, projectName, lb.Name)
-			continue
-		}
-		valid = append(valid, lb)
-	}
-	return valid
 }
 
 func (r *Reconciler) reconcileSvcs(desiredSvcs, currentSvcs []v1.Service) {
