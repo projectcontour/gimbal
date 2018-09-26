@@ -204,25 +204,31 @@ func (r *Reconciler) skipInvalidLoadBalancers(projectName string, lbs []loadbala
 func (r *Reconciler) reconcileSvcs(desiredSvcs, currentSvcs []v1.Service) {
 	add, up, del := diffServices(desiredSvcs, currentSvcs)
 	for _, svc := range add {
-		r.syncqueue.Enqueue(sync.AddServiceAction(&svc))
+		s := svc
+		r.syncqueue.Enqueue(sync.AddServiceAction(&s))
 	}
 	for _, svc := range up {
-		r.syncqueue.Enqueue(sync.UpdateServiceAction(&svc))
+		s := svc
+		r.syncqueue.Enqueue(sync.UpdateServiceAction(&s))
 	}
 	for _, svc := range del {
-		r.syncqueue.Enqueue(sync.DeleteServiceAction(&svc))
+		s := svc
+		r.syncqueue.Enqueue(sync.DeleteServiceAction(&s))
 	}
 }
 
 func (r *Reconciler) reconcileEndpoints(desired []Endpoints, current []Endpoints) {
 	add, up, del := diffEndpoints(desired, current)
 	for _, ep := range add {
-		r.syncqueue.Enqueue(sync.AddEndpointsAction(&ep.endpoints, ep.upstreamName))
+		e := ep
+		r.syncqueue.Enqueue(sync.AddEndpointsAction(&e.endpoints, e.upstreamName))
 	}
 	for _, ep := range up {
-		r.syncqueue.Enqueue(sync.UpdateEndpointsAction(&ep.endpoints, ep.upstreamName))
+		e := ep
+		r.syncqueue.Enqueue(sync.UpdateEndpointsAction(&e.endpoints, e.upstreamName))
 	}
 	for _, ep := range del {
-		r.syncqueue.Enqueue(sync.DeleteEndpointsAction(&ep.endpoints, ep.upstreamName))
+		e := ep
+		r.syncqueue.Enqueue(sync.DeleteEndpointsAction(&e.endpoints, e.upstreamName))
 	}
 }
