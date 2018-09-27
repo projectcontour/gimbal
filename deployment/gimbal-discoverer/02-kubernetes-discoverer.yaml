@@ -22,7 +22,7 @@ spec:
         prometheus.io/port: "8080"
     spec:
       containers:
-      - image: gcr.io/heptio-images/gimbal-discoverer:v0.3.0
+      - image: gcr.io/heptio-images/gimbal-discoverer:v0.3.1
         imagePullPolicy: Always
         name: kubernetes-discoverer
         command: ["/kubernetes-discoverer"]
