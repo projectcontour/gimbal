@@ -8,23 +8,30 @@ The Discoverer will poll the Openstack API on a customizable interval and update
 
 The discoverer will only be responsible for monitoring a single cluster at a time. If multiple clusters are required to be watched, then multiple discoverers will need to be deployed.
 
-## Naming Requirements
+## Handling OpenStack Names
 
-Named OpenStack Load Balancers must have names that are compatible with the Kubernetes service naming rules.
+The OpenStack discoverer adds a label to discovered services and endpoints that contains the OpenStack Load Balancer name. Given that Kubernetes has specific requirements around label values, the discoverer will do the following when necessary:
 
-The following requirements apply to OpenStack Load Balancers that have a non-empty name:
+1. Replace any disallowed character with a dash (-).
+2. Prepend lb to the name when it does not begin with an alphanumeric character
+3. Append lb to the name when it does not end with an alphanumeric character
 
-* The allowed characters are `A-Z`, `a-z`, `0-9` and `-`.
-* The name must end with an alpha-numeric character
+Examples:
 
-The OpenStack discoverer will skip any Load Balancers that do not adhere to
-these rules, and log a warning that includes details about the Load Balancer
-that was skipped. Additionally, the OpenStack discoverer will increment the
-`gimbal_discoverer_error_total[errortype=InvalidLoadBalancerName]` prometheus
-metric.
+| Load Balancer name | Label value |
+|----------------------|-----------|
+| bar:8080| bar-8080|
+|foo!@#$%^&*()_+bar | foo----------_-bar |
+| foo-bar_BAZ.123 | foo-bar_BAZ.123 (no change) |
+| foo! | foo-lb |
+| !foo | lb-foo|
+|!foo! | lb-foo-lb |
+| foo- | foo-lb|
+| foo_ | foo_lb|
+|foo.| foo.lb|
 
 See the [naming conventions documentation](./discovery-naming-conventions.md)
-for more details.
+for additional information around handling names.
 
 ## Technical Details
 

@@ -24,19 +24,6 @@ Kubernetes Service names must adhere to the [rfc1035 DNS Label](https://github.c
 > with the '-' character allowed anywhere except the first or last character,
 > suitable for use as a hostname or segment in a domain name.
 
-### Handling names that contain invalid characters
-
-Backend systems other than Kubernetes (e.g. OpenStack) might support names that
-contain characters that are invalid according to the Kubernetes Service naming
-requirements. In these scenarios, discoverers will skip the service and inform
-the user via logs and metrics that the backend service name is not compatible
-with Gimbal.
-
-Even thought this might affect the user experience and cause friction, Gimbal
-prefers to be predictable and safe when it comes to managing backend services
-and endpoints, instead of using "magic" (replacing or removing characters, etc)
-to massage invalid names into valid ones.
-
 ### Handling Discovered Names that are longer than 63 characters
 
 When the _Discovered Name_ is longer than 63 characters, it is shortened using

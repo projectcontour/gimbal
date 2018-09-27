@@ -120,6 +120,159 @@ func TestKubeServices(t *testing.T) {
 			},
 		},
 		{
+			name:        "lb with invalid characters in name",
+			backendName: "us-east",
+			tenantName:  "finance",
+			lbs: []loadbalancers.LoadBalancer{
+				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "foo!@#$%^&*()_+bar"),
+			},
+			expected: []v1.Service{
+				service("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+					map[string]string{
+						"gimbal.heptio.com/backend":            "us-east",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-name": "foo----------_-bar"},
+					nil),
+			},
+		},
+		{
+			name:        "lb with invalid characters in name (2)",
+			backendName: "us-east",
+			tenantName:  "finance",
+			lbs: []loadbalancers.LoadBalancer{
+				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "bar:8080"),
+			},
+			expected: []v1.Service{
+				service("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+					map[string]string{
+						"gimbal.heptio.com/backend":            "us-east",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-name": "bar-8080"},
+					nil),
+			},
+		},
+		{
+			name:        "lb with all valid chars in name",
+			backendName: "us-east",
+			tenantName:  "finance",
+			lbs: []loadbalancers.LoadBalancer{
+				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "foo-bar_BAZ.123"),
+			},
+			expected: []v1.Service{
+				service("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+					map[string]string{
+						"gimbal.heptio.com/backend":            "us-east",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-name": "foo-bar_BAZ.123"},
+					nil),
+			},
+		},
+		{
+			name:        "lb name that doesn't start with alphanum",
+			backendName: "us-east",
+			tenantName:  "finance",
+			lbs: []loadbalancers.LoadBalancer{
+				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "!foo"),
+			},
+			expected: []v1.Service{
+				service("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+					map[string]string{
+						"gimbal.heptio.com/backend":            "us-east",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-name": "lb-foo"},
+					nil),
+			},
+		},
+		{
+			name:        "lb name that doesn't end with alphanum",
+			backendName: "us-east",
+			tenantName:  "finance",
+			lbs: []loadbalancers.LoadBalancer{
+				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "foo!"),
+			},
+			expected: []v1.Service{
+				service("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+					map[string]string{
+						"gimbal.heptio.com/backend":            "us-east",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-name": "foo-lb"},
+					nil),
+			},
+		},
+		{
+			name:        "lb name that doesn't end with alphanum (2)",
+			backendName: "us-east",
+			tenantName:  "finance",
+			lbs: []loadbalancers.LoadBalancer{
+				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "foo-"),
+			},
+			expected: []v1.Service{
+				service("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+					map[string]string{
+						"gimbal.heptio.com/backend":            "us-east",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-name": "foo-lb"},
+					nil),
+			},
+		},
+		{
+			name:        "lb name that doesn't end with alphanum (3)",
+			backendName: "us-east",
+			tenantName:  "finance",
+			lbs: []loadbalancers.LoadBalancer{
+				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "foo_"),
+			},
+			expected: []v1.Service{
+				service("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+					map[string]string{
+						"gimbal.heptio.com/backend":            "us-east",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-name": "foo_lb"},
+					nil),
+			},
+		},
+		{
+			name:        "lb name that doesn't end with alphanum (3)",
+			backendName: "us-east",
+			tenantName:  "finance",
+			lbs: []loadbalancers.LoadBalancer{
+				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "foo."),
+			},
+			expected: []v1.Service{
+				service("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+					map[string]string{
+						"gimbal.heptio.com/backend":            "us-east",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-name": "foo.lb"},
+					nil),
+			},
+		},
+		{
+			name:        "lb name that doesn't start/end with alphanum",
+			backendName: "us-east",
+			tenantName:  "finance",
+			lbs: []loadbalancers.LoadBalancer{
+				loadbalancer("5a5c3d9e-e679-43ec-b9fc-9bc51132541e", "!foo!"),
+			},
+			expected: []v1.Service{
+				service("finance", "us-east-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+					map[string]string{
+						"gimbal.heptio.com/backend":            "us-east",
+						"gimbal.heptio.com/service":            "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-id":   "5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
+						"gimbal.heptio.com/load-balancer-name": "lb-foo-lb"},
+					nil),
+			},
+		},
+		{
 			name:        "long cluster name, normal lb name",
 			backendName: "cluster-name-that-is-definitely-too-long-to-be-useful",
 			tenantName:  "finance",
@@ -469,4 +622,20 @@ func pool(id, protocol, loadBalancerID string, members ...pools.Member) pools.Po
 
 func poolmember(address string, port int) pools.Member {
 	return pools.Member{Address: address, ProtocolPort: port}
+}
+
+func TestIsAlphanum(t *testing.T) {
+	someAlphanums := []byte{'a', 'e', 'z', 'A', 'E', 'Z', '0', '5', '9'}
+	for _, a := range someAlphanums {
+		if !isalphanum(a) {
+			t.Errorf("got not alphanum for %c", a)
+		}
+	}
+
+	someNonAlphanums := []byte{'!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '.', ',', ':', '-', '_', '+', '='}
+	for _, a := range someNonAlphanums {
+		if isalphanum(a) {
+			t.Errorf("got yes alphanum for %c", a)
+		}
+	}
 }
