@@ -1,5 +1,7 @@
 # Gimbal
 
+[![Build Status](https://travis-ci.org/heptio/gimbal.svg?branch=master)](https://travis-ci.org/heptio/gimbal)
+
 Maintainers: [Heptio](https://github.com/heptio)
 
 ## Overview
