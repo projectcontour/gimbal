@@ -88,6 +88,28 @@ var serviceTests = []struct {
 		expectedServicesCount: 0,
 	},
 	{
+		name: "kubernetes service gimbal label backend",
+		service: &v1.Service{
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      "kubernetes",
+				Namespace: "default",
+				Labels: map[string]string{
+					"gimbal.heptio.com/backend": "zzzzz",
+				},
+			},
+			Spec: v1.ServiceSpec{
+				Ports: []v1.ServicePort{
+					{
+						Name: "http",
+						Port: 80,
+					},
+				},
+			},
+		},
+		expected:              0,
+		expectedServicesCount: 0,
+	},
+	{
 		name: "kubernetes service diff namespace",
 		service: &v1.Service{
 			ObjectMeta: metav1.ObjectMeta{
