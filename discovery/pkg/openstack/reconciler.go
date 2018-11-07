@@ -15,6 +15,8 @@ package openstack
 
 import (
 	"fmt"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
@@ -116,6 +118,24 @@ func (r *Reconciler) reconcile() {
 		log.Errorf("error listing OpenStack projects: %v", err)
 		return
 	}
+
+	// import white list
+	tmp := projects[:0]
+	if whitelist, ok := os.LookupEnv("PROJECT_WHITELIST"); ok && len(whitelist) > 0 {
+		desireds := strings.Split(whitelist, ",")
+		for _, project := range projects {
+			for _, desired := range desireds {
+				if desired == project.Name {
+					tmp = append(tmp, project)
+				}
+			}
+		}
+		projects = tmp
+		log.Info("sync whitelist load balancers")
+	} else {
+		log.Info("sync all load balancers")
+	}
+
 	for _, project := range projects {
 		projectName := project.Name
 
