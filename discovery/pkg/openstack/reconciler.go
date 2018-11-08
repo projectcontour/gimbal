@@ -15,6 +15,7 @@ package openstack
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -48,9 +49,8 @@ type Reconciler struct {
 	ProjectLister
 
 	// BackendName is the name of the OpenStack cluster
-	BackendName     string
-	ClusterType     string
-	WatchedProjects string
+	BackendName string
+	ClusterType string
 	// GimbalKubeClient is the client of the Kubernetes cluster where Gimbal is running
 	GimbalKubeClient kubernetes.Interface
 	// Interval between reconciliation loops
@@ -68,7 +68,7 @@ type Endpoints struct {
 }
 
 // NewReconciler returns an OpenStack reconciler
-func NewReconciler(backendName, clusterType, watchedProjects string, gimbalKubeClient kubernetes.Interface, syncPeriod time.Duration, lbLister LoadBalancerLister,
+func NewReconciler(backendName, clusterType string, gimbalKubeClient kubernetes.Interface, syncPeriod time.Duration, lbLister LoadBalancerLister,
 	projectLister ProjectLister, log *logrus.Logger, queueWorkers int, metrics localmetrics.DiscovererMetrics) Reconciler {
 
 	return Reconciler{
@@ -80,7 +80,6 @@ func NewReconciler(backendName, clusterType, watchedProjects string, gimbalKubeC
 		Logger:             log,
 		Metrics:            metrics,
 		syncqueue:          sync.NewQueue(log, gimbalKubeClient, queueWorkers, metrics),
-		WatchedProjects:    watchedProjects,
 	}
 }
 
@@ -122,9 +121,8 @@ func (r *Reconciler) reconcile() {
 
 	// import white list
 	tmp := projects[:0]
-	watchedProjects := r.WatchedProjects
-	if watchedProjects != "" {
-		desireds := strings.Split(watchedProjects, ",")
+	if whitelist, ok := os.LookupEnv("PROJECT_WHITELIST"); ok && len(whitelist) > 0 {
+		desireds := strings.Split(whitelist, ",")
 		for _, project := range projects {
 			for _, desired := range desireds {
 				if desired == project.Name {
@@ -133,7 +131,7 @@ func (r *Reconciler) reconcile() {
 			}
 		}
 		projects = tmp
-		log.Info("sync load balancers on watched projects")
+		log.Info("sync whitelist load balancers")
 	} else {
 		log.Info("sync all load balancers")
 	}
