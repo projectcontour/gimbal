@@ -142,6 +142,10 @@ func main() {
 		log.Warnf("The OS_USER_DOMAIN_NAME environment variable was not set. Using %q as the OpenStack user domain name.", defaultUserDomainName)
 		userDomainName = defaultUserDomainName
 	}
+	watchedProjects := os.Getenv("WATCHED_PROJECTS")
+	if watchedProjects == "" {
+		log.Warnf("The WATCHED_PROJECTS environment variable was not set. Syncing all load balancers on the OpenStack cluster.")
+	}
 
 	// Create and configure client
 	osClient, err := gopheropenstack.NewClient(identityEndpoint)
@@ -191,6 +195,7 @@ func main() {
 	reconciler = openstack.NewReconciler(
 		backendName,
 		clusterType,
+		watchedProjects,
 		gimbalKubeClient,
 		reconciliationPeriod,
 		lbv2,
