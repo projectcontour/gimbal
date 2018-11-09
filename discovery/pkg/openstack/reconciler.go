@@ -133,7 +133,7 @@ func (r *Reconciler) reconcile() {
 			}
 		}
 		projects = tmp
-		log.Info("sync load balancers  on watched projects")
+		log.Info("sync load balancers on watched projects")
 	} else {
 		log.Info("sync all load balancers")
 	}
