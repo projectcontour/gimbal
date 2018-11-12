@@ -52,6 +52,7 @@ var (
 	log                               *logrus.Logger
 	gimbalKubeClientQPS               float64
 	gimbalKubeClientBurst             int
+	openstackProjectWhitelist         string
 )
 
 var reconciler openstack.Reconciler
@@ -73,6 +74,7 @@ func init() {
 	flag.IntVar(&prometheusListenPort, "prometheus-listen-address", 8080, "The address to listen on for Prometheus HTTP requests")
 	flag.Float64Var(&gimbalKubeClientQPS, "gimbal-client-qps", 5, "The maximum queries per second (QPS) that can be performed on the Gimbal Kubernetes API server")
 	flag.IntVar(&gimbalKubeClientBurst, "gimbal-client-burst", 10, "The maximum number of queries that can be performed on the Gimbal Kubernetes API server during a burst")
+	flag.StringVar(&openstackProjectWhitelist, "openstack-project-whitelist", "", "Whitelist of projects that should be reconciled. If empty, load balancers across all projects will be reconciled.")
 	flag.Parse()
 }
 
@@ -142,10 +144,6 @@ func main() {
 		log.Warnf("The OS_USER_DOMAIN_NAME environment variable was not set. Using %q as the OpenStack user domain name.", defaultUserDomainName)
 		userDomainName = defaultUserDomainName
 	}
-	watchedProjects := os.Getenv("WATCHED_PROJECTS")
-	if watchedProjects == "" {
-		log.Warnf("The WATCHED_PROJECTS environment variable was not set. Syncing all load balancers on the OpenStack cluster.")
-	}
 
 	// Create and configure client
 	osClient, err := gopheropenstack.NewClient(identityEndpoint)
@@ -162,6 +160,10 @@ func main() {
 
 	if openstackCertificateAuthorityFile != "" {
 		transport.RoundTripper = httpTransportWithCA(log, openstackCertificateAuthorityFile)
+	}
+
+	if openstackProjectWhitelist == "" {
+		log.Infof("The OpenStack Whitelist is empty. Syncing all load balancers on the OpenStack cluster.")
 	}
 
 	osClient.HTTPClient = http.Client{
@@ -195,7 +197,7 @@ func main() {
 	reconciler = openstack.NewReconciler(
 		backendName,
 		clusterType,
-		watchedProjects,
+		openstackProjectWhitelist,
 		gimbalKubeClient,
 		reconciliationPeriod,
 		lbv2,
