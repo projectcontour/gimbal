@@ -121,22 +121,17 @@ func (r *Reconciler) reconcile() {
 	}
 
 	// import white list
-	tmp := projects[:0]
+	whitelist := []string{}
 	openstackProjectWhitelist := r.OpenstackProjectWhitelist
-	if openstackProjectWhitelist != "" && len(projects) > 0 {
-		watchedProjects := strings.Split(openstackProjectWhitelist, ",")
-		for _, project := range projects {
-			for _, watchedProject := range watchedProjects {
-				if watchedProject == project.Name {
-					tmp = append(tmp, project)
-				}
-			}
-		}
-		projects = tmp
+	if len(openstackProjectWhitelist) > 0 {
+		whitelist = strings.Split(openstackProjectWhitelist, ",")
 	}
 
 	for _, project := range projects {
 		projectName := project.Name
+		if !contains(whitelist, projectName) {
+			continue
+		}
 
 		// Get load balancers that are defined in the project
 		loadbalancers, err := r.ListLoadBalancers(project.ID)
@@ -230,4 +225,13 @@ func (r *Reconciler) reconcileEndpoints(desired []Endpoints, current []Endpoints
 		e := ep
 		r.syncqueue.Enqueue(sync.DeleteEndpointsAction(&e.endpoints, e.upstreamName))
 	}
+}
+
+func contains(s []string, e string) bool {
+	for _, v := range s {
+		if e == v {
+			return true
+		}
+	}
+	return false
 }
