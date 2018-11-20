@@ -129,7 +129,7 @@ func (r *Reconciler) reconcile() {
 
 	for _, project := range projects {
 		projectName := project.Name
-		if !contains(whitelist, projectName) {
+		if !contains(whitelist, projectName) && len(whitelist) > 0 {
 			continue
 		}
 
