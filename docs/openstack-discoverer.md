@@ -57,7 +57,7 @@ Arguments are available to customize the discoverer, most have defaults but othe
 | prometheus-listen-address | 8080 | The address to listen on for Prometheus HTTP requests
 | gimbal-client-qps | 5 | The maximum queries per second (QPS) that can be performed on the Gimbal Kubernetes API server
 | gimbal-client-burst | 10 | The maximum number of queries that can be performed on the Gimbal Kubernetes API server during a burst
-| openstack-project-whitelist | "" | The whitelist of projects that should be reconciled. If empty, load balancers across all projects will be reconciled.
+| openstack-project-whitelist | "" | List of projects to be watched for reconcilation. If empty, load balancers across all projects will be reconciled. This whitelist should be comma separated list. e.g) --openstack-project-whitelist=project1,project2...
 
 ### Credentials
 
