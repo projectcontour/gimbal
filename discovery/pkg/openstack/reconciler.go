@@ -50,7 +50,7 @@ type Reconciler struct {
 	// BackendName is the name of the OpenStack cluster
 	BackendName               string
 	ClusterType               string
-	OpenstackProjectWhitelist string
+	OpenstackProjectWatchlist string
 	// GimbalKubeClient is the client of the Kubernetes cluster where Gimbal is running
 	GimbalKubeClient kubernetes.Interface
 	// Interval between reconciliation loops
@@ -68,7 +68,7 @@ type Endpoints struct {
 }
 
 // NewReconciler returns an OpenStack reconciler
-func NewReconciler(backendName, clusterType, openstackProjectWhitelist string, gimbalKubeClient kubernetes.Interface, syncPeriod time.Duration, lbLister LoadBalancerLister,
+func NewReconciler(backendName, clusterType, openstackProjectWatchlist string, gimbalKubeClient kubernetes.Interface, syncPeriod time.Duration, lbLister LoadBalancerLister,
 	projectLister ProjectLister, log *logrus.Logger, queueWorkers int, metrics localmetrics.DiscovererMetrics) Reconciler {
 
 	return Reconciler{
@@ -80,7 +80,7 @@ func NewReconciler(backendName, clusterType, openstackProjectWhitelist string, g
 		Logger:                    log,
 		Metrics:                   metrics,
 		syncqueue:                 sync.NewQueue(log, gimbalKubeClient, queueWorkers, metrics),
-		OpenstackProjectWhitelist: openstackProjectWhitelist,
+		OpenstackProjectWatchlist: openstackProjectWatchlist,
 	}
 }
 
@@ -120,16 +120,16 @@ func (r *Reconciler) reconcile() {
 		return
 	}
 
-	// import white list
-	whitelist := []string{}
-	openstackProjectWhitelist := r.OpenstackProjectWhitelist
-	if len(openstackProjectWhitelist) > 0 {
-		whitelist = strings.Split(openstackProjectWhitelist, ",")
+	// import watch list
+	watchlist := []string{}
+	openstackProjectWatchlist := r.OpenstackProjectWatchlist
+	if len(openstackProjectWatchlist) > 0 {
+		watchlist = strings.Split(openstackProjectWatchlist, ",")
 	}
 
 	for _, project := range projects {
 		projectName := project.Name
-		if !contains(whitelist, projectName) && len(whitelist) > 0 {
+		if !contains(watchlist, projectName) && len(watchlist) > 0 {
 			continue
 		}
 

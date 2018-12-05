@@ -52,7 +52,7 @@ var (
 	log                               *logrus.Logger
 	gimbalKubeClientQPS               float64
 	gimbalKubeClientBurst             int
-	openstackProjectWhitelist         string
+	openstackProjectWatchlist         string
 )
 
 var reconciler openstack.Reconciler
@@ -74,7 +74,7 @@ func init() {
 	flag.IntVar(&prometheusListenPort, "prometheus-listen-address", 8080, "The address to listen on for Prometheus HTTP requests")
 	flag.Float64Var(&gimbalKubeClientQPS, "gimbal-client-qps", 5, "The maximum queries per second (QPS) that can be performed on the Gimbal Kubernetes API server")
 	flag.IntVar(&gimbalKubeClientBurst, "gimbal-client-burst", 10, "The maximum number of queries that can be performed on the Gimbal Kubernetes API server during a burst")
-	flag.StringVar(&openstackProjectWhitelist, "openstack-project-whitelist", "", "List of projects to be watched for reconcilation. If empty, load balancers across all projects will be reconciled.")
+	flag.StringVar(&openstackProjectWatchlist, "openstack-project-watchlist", "", "List of projects to be watched for reconcilation. If empty, load balancers across all projects will be reconciled.")
 	flag.Parse()
 }
 
@@ -162,8 +162,8 @@ func main() {
 		transport.RoundTripper = httpTransportWithCA(log, openstackCertificateAuthorityFile)
 	}
 
-	if openstackProjectWhitelist == "" {
-		log.Infof("The OpenStack Whitelist is empty. Syncing all load balancers on the OpenStack cluster.")
+	if openstackProjectWatchlist == "" {
+		log.Infof("The OpenStack Watchlist is empty. Syncing all load balancers on the OpenStack cluster.")
 	}
 
 	osClient.HTTPClient = http.Client{
@@ -197,7 +197,7 @@ func main() {
 	reconciler = openstack.NewReconciler(
 		backendName,
 		clusterType,
-		openstackProjectWhitelist,
+		openstackProjectWatchlist,
 		gimbalKubeClient,
 		reconciliationPeriod,
 		lbv2,

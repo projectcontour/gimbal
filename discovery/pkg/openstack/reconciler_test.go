@@ -35,10 +35,10 @@ func TestListProjects(t *testing.T) {
 	if err != nil {
 		t.Errorf("failed to list projects: %v", err)
 	}
-	openstackProjectWhitelist := envOrFail(t, "OS_PROJECT_WHITELIST")
+	openstackProjectWatchlist := envOrFail(t, "OS_PROJECT_WHITELIST")
 
-	if openstackProjectWhitelist != "" && len(projects) > 0 {
-		watchedProjects := strings.Split(openstackProjectWhitelist, ",")
+	if openstackProjectWatchlist != "" && len(projects) > 0 {
+		watchedProjects := strings.Split(openstackProjectWatchlist, ",")
 		for _, project := range projects {
 			for _, watchedProject := range watchedProjects {
 				if watchedProject == project.Name {
