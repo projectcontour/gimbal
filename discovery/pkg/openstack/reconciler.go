@@ -15,6 +15,7 @@ package openstack
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
@@ -47,8 +48,9 @@ type Reconciler struct {
 	ProjectLister
 
 	// BackendName is the name of the OpenStack cluster
-	BackendName string
-	ClusterType string
+	BackendName               string
+	ClusterType               string
+	OpenstackProjectWatchlist string
 	// GimbalKubeClient is the client of the Kubernetes cluster where Gimbal is running
 	GimbalKubeClient kubernetes.Interface
 	// Interval between reconciliation loops
@@ -66,18 +68,19 @@ type Endpoints struct {
 }
 
 // NewReconciler returns an OpenStack reconciler
-func NewReconciler(backendName, clusterType string, gimbalKubeClient kubernetes.Interface, syncPeriod time.Duration, lbLister LoadBalancerLister,
+func NewReconciler(backendName, clusterType, openstackProjectWatchlist string, gimbalKubeClient kubernetes.Interface, syncPeriod time.Duration, lbLister LoadBalancerLister,
 	projectLister ProjectLister, log *logrus.Logger, queueWorkers int, metrics localmetrics.DiscovererMetrics) Reconciler {
 
 	return Reconciler{
-		BackendName:        backendName,
-		GimbalKubeClient:   gimbalKubeClient,
-		SyncPeriod:         syncPeriod,
-		LoadBalancerLister: lbLister,
-		ProjectLister:      projectLister,
-		Logger:             log,
-		Metrics:            metrics,
-		syncqueue:          sync.NewQueue(log, gimbalKubeClient, queueWorkers, metrics),
+		BackendName:               backendName,
+		GimbalKubeClient:          gimbalKubeClient,
+		SyncPeriod:                syncPeriod,
+		LoadBalancerLister:        lbLister,
+		ProjectLister:             projectLister,
+		Logger:                    log,
+		Metrics:                   metrics,
+		syncqueue:                 sync.NewQueue(log, gimbalKubeClient, queueWorkers, metrics),
+		OpenstackProjectWatchlist: openstackProjectWatchlist,
 	}
 }
 
@@ -116,8 +119,19 @@ func (r *Reconciler) reconcile() {
 		log.Errorf("error listing OpenStack projects: %v", err)
 		return
 	}
+
+	// import watch list
+	watchlist := []string{}
+	openstackProjectWatchlist := r.OpenstackProjectWatchlist
+	if len(openstackProjectWatchlist) > 0 {
+		watchlist = strings.Split(openstackProjectWatchlist, ",")
+	}
+
 	for _, project := range projects {
 		projectName := project.Name
+		if !contains(watchlist, projectName) && len(watchlist) > 0 {
+			continue
+		}
 
 		// Get load balancers that are defined in the project
 		loadbalancers, err := r.ListLoadBalancers(project.ID)
@@ -211,4 +225,13 @@ func (r *Reconciler) reconcileEndpoints(desired []Endpoints, current []Endpoints
 		e := ep
 		r.syncqueue.Enqueue(sync.DeleteEndpointsAction(&e.endpoints, e.upstreamName))
 	}
+}
+
+func contains(s []string, e string) bool {
+	for _, v := range s {
+		if e == v {
+			return true
+		}
+	}
+	return false
 }
