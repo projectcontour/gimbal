@@ -89,7 +89,7 @@ $ kubectl -n gimbal-discovery create secret generic remote-discover-openstack \
     --from-literal=username=admin \
     --from-literal=password=abc123 \
     --from-literal=auth-url=https://api.openstack:5000/ \
-    --from-literal=tenant-name=heptio
+    --from-literal=tenant-name=team1
 
 # Deploy Discoverer
 $ kubectl apply -f gimbal-discoverer/02-openstack-discoverer.yaml
