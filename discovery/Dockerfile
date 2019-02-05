@@ -1,5 +1,5 @@
 FROM alpine:3.6
-LABEL maintainer="Steve Sloka <steves@heptio.com>"
+LABEL maintainer="Steve Sloka <slokas@vmware.com>"
 
 RUN apk add --update ca-certificates && \
   rm -rf /var/cache/apk/*

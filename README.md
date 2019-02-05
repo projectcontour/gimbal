@@ -2,13 +2,11 @@
 
 [![Build Status](https://travis-ci.org/heptio/gimbal.svg?branch=master)](https://travis-ci.org/heptio/gimbal)
 
-Maintainers: [Heptio](https://github.com/heptio)
-
 ## Overview
 
-Heptio Gimbal is a layer-7 load balancing platform built on Kubernetes, the [Envoy proxy](https://www.envoyproxy.io/), and Heptio's Kubernetes Ingress controller, [Contour](https://heptio.github.io/contour/). It provides a scalable, multi-team, and API-driven ingress tier capable of routing Internet traffic to multiple upstream Kubernetes clusters and to traditional infrastructure technologies such as OpenStack.
+Gimbal is a layer-7 load balancing platform built on [Contour](https://heptio.github.io/contour/), which is an Ingress controller for Kubernetes that works by deploying the [Envoy proxy](https://www.envoyproxy.io/) as a reverse proxy and load balancer. It provides a scalable, multi-team, and API-driven ingress tier capable of routing Internet traffic to multiple upstream Kubernetes clusters and to traditional infrastructure technologies such as OpenStack.
 
-Gimbal was developed out of a joint effort between Heptio and Yahoo Japan Corporation's subsidiary, Actapio, to modernize Yahoo Japan’s infrastructure with Kubernetes,  without affecting legacy investments in OpenStack.
+Gimbal was developed out of a joint effort between Heptio and Yahoo Japan Corporation's subsidiary, Actapio, to modernize Yahoo Japan’s infrastructure with Kubernetes, without affecting legacy investments in OpenStack.
 
 Early releases of Gimbal can discover services that run on Kubernetes and OpenStack clusters, but support for additional platforms is expected in future releases.
 
@@ -47,8 +45,6 @@ If you encounter any problems that the documentation does not address, please [f
 ## Contributing
 
 Thanks for taking the time to join our community and start contributing!
-
-Feedback and discussion is available on the [mailing list](https://groups.google.com/forum/#!forum/heptio-gimbal).
 
 ### Before you start
 

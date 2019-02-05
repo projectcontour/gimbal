@@ -5,12 +5,12 @@ All authors to the project retain copyright to their work. However, to ensure
 that they are only submitting work that they have rights to, we are requiring
 everyone to acknowledge this by signing their work.
 
-Any copyright notices in this repo should specify the authors as "the Heptio Gimbal project contributors".
+Any copyright notices in this repo should specify the authors as "the Gimbal project contributors".
 
 To sign your work, just add a line like this at the end of your commit message:
 
 ```
-Signed-off-by: Joe Beda <joe@heptio.com>
+Signed-off-by: Joe Beda <jbeda@vmware.com>
 ```
 
 This can easily be done with the `--signoff` option to `git commit`.
