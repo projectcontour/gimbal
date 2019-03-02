@@ -1,8 +1,4 @@
-# Gimbal
-
-<img src="docs/images/gimbal-logo.png" width="150px" >
-
-[![Build Status](https://travis-ci.org/heptio/gimbal.svg?branch=master)](https://travis-ci.org/heptio/gimbal)
+# <img src="docs/images/gimbal-logo.png" width="400px" > [![Build Status](https://travis-ci.org/heptio/gimbal.svg?branch=master)](https://travis-ci.org/heptio/gimbal)
 
 ## Overview
 
