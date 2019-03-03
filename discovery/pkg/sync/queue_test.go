@@ -102,12 +102,12 @@ func TestQueueServicesMetrics(t *testing.T) {
 		expectedErrorCounter   float64
 	}{
 		{
-			name: "successfull replication",
+			name:                   "successfull replication",
 			expectedTimestampGauge: float64(now.Unix()),
 			expectedErrorCounter:   float64(-1), // no error, so error counter is not initialized
 		},
 		{
-			name: "failed to replicate service",
+			name:                   "failed to replicate service",
 			expectedTimestampGauge: float64(-1), // failed to sync resource, so timestamp is not initialized
 			expectedErrorCounter:   float64(queueMaxRetries),
 			apiServerError:         errors.New("api server error"),
@@ -155,13 +155,13 @@ func TestQueueEndpointsMetrics(t *testing.T) {
 		expectedReplicatedEndpointsGauge float64
 	}{
 		{
-			name: "successfull replication",
+			name:                             "successfull replication",
 			expectedTimestampGauge:           float64(now.Unix()),
 			expectedErrorCounter:             float64(-1), // no error, so error counter is not initialized
 			expectedReplicatedEndpointsGauge: float64(2),
 		},
 		{
-			name: "failed to replicate endpoints resource",
+			name:                             "failed to replicate endpoints resource",
 			expectedTimestampGauge:           float64(-1), // failed to sync resource, so timestamp is not initialized
 			expectedErrorCounter:             float64(queueMaxRetries),
 			expectedReplicatedEndpointsGauge: float64(-1), // failed to replicate, so gauge is not initialized

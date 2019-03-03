@@ -137,7 +137,7 @@ func TestAddLabels(t *testing.T) {
 			expected: map[string]string{
 				"gimbal.heptio.com/backend": "test01",
 				"gimbal.heptio.com/service": "service01",
-				"key1": "value1",
+				"key1":                      "value1",
 			},
 		},
 		{
@@ -147,12 +147,12 @@ func TestAddLabels(t *testing.T) {
 			podLabels: map[string]string{
 				"gimbal.heptio.com/backend": "badBackendName",
 				"gimbal.heptio.com/service": "badService",
-				"key1": "value1",
+				"key1":                      "value1",
 			},
 			expected: map[string]string{
 				"gimbal.heptio.com/backend": "test01",
 				"gimbal.heptio.com/service": "service01",
-				"key1": "value1",
+				"key1":                      "value1",
 			},
 		},
 		{

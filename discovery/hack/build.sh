@@ -40,6 +40,7 @@ if [ -z "${VERSION}" ]; then
 fi
 
 export CGO_ENABLED=0
+export XDG_CACHE_HOME=/tmp/.cache
 
 # GIT_SHA=$(git --git-dir=/git describe --tags --always)
 # GIT_DIRTY=$(git --git-dir=/git status --porcelain 2> /dev/null)
@@ -55,7 +56,7 @@ LDFLAGS="${LDFLAGS} -X ${PKG}/pkg/buildinfo.GitSHA=${GIT_SHA}"
 LDFLAGS="${LDFLAGS} -X ${PKG}/pkg/buildinfo.GitTreeState=${GIT_TREE_STATE}"
 
 if [[ -z "${OUTPUT_DIR:-}" ]]; then
-  OUTPUT_DIR=.
+  OUTPUT_DIR=${PWD}
 fi
 OUTPUT=${OUTPUT_DIR}/${BIN}
 if [[ "${GOOS}" = "windows" ]]; then
