@@ -15,9 +15,10 @@
 # limitations under the License.
 
 HACK_DIR=$(dirname "${BASH_SOURCE}")
+export XDG_CACHE_HOME=/tmp/.cache
 
 echo "Verifying gofmt"
-files=$(gofmt -l -s $(find . -type f -name "*.go" -not -path "./vendor/*" -not -path "./pkg/generated/*" -not -name "zz_generated*"))
+files=$(gofmt -l -s $(find . -type f -name "*.go" -not -path "./vendor/*" -not -path "./pkg/generated/*" -not -name "zz_generated*" -not -path "./.go/*"))
 if [[ -n "${files}" ]]; then
   echo "The following files need gofmt updating - please run 'make update'"
   echo "${files}"

@@ -40,7 +40,7 @@ GOARCH = $(word 2, $(platform_temp))
 
 IMAGE := $(REGISTRY)/gimbal-discoverer
 
-BUILD_IMAGE ?= gcr.io/heptio-images/golang:1.9-alpine3.6
+BUILD_IMAGE ?= golang:1.12-stretch
 
 PARENTDIR ?= $(dirname "$(pwd)")
 

@@ -15,6 +15,7 @@
 # limitations under the License.
 
 HACK_DIR=$(dirname "${BASH_SOURCE}")
+export XDG_CACHE_HOME=/tmp/.cache
 
 echo "Running all verification scripts"
 
