@@ -34,7 +34,7 @@ spec:
         - node0
         command:
         - envoy
-        image: docker.io/envoyproxy/envoy-alpine:v1.9.0
+        image: docker.io/envoyproxy/envoy:v1.9.0
         imagePullPolicy: IfNotPresent
         name: envoy
         ports:
@@ -46,9 +46,19 @@ spec:
           hostPort: 443
           name: https
           protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8002
+          initialDelaySeconds: 3
+          periodSeconds: 3
         volumeMounts:
           - name: contour-config
             mountPath: /config
+        lifecycle:
+          preStop:
+            exec:
+              command: ["wget", "-qO-", "--post-data=''", "http://localhost:9001/healthcheck/fail"] 
       - name: statsd-sink
         image: prom/statsd-exporter:v0.6.0
         command: 
