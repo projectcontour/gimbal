@@ -38,11 +38,7 @@ spec:
         - --envoy-service-http-port=80
         - --envoy-service-https-port=443
         command: ["contour"]
-<<<<<<< HEAD
-        image: gcr.io/heptio-images/contour:v0.9.0
-=======
         image: gcr.io/heptio-images/contour:v0.11.0
->>>>>>> 78bddb63... Bump version to Contour v0.11.0 & Envoy v1.9.1
         imagePullPolicy: Always
         name: contour
         ports:
