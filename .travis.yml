@@ -1,7 +1,17 @@
 language: go
 go_import_path: github.com/heptio/gimbal/discovery
 go:
-  - 1.12.x
+  - 1.13.x
+
+sudo: false
+
+cache:
+  directories:
+    - /home/travis/.cache/go-build
+    - /home/travis/gopath/pkg/mod
+
+env:
+  - GOPROXY=https://proxy.golang.org/
 
 sudo: false
 
