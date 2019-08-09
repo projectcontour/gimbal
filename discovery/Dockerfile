@@ -1,12 +1,21 @@
-FROM debian:stretch-slim
+FROM golang:1.12.7 as build
 LABEL maintainer="Steve Sloka <slokas@vmware.com>"
 
-RUN apt-get update && apt-get install -y ca-certificates && \
-  apt-get clean autoclean && apt-get autoremove -y && \
-  rm -rf /var/lib/{apt,dpkg,cache,log}/
+WORKDIR /gimbal
 
-ADD _output/bin/linux/amd64/kubernetes-discoverer /kubernetes-discoverer
-ADD _output/bin/linux/amd64/openstack-discoverer /openstack-discoverer
+ENV GOPROXY=https://gocenter.io
+COPY go.mod ./
+RUN go mod download
+
+COPY cmd cmd
+COPY pkg pkg
+
+RUN CGO_ENABLED=0 GOOS=linux GOFLAGS=-ldflags=-w go build -o /go/bin/kubernetes-discoverer -ldflags=-s -v github.com/heptio/gimbal/discovery/cmd/kubernetes-discoverer
+RUN CGO_ENABLED=0 GOOS=linux GOFLAGS=-ldflags=-w go build -o /go/bin/openstack-discoverer -ldflags=-s -v github.com/heptio/gimbal/discovery/cmd/openstack-discoverer
+
+FROM scratch AS final
+COPY --from=build /go/bin/kubernetes-discoverer /go/bin/kubernetes-discoverer
+COPY --from=build /go/bin/openstack-discoverer /go/bin/openstack-discoverer
 
 USER nobody:nobody
 
