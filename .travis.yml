@@ -1,7 +1,9 @@
 language: go
-
+go_import_path: github.com/heptio/gimbal/discovery
 go:
   - 1.12.x
 
+sudo: false
+
 script:
-- cd discovery && make ci
+  - make check
