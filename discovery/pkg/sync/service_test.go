@@ -1,4 +1,4 @@
-// Copyright © 2018 Heptio
+// Copyright © 2018 the Gimbal contributors.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -22,8 +22,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
 	"github.com/sirupsen/logrus"
+	localmetrics "github.com/vmware-tanzu/gimbal/discovery/pkg/metrics"
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"

@@ -7,11 +7,11 @@ ENV GOPROXY=https://gocenter.io
 COPY go.mod ./
 RUN go mod download
 
-COPY discovery/cmd cmd
-COPY discovery/pkg pkg
+COPY cmd cmd
+COPY pkg pkg
 
-RUN CGO_ENABLED=0 GOOS=linux GOFLAGS=-ldflags=-w go build -o /go/bin/kubernetes-discoverer -ldflags=-s -v github.com/heptio/gimbal/discovery/cmd/kubernetes-discoverer
-RUN CGO_ENABLED=0 GOOS=linux GOFLAGS=-ldflags=-w go build -o /go/bin/openstack-discoverer -ldflags=-s -v github.com/heptio/gimbal/discovery/cmd/openstack-discoverer
+RUN CGO_ENABLED=0 GOOS=linux GOFLAGS=-ldflags=-w go build -o /go/bin/kubernetes-discoverer -ldflags=-s -v github.com/vmware-tanzu/gimbal/discovery/cmd/kubernetes-discoverer
+RUN CGO_ENABLED=0 GOOS=linux GOFLAGS=-ldflags=-w go build -o /go/bin/openstack-discoverer -ldflags=-s -v github.com/vmware-tanzu/gimbal/discovery/cmd/openstack-discoverer
 
 FROM scratch AS final
 COPY --from=build /go/bin/kubernetes-discoverer /go/bin/kubernetes-discoverer

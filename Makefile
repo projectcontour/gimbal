@@ -2,6 +2,7 @@ PROJECT = gimbal
 REGISTRY ?= gcr.io/heptio-images
 IMAGE := $(REGISTRY)/$(PROJECT)
 SRCDIRS := ./discovery/cmd ./discovery/pkg
+# PHONY = gencerts
 
 TAG_LATEST ?= false
 
@@ -11,15 +12,15 @@ VERSION ?= $(GIT_REF)
 export GO111MODULE=on
 
 test: install
-	go test -mod=readonly ./...
+	go test -mod=readonly ./discovery/...
 
 vet: | test
-	go vet ./...
+	go vet ./discovery/...
 
 check: test vet gofmt staticcheck misspell unconvert unparam ineffassign
 
 install:
-	go install ./...
+	go install -mod=readonly -v -tags "oidc gcp" ./discovery/...
 
 download:
 	go mod download
@@ -38,7 +39,7 @@ staticcheck:
 	go install honnef.co/go/tools/cmd/staticcheck
 	staticcheck \
 		-checks all,-ST1003 \
-		./discovery/cmd/... ./discovery/internal/...
+		./cmd/... ./internal/...
 
 misspell:
 	go install github.com/client9/misspell/cmd/misspell
@@ -46,11 +47,11 @@ misspell:
 		-i clas \
 		-locale US \
 		-error \
-		discovery/cmd/* *.md
+		discovery/cmd/* discovery/pkg/* discovery/docs/* discovery/design/* *.md
 
 unconvert:
 	go install github.com/mdempsky/unconvert
-	unconvert -v ./discovery/cmd/... ./discovery/internal/...
+	unconvert -v .discovery/cmd/... .discovery/pkg/...
 
 ineffassign:
 	go install github.com/gordonklaus/ineffassign

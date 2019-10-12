@@ -1,6 +1,6 @@
 # Gimbal Discoverer
 
-[![Build Status](https://travis-ci.com/heptio/gimbal.svg?token=dGsEGqM7L7s2vaK7wDXC&branch=master)](https://travis-ci.com/heptio/gimbal)
+[![Build Status](https://travis-ci.com/vmware-tanzu/gimbal.svg?token=dGsEGqM7L7s2vaK7wDXC&branch=master)](https://travis-ci.com/vmware-tanzu/gimbal)
 
 ## Overview
 The Gimbal Discoverer currently can monitor two systems, Kubernetes and Openstack. The Discoverers perform service discovery of remote clusters by finding remote endpoints and synchronizing them to a central Kubernetes cluster as Services & Endpoints. 
@@ -86,10 +86,10 @@ Run tests:
 $ make test
 
 Create container:
-$ REGISTRY=heptio make container
+$ REGISTRY=vmware-tanzu make container
 
 Push container: 
-$ REGISTRY=heptio make push
+$ REGISTRY=vmware-tanzu make push
 ```
 
 _NOTE: The registry ENV variable allow you to override the registry so custom images can be tested._
@@ -101,8 +101,8 @@ Thanks for taking the time to join our community and start contributing!
 #### Before you start
 
 * Please familiarize yourself with the [Code of
-Conduct](https://github.com/heptio/gimbal/blob/master/CODE_OF_CONDUCT.md) before contributing.
-* See [CONTRIBUTING.md](https://github.com/heptio/gimbal/blob/master/CONTRIBUTING.md) for instructions on the
+Conduct](https://github.com/vmware-tanzu/gimbal/blob/master/CODE_OF_CONDUCT.md) before contributing.
+* See [CONTRIBUTING.md](https://github.com/vmware-tanzu/gimbal/blob/master/CONTRIBUTING.md) for instructions on the
 developer certificate of origin that we require.
 
 #### Pull requests
