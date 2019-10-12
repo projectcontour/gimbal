@@ -1,4 +1,4 @@
-module github.com/heptio/gimbal/discovery
+module github.com/vmware-tanzu/gimbal/discovery
 
 go 1.13
 

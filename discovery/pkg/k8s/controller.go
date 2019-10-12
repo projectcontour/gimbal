@@ -1,4 +1,4 @@
-// Copyright © 2018 Heptio
+// Copyright © 2018 the Gimbal contributors.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,9 +18,9 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
-	"github.com/heptio/gimbal/discovery/pkg/sync"
-	"github.com/heptio/gimbal/discovery/pkg/translator"
+	localmetrics "github.com/vmware-tanzu/gimbal/discovery/pkg/metrics"
+	"github.com/vmware-tanzu/gimbal/discovery/pkg/sync"
+	"github.com/vmware-tanzu/gimbal/discovery/pkg/translator"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/runtime"

@@ -1,4 +1,4 @@
-// Copyright © 2018 Heptio
+// Copyright © 2018 the Gimbal contributors.
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,8 +20,8 @@ import (
 	"net/http/httptrace"
 	"time"
 
-	localmetrics "github.com/heptio/gimbal/discovery/pkg/metrics"
 	"github.com/sirupsen/logrus"
+	localmetrics "github.com/vmware-tanzu/gimbal/discovery/pkg/metrics"
 )
 
 // LogRoundTripper satisfies the http.RoundTripper interface and is used to
