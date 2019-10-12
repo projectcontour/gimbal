@@ -125,7 +125,7 @@ func (sq *Queue) processNextWorkItem() bool {
 		return true
 	}
 
-	// An error ocurred. Set the error metrics.
+	// An error occurred. Set the error metrics.
 	action.SetMetricError(sq.Metrics)
 
 	// If there was an error handling the item, we will retry up to

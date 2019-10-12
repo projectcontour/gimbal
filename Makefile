@@ -1,7 +1,7 @@
 PROJECT = gimbal
 REGISTRY ?= gcr.io/heptio-images
 IMAGE := $(REGISTRY)/$(PROJECT)
-SRCDIRS := ./cmd ./pkg
+SRCDIRS := ./discovery/cmd ./discovery/pkg
 # PHONY = gencerts
 
 TAG_LATEST ?= false
@@ -12,15 +12,15 @@ VERSION ?= $(GIT_REF)
 export GO111MODULE=on
 
 test: install
-	go test -mod=readonly ./...
+	go test -mod=readonly ./discovery/...
 
 vet: | test
-	go vet ./...
+	go vet ./discovery/...
 
 check: test vet gofmt staticcheck misspell unconvert unparam ineffassign
 
 install:
-	go install -mod=readonly -v -tags "oidc gcp" ./...
+	go install -mod=readonly -v -tags "oidc gcp" ./discovery/...
 
 download:
 	go mod download
@@ -47,11 +47,11 @@ misspell:
 		-i clas \
 		-locale US \
 		-error \
-		cmd/* internal/* docs/* design/* *.md
+		discovery/cmd/* discovery/pkg/* discovery/docs/* discovery/design/* *.md
 
 unconvert:
 	go install github.com/mdempsky/unconvert
-	unconvert -v ./cmd/... ./internal/...
+	unconvert -v .discovery/cmd/... .discovery/pkg/...
 
 ineffassign:
 	go install github.com/gordonklaus/ineffassign
@@ -61,11 +61,11 @@ pedantic: check errcheck
 
 unparam:
 	go install mvdan.cc/unparam
-	unparam -exported ./cmd/... ./internal/...
+	unparam -exported ./discovery/cmd/... ./discovery/internal/...
 
 errcheck:
 	go install github.com/kisielk/errcheck
-	errcheck ./...
+	errcheck ./discovery/...
 
 gofmt:
 	@echo Checking code is gofmted

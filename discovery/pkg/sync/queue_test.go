@@ -11,7 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/vmware-tanzu/gimbal/discovery/pkg/metrics"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes/fake"
 	k8stesting "k8s.io/client-go/testing"
@@ -102,7 +102,7 @@ func TestQueueServicesMetrics(t *testing.T) {
 		expectedErrorCounter   float64
 	}{
 		{
-			name:                   "successfull replication",
+			name:                   "successful replication",
 			expectedTimestampGauge: float64(now.Unix()),
 			expectedErrorCounter:   float64(-1), // no error, so error counter is not initialized
 		},
@@ -155,7 +155,7 @@ func TestQueueEndpointsMetrics(t *testing.T) {
 		expectedReplicatedEndpointsGauge float64
 	}{
 		{
-			name:                             "successfull replication",
+			name:                             "successful replication",
 			expectedTimestampGauge:           float64(now.Unix()),
 			expectedErrorCounter:             float64(-1), // no error, so error counter is not initialized
 			expectedReplicatedEndpointsGauge: float64(2),
