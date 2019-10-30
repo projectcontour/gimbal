@@ -16,7 +16,7 @@ To route traffic to a new backend, you must deploy a new Discoverer instance tha
         --from-literal=backend-name=${BACKEND_NAME}
     ```
 
-1. Update the [deployment manfiest](../deployment/gimbal-discoverer/02-kubernetes-discoverer.yaml). Set the deployment name to the name of the new backend, and set the Secret name to the name of the new Secret.
+1. Update the [deployment manifest](../deployment/gimbal-discoverer/02-kubernetes-discoverer.yaml). Set the deployment name to the name of the new backend, and set the Secret name to the name of the new Secret.
 1. Apply the updated manifest to the Gimbal cluster:
 
     ```sh
