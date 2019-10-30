@@ -12,7 +12,7 @@ The discoverer will only be responsible for monitoring a single cluster at a tim
 
 The following sections outline the technical implementations of the discoverer.
 
-See the [design documentation](../discovery/design/kubernetes.md) for additional details.
+See the [design documentation](../design/kubernetes.md) for additional details.
 
 ### Arguments
 
