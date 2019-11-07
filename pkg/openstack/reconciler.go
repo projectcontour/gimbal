@@ -43,7 +43,7 @@ type LoadBalancerLister interface {
 
 // The Reconciler connects to an OpenStack cluster and makes sure that the Load
 // Balancers defined in the cluster are reflected in the Gimbal Kubernetes
-// cluster as Services and Endpoints. The Reconciler runs on a configurable
+// cluster as Services and Endpoint. The Reconciler runs on a configurable
 // interval.
 type Reconciler struct {
 	LoadBalancerLister
@@ -61,12 +61,6 @@ type Reconciler struct {
 	syncqueue  sync.Queue
 
 	Metrics localmetrics.DiscovererMetrics
-}
-
-// Endpoints represents a v1.Endpoints + upstream name to facilicate metrics
-type Endpoints struct {
-	endpoints    v1.Endpoints
-	upstreamName string
 }
 
 // NewReconciler returns an OpenStack reconciler
@@ -170,10 +164,10 @@ func (r *Reconciler) reconcile() {
 			continue
 		}
 
-		// Convert the k8s list to type []Endpoints so make comparison easier
-		currentEndpoints := []Endpoints{}
+		// Convert the k8s list to type []Endpoint so make comparison easier
+		currentEndpoints := []translator.Endpoint{}
 		for _, v := range currentk8sEndpoints.Items {
-			currentEndpoints = append(currentEndpoints, Endpoints{endpoints: v, upstreamName: ""})
+			currentEndpoints = append(currentEndpoints, translator.Endpoint{Endpoints: v, UpstreamName: ""})
 		}
 
 		// Reconcile current state with desired state
@@ -188,8 +182,8 @@ func (r *Reconciler) reconcile() {
 		r.Metrics.DiscovererInvalidServicesMetric(projectName, totalInvalidServices)
 
 		for _, ep := range desiredEndpoints {
-			totalUpstreamEndpoints := sync.SumEndpoints(&ep.endpoints)
-			r.Metrics.DiscovererUpstreamEndpointsMetric(projectName, ep.upstreamName, totalUpstreamEndpoints)
+			totalUpstreamEndpoints := sync.SumEndpoints(&ep.Endpoints)
+			r.Metrics.DiscovererUpstreamEndpointsMetric(projectName, ep.UpstreamName, totalUpstreamEndpoints)
 		}
 	}
 
@@ -198,7 +192,7 @@ func (r *Reconciler) reconcile() {
 }
 
 func (r *Reconciler) reconcileSvcs(desiredSvcs, currentSvcs []v1.Service) {
-	add, up, del := diffServices(desiredSvcs, currentSvcs)
+	add, up, del := translator.DiffServices(desiredSvcs, currentSvcs)
 	for _, svc := range add {
 		s := svc
 		r.syncqueue.Enqueue(sync.AddServiceAction(&s))
@@ -213,19 +207,19 @@ func (r *Reconciler) reconcileSvcs(desiredSvcs, currentSvcs []v1.Service) {
 	}
 }
 
-func (r *Reconciler) reconcileEndpoints(desired []Endpoints, current []Endpoints) {
-	add, up, del := diffEndpoints(desired, current)
+func (r *Reconciler) reconcileEndpoints(desired, current []translator.Endpoint) {
+	add, up, del := translator.DiffEndpoints(desired, current)
 	for _, ep := range add {
 		e := ep
-		r.syncqueue.Enqueue(sync.AddEndpointsAction(&e.endpoints, e.upstreamName))
+		r.syncqueue.Enqueue(sync.AddEndpointsAction(&e.Endpoints, e.UpstreamName))
 	}
 	for _, ep := range up {
 		e := ep
-		r.syncqueue.Enqueue(sync.UpdateEndpointsAction(&e.endpoints, e.upstreamName))
+		r.syncqueue.Enqueue(sync.UpdateEndpointsAction(&e.Endpoints, e.UpstreamName))
 	}
 	for _, ep := range del {
 		e := ep
-		r.syncqueue.Enqueue(sync.DeleteEndpointsAction(&e.endpoints, e.upstreamName))
+		r.syncqueue.Enqueue(sync.DeleteEndpointsAction(&e.Endpoints, e.UpstreamName))
 	}
 }
 

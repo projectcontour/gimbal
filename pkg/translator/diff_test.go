@@ -11,13 +11,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package openstack
+package translator
 
 import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -211,7 +211,7 @@ func TestDiffServices(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			add, up, del := diffServices(tc.desired, tc.current)
+			add, up, del := DiffServices(tc.desired, tc.current)
 			assert.Equal(t, tc.expectedAdd, add, "ExpectedADD")
 			assert.Equal(t, tc.expectedUpdate, up, "ExpectedUPDATE")
 			assert.Equal(t, tc.expectedDel, del, "ExpectedDELETE")
@@ -221,42 +221,42 @@ func TestDiffServices(t *testing.T) {
 func TestDiffEndpoints(t *testing.T) {
 	tests := []struct {
 		name           string
-		current        []Endpoints
-		desired        []Endpoints
-		expectedAdd    []Endpoints
-		expectedUpdate []Endpoints
-		expectedDel    []Endpoints
+		current        []Endpoint
+		desired        []Endpoint
+		expectedAdd    []Endpoint
+		expectedUpdate []Endpoint
+		expectedDel    []Endpoint
 	}{
 		{
 			name: "new endpoint",
-			desired: []Endpoints{
+			desired: []Endpoint{
 				{
-					endpoints: v1.Endpoints{
+					Endpoints: v1.Endpoints{
 						ObjectMeta: metav1.ObjectMeta{
 							Namespace: "finance",
 							Name:      "production-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						},
 					},
-					upstreamName: "upname",
+					UpstreamName: "upname",
 				},
 			},
-			expectedAdd: []Endpoints{
+			expectedAdd: []Endpoint{
 				{
-					endpoints: v1.Endpoints{
+					Endpoints: v1.Endpoints{
 						ObjectMeta: metav1.ObjectMeta{
 							Namespace: "finance",
 							Name:      "production-stocks-5a5c3d9e-e679-43ec-b9fc-9bc51132541e",
 						},
 					},
-					upstreamName: "upname",
+					UpstreamName: "upname",
 				},
 			},
 		},
 		{
 			name: "updated endpoint",
-			current: []Endpoints{
+			current: []Endpoint{
 				{
-					endpoints: v1.Endpoints{
+					Endpoints: v1.Endpoints{
 						ObjectMeta: metav1.ObjectMeta{
 							Namespace: "finance",
 							Name:      "production",
@@ -278,12 +278,12 @@ func TestDiffEndpoints(t *testing.T) {
 							},
 						},
 					},
-					upstreamName: "upname",
+					UpstreamName: "upname",
 				},
 			},
-			desired: []Endpoints{
+			desired: []Endpoint{
 				{
-					endpoints: v1.Endpoints{
+					Endpoints: v1.Endpoints{
 						ObjectMeta: metav1.ObjectMeta{
 							Namespace: "finance",
 							Name:      "production",
@@ -305,12 +305,12 @@ func TestDiffEndpoints(t *testing.T) {
 							},
 						},
 					},
-					upstreamName: "upname",
+					UpstreamName: "upname",
 				},
 			},
-			expectedUpdate: []Endpoints{
+			expectedUpdate: []Endpoint{
 				{
-					endpoints: v1.Endpoints{
+					Endpoints: v1.Endpoints{
 						ObjectMeta: metav1.ObjectMeta{
 							Namespace: "finance",
 							Name:      "production",
@@ -332,15 +332,15 @@ func TestDiffEndpoints(t *testing.T) {
 							},
 						},
 					},
-					upstreamName: "upname",
+					UpstreamName: "upname",
 				},
 			},
 		},
 		{
 			name: "deleted service",
-			current: []Endpoints{
+			current: []Endpoint{
 				{
-					endpoints: v1.Endpoints{
+					Endpoints: v1.Endpoints{
 						ObjectMeta: metav1.ObjectMeta{
 							Namespace: "finance",
 							Name:      "production",
@@ -362,12 +362,12 @@ func TestDiffEndpoints(t *testing.T) {
 							},
 						},
 					},
-					upstreamName: "upname",
+					UpstreamName: "upname",
 				},
 			},
-			expectedDel: []Endpoints{
+			expectedDel: []Endpoint{
 				{
-					endpoints: v1.Endpoints{
+					Endpoints: v1.Endpoints{
 						ObjectMeta: metav1.ObjectMeta{
 							Namespace: "finance",
 							Name:      "production",
@@ -389,15 +389,15 @@ func TestDiffEndpoints(t *testing.T) {
 							},
 						},
 					},
-					upstreamName: "upname",
+					UpstreamName: "upname",
 				},
 			},
 		},
 		{
 			name: "order doesn't matter for update",
-			current: []Endpoints{
+			current: []Endpoint{
 				{
-					endpoints: v1.Endpoints{
+					Endpoints: v1.Endpoints{
 						ObjectMeta: metav1.ObjectMeta{
 							Namespace: "finance",
 							Name:      "endpoints1",
@@ -419,10 +419,10 @@ func TestDiffEndpoints(t *testing.T) {
 							},
 						},
 					},
-					upstreamName: "",
+					UpstreamName: "",
 				},
 				{
-					endpoints: v1.Endpoints{
+					Endpoints: v1.Endpoints{
 						ObjectMeta: metav1.ObjectMeta{
 							Namespace: "finance",
 							Name:      "endpoints2",
@@ -444,12 +444,12 @@ func TestDiffEndpoints(t *testing.T) {
 							},
 						},
 					},
-					upstreamName: "upname",
+					UpstreamName: "upname",
 				},
 			},
-			desired: []Endpoints{
+			desired: []Endpoint{
 				{
-					endpoints: v1.Endpoints{
+					Endpoints: v1.Endpoints{
 						ObjectMeta: metav1.ObjectMeta{
 							Namespace: "finance",
 							Name:      "endpoints2",
@@ -471,10 +471,10 @@ func TestDiffEndpoints(t *testing.T) {
 							},
 						},
 					},
-					upstreamName: "upname",
+					UpstreamName: "upname",
 				},
 				{
-					endpoints: v1.Endpoints{
+					Endpoints: v1.Endpoints{
 						ObjectMeta: metav1.ObjectMeta{
 							Namespace: "finance",
 							Name:      "endpoints1",
@@ -496,7 +496,7 @@ func TestDiffEndpoints(t *testing.T) {
 							},
 						},
 					},
-					upstreamName: "upname",
+					UpstreamName: "upname",
 				},
 			},
 		},
@@ -504,7 +504,7 @@ func TestDiffEndpoints(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			add, up, del := diffEndpoints(tc.desired, tc.current)
+			add, up, del := DiffEndpoints(tc.desired, tc.current)
 			assert.Equal(t, tc.expectedAdd, add, "ExpectedADD")
 			assert.Equal(t, tc.expectedUpdate, up, "ExpectedUPDATE")
 			assert.Equal(t, tc.expectedDel, del, "ExpectedDELETE")
