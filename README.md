@@ -2,7 +2,7 @@
 
 ## Overview
 
-Gimbal is a layer-7 load balancing platform built on [Contour](https://vmware-tanzu.github.io/contour/), which is an Ingress controller for Kubernetes that works by deploying the [Envoy proxy](https://www.envoyproxy.io/) as a reverse proxy and load balancer. It provides a scalable, multi-team, and API-driven ingress tier capable of routing Internet traffic to multiple upstream Kubernetes clusters and to traditional infrastructure technologies such as OpenStack.
+Gimbal is a layer-7 load balancing platform built on [Contour](https://projectcontour.io/), which is an Ingress controller for Kubernetes that works by deploying the [Envoy proxy](https://www.envoyproxy.io/) as a reverse proxy and load balancer. It provides a scalable, multi-team, and API-driven ingress tier capable of routing Internet traffic to multiple upstream Kubernetes clusters and to traditional infrastructure technologies such as OpenStack.
 
 Gimbal was developed out of a joint effort between gimbal and Yahoo Japan Corporation's subsidiary, Actapio, to modernize Yahoo Japan’s infrastructure with Kubernetes, without affecting legacy investments in OpenStack.
 
