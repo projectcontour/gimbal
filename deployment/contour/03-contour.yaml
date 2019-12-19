@@ -1,12 +1,19 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
     app: contour
   name: contour
-  namespace: gimbal-contour
+  namespace: projectcontour
 spec:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      # This value of maxSurge means that during a rolling update
+      # the new ReplicaSet will be created first.
+      maxSurge: 50%
   selector:
     matchLabels:
       app: contour
@@ -31,14 +38,17 @@ spec:
       - args:
         - serve
         - --incluster
-        - --xds-address
-        - 0.0.0.0
-        - --xds-port
-        - $(CONTOUR_SERVICE_PORT)
+        - --use-extensions-v1beta1-ingress
+        - --xds-address=0.0.0.0
+        - --xds-port=8001
         - --envoy-service-http-port=80
         - --envoy-service-https-port=443
+        - --contour-cafile=/ca/cacert.pem
+        - --contour-cert-file=/certs/tls.crt
+        - --contour-key-file=/certs/tls.key
+        - --config-path=/config/contour.yaml
         command: ["contour"]
-        image: gcr.io/vmware-tanzu-images/contour:v0.11.0
+        image: docker.io/projectcontour/contour:master
         imagePullPolicy: Always
         name: contour
         ports:
@@ -48,5 +58,48 @@ spec:
         - containerPort: 8000
           name: debug
           protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8000
+        readinessProbe:
+          tcpSocket:
+            port: 8001
+          initialDelaySeconds: 15
+          periodSeconds: 10
+        volumeMounts:
+          - name: contourcert
+            mountPath: /certs
+            readOnly: true
+          - name: cacert
+            mountPath: /ca
+            readOnly: true
+          - name: contour-config
+            mountPath: /config
+            readOnly: true
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
       dnsPolicy: ClusterFirst
       serviceAccountName: contour
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+      volumes:
+        - name: contourcert
+          secret:
+            secretName: contourcert
+        - name: cacert
+          secret:
+            secretName: cacert
+        - name: contour-config
+          configMap:
+            name: contour
+            defaultMode: 0644
+            items:
+            - key: contour.yaml
+              path: contour.yaml
