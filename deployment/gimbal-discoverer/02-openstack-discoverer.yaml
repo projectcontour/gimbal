@@ -22,7 +22,7 @@ spec:
         cluster: openstack
     spec:
       containers:
-        - image: gcr.io/vmware-tanzu-images/gimbal-discoverer:v0.4.0
+        - image: gcr.io/heptio-images/gimbal-discoverer:v0.4.0
           imagePullPolicy: Always
           name: openstack-discoverer
           command: ["/openstack-discoverer"]
