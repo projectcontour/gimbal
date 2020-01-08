@@ -17,8 +17,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	localmetrics "github.com/projectcontour/gimbal/pkg/metrics"
 	"github.com/sirupsen/logrus"
-	localmetrics "github.com/vmware-tanzu/gimbal/pkg/metrics"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

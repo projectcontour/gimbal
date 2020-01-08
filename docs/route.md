@@ -1,6 +1,6 @@
 # Route Specification
 
-The core of Gimbal is IngressRoutes, which allow traffic to be routed into one or more applications. This section will discuss how to utilize [Contour IngressRoute](https://github.com/vmware-tanzu/contour/blob/master/docs/ingressroute.md) objects to create these definitions.
+The core of Gimbal is IngressRoutes, which allow traffic to be routed into one or more applications. This section will discuss how to utilize [Contour IngressRoute](https://github.com/projectcontour/contour/blob/master/docs/ingressroute.md) objects to create these definitions.
 
 Before beginning it is important to understand how service discovery functions within Gimbal. The Discoverer components should be deployed per upstream cluster. Once synchronized, services will show up in your team namespace with the cluster name appended.
 
@@ -27,7 +27,7 @@ spec:
 
 ## IngressRoute Features
 
-The IngressRoute API provides a number of [enhancements](https://github.com/vmware-tanzu/contour/blob/master/docs/ingressroute.md#key-ingressroute-benefits) over Kubernetes Ingress:
+The IngressRoute API provides a number of [enhancements](https://github.com/projectcontour/contour/blob/master/docs/ingressroute.md#key-ingressroute-benefits) over Kubernetes Ingress:
 
 * Weight shifting
 * Multiple services per route
@@ -36,15 +36,15 @@ The IngressRoute API provides a number of [enhancements](https://github.com/vmwa
 
 ## IngressRoute Delegation
 
-Gimbal's multi-team support is enabled through Contour's [IngressRoute Delegation](https://github.com/vmware-tanzu/contour/blob/master/docs/ingressroute.md#ingressroute-delegation).
+Gimbal's multi-team support is enabled through Contour's [IngressRoute Delegation](https://github.com/projectcontour/contour/blob/master/docs/ingressroute.md#ingressroute-delegation).
 
 ### Restricted root namespaces
 
-Contour has an [enforcing mode](https://github.com/vmware-tanzu/contour/blob/master/docs/ingressroute.md#restricted-root-namespaces) which accepts a list of namespaces where root IngressRoutes are valid.
+Contour has an [enforcing mode](https://github.com/projectcontour/contour/blob/master/docs/ingressroute.md#restricted-root-namespaces) which accepts a list of namespaces where root IngressRoutes are valid.
 Only users permitted to operate in those namespaces can therefore create IngressRoutes with the `virtualhost` field.
 
 This restricted mode is enabled in Contour by specifying a command line flag, `--ingressroute-root-namespaces`, which will restrict Contour to only searching the defined namespaces for root IngressRoutes.
 
 ## Additional Information
 
-More information regarding IngressRoutes can be found in the [Contour Documentation](https://github.com/vmware-tanzu/contour/blob/master/docs/ingressroute.md)
+More information regarding IngressRoutes can be found in the [Contour Documentation](https://github.com/projectcontour/contour/blob/master/docs/ingressroute.md)

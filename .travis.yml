@@ -1,5 +1,5 @@
 language: go
-go_import_path: github.com/vmware-tanzu/gimbal
+go_import_path: github.com/projectcontour/gimbal
 go:
   - 1.13.x
 

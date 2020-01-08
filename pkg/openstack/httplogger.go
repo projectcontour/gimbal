@@ -20,8 +20,8 @@ import (
 	"net/http/httptrace"
 	"time"
 
+	localmetrics "github.com/projectcontour/gimbal/pkg/metrics"
 	"github.com/sirupsen/logrus"
-	localmetrics "github.com/vmware-tanzu/gimbal/pkg/metrics"
 )
 
 // LogRoundTripper satisfies the http.RoundTripper interface and is used to

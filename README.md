@@ -1,4 +1,4 @@
-# <img src="docs/images/gimbal-logo.png" width="400px" > [![Build Status](https://travis-ci.org/vmware-tanzu/gimbal.svg?branch=master)](https://travis-ci.org/vmware-tanzu/gimbal)
+# <img src="docs/images/gimbal-logo.png" width="400px" > [![Build Status](https://travis-ci.org/projectcontour/gimbal.svg?branch=master)](https://travis-ci.org/projectcontour/gimbal)
 
 ## Overview
 
@@ -34,11 +34,11 @@ Documentation for all the Gimbal components can be found in the [docs directory]
 
 * Upstream Kubernetes Pods and OpenStack VMs must be routable from the Gimbal load balancing cluster.
   * Support is not available for Kubernetes clusters with overlay networks.
-  * We are looking for community feedback on design requirements for a solution. A possible option is one GRE tunnel per upstream cluster. [Feedback welcome here](https://github.com/vmware-tanzu/gimbal/issues/39)!
+  * We are looking for community feedback on design requirements for a solution. A possible option is one GRE tunnel per upstream cluster. [Feedback welcome here](https://github.com/projectcontour/gimbal/issues/39)!
 
 ## Troubleshooting
 
-If you encounter any problems that the documentation does not address, please [file an issue](https://github.com/vmware-tanzu/gimbal/issues) or talk to us on the Kubernetes Slack team channel [#gimbal](https://kubernetes.slack.com/messages/gimbal).
+If you encounter any problems that the documentation does not address, please [file an issue](https://github.com/projectcontour/gimbal/issues) or talk to us on the Kubernetes Slack team channel [#gimbal](https://kubernetes.slack.com/messages/gimbal).
 
 ## Contributing
 
@@ -51,4 +51,4 @@ Thanks for taking the time to join our community and start contributing!
 
 ### Pull Requests
 
-- We welcome pull requests. Fee free to dig through the [issues](https://github.com/vmware-tanzu/gimbal/issues) and jump in.
+- We welcome pull requests. Fee free to dig through the [issues](https://github.com/projectcontour/gimbal/issues) and jump in.

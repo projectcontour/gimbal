@@ -26,7 +26,7 @@
 - A copy of this repository. Download, or clone: 
 
   ```sh
-  $ git clone git@github.com:vmware-tanzu/gimbal.git
+  $ git clone git@github.com:projectcontour/gimbal.git
   ```
 
 - A single Kubernetes cluster to deploy Gimbal

@@ -18,14 +18,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/vmware-tanzu/gimbal/pkg/translator"
+	"github.com/projectcontour/gimbal/pkg/translator"
 
 	"github.com/gophercloud/gophercloud/openstack/identity/v3/projects"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/loadbalancers"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/pools"
+	localmetrics "github.com/projectcontour/gimbal/pkg/metrics"
+	"github.com/projectcontour/gimbal/pkg/sync"
 	"github.com/sirupsen/logrus"
-	localmetrics "github.com/vmware-tanzu/gimbal/pkg/metrics"
-	"github.com/vmware-tanzu/gimbal/pkg/sync"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"

@@ -18,10 +18,10 @@ import (
 	"testing"
 	"time"
 
+	localmetrics "github.com/projectcontour/gimbal/pkg/metrics"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	localmetrics "github.com/vmware-tanzu/gimbal/pkg/metrics"
 
 	"github.com/sirupsen/logrus"
 	v1 "k8s.io/api/core/v1"

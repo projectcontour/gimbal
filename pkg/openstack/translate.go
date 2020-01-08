@@ -18,7 +18,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/vmware-tanzu/gimbal/pkg/translator"
+	"github.com/projectcontour/gimbal/pkg/translator"
 
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/listeners"
 	"github.com/gophercloud/gophercloud/openstack/networking/v2/extensions/lbaas_v2/loadbalancers"

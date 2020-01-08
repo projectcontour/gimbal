@@ -16,12 +16,12 @@ package k8s
 import (
 	"fmt"
 
-	"github.com/vmware-tanzu/gimbal/pkg/translator"
+	"github.com/projectcontour/gimbal/pkg/translator"
 
 	"github.com/sirupsen/logrus"
 
-	localmetrics "github.com/vmware-tanzu/gimbal/pkg/metrics"
-	"github.com/vmware-tanzu/gimbal/pkg/sync"
+	localmetrics "github.com/projectcontour/gimbal/pkg/metrics"
+	"github.com/projectcontour/gimbal/pkg/sync"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/util/runtime"

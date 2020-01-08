@@ -1,4 +1,4 @@
-module github.com/vmware-tanzu/gimbal
+module github.com/projectcontour/gimbal
 
 go 1.13
 
