@@ -20,9 +20,9 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 
+	localmetrics "github.com/projectcontour/gimbal/pkg/metrics"
+	"github.com/projectcontour/gimbal/pkg/sync"
 	"github.com/prometheus/client_golang/prometheus"
-	localmetrics "github.com/vmware-tanzu/gimbal/pkg/metrics"
-	"github.com/vmware-tanzu/gimbal/pkg/sync"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kubeinformers "k8s.io/client-go/informers"

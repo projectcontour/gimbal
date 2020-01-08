@@ -25,17 +25,17 @@ import (
 	"os"
 	"time"
 
-	"github.com/vmware-tanzu/gimbal/pkg/buildinfo"
-	"github.com/vmware-tanzu/gimbal/pkg/openstack"
+	"github.com/projectcontour/gimbal/pkg/buildinfo"
+	"github.com/projectcontour/gimbal/pkg/openstack"
 
 	"github.com/gophercloud/gophercloud"
 	gopheropenstack "github.com/gophercloud/gophercloud/openstack"
+	"github.com/projectcontour/gimbal/pkg/k8s"
+	localmetrics "github.com/projectcontour/gimbal/pkg/metrics"
+	"github.com/projectcontour/gimbal/pkg/signals"
+	"github.com/projectcontour/gimbal/pkg/util"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/sirupsen/logrus"
-	"github.com/vmware-tanzu/gimbal/pkg/k8s"
-	localmetrics "github.com/vmware-tanzu/gimbal/pkg/metrics"
-	"github.com/vmware-tanzu/gimbal/pkg/signals"
-	"github.com/vmware-tanzu/gimbal/pkg/util"
 )
 
 var (

@@ -10,8 +10,8 @@ RUN go mod download
 COPY cmd cmd
 COPY pkg pkg
 
-RUN CGO_ENABLED=0 GOOS=linux GOFLAGS=-ldflags=-w go build -o /go/bin/kubernetes-discoverer -ldflags=-s -v github.com/vmware-tanzu/gimbal/cmd/kubernetes-discoverer
-RUN CGO_ENABLED=0 GOOS=linux GOFLAGS=-ldflags=-w go build -o /go/bin/openstack-discoverer -ldflags=-s -v github.com/vmware-tanzu/gimbal/cmd/openstack-discoverer
+RUN CGO_ENABLED=0 GOOS=linux GOFLAGS=-ldflags=-w go build -o /go/bin/kubernetes-discoverer -ldflags=-s -v github.com/projectcontour/gimbal/cmd/kubernetes-discoverer
+RUN CGO_ENABLED=0 GOOS=linux GOFLAGS=-ldflags=-w go build -o /go/bin/openstack-discoverer -ldflags=-s -v github.com/projectcontour/gimbal/cmd/openstack-discoverer
 
 FROM scratch AS final
 COPY --from=build /go/bin/kubernetes-discoverer /go/bin/kubernetes-discoverer

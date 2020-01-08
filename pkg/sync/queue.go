@@ -16,8 +16,8 @@ package sync
 import (
 	"time"
 
+	localmetrics "github.com/projectcontour/gimbal/pkg/metrics"
 	"github.com/sirupsen/logrus"
-	localmetrics "github.com/vmware-tanzu/gimbal/pkg/metrics"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/runtime"
 	"k8s.io/apimachinery/pkg/util/wait"
