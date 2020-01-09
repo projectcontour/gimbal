@@ -5,7 +5,7 @@ The Gimbal Discoverers add labels to the discovered services and endpoints befor
 ## List all discovered services and endpoints
 
 ```sh
-kubectl get svc,endpoints -l gimbal.heptio.com/backend
+kubectl get svc,endpoints -l gimbal.projectcontour.io/backend
 ```
 
 You can add `--all-namespaces` to list across all namespaces in the Gimbal cluster.
@@ -13,14 +13,14 @@ You can add `--all-namespaces` to list across all namespaces in the Gimbal clust
 ## List services and endpoints that were discovered from a specific cluster
 
 ```sh
-kubectl get svc,endpoints -l gimbal.heptio.com/backend=${CLUSTER_NAME}
+kubectl get svc,endpoints -l gimbal.projectcontour.io/backend=${CLUSTER_NAME}
 ```
 
 ## List services that belong to the same logical service
 
-If you have instances of a service spread across clusters, you can use the `gimbal.heptio.com/service` label to list
+If you have instances of a service spread across clusters, you can use the `gimbal.projectcontour.io/service` label to list
 them:
 
 ```sh
-kubectl get svc,endpoints -l gimbal.heptio.com/service=${SERVICE_NAME}
+kubectl get svc,endpoints -l gimbal.projectcontour.io/service=${SERVICE_NAME}
 ```

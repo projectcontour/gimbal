@@ -123,8 +123,8 @@ All synchronized services & endpoints will have additional labels added to assis
 
 Labels added to service and endpoints:
 ```
-gimbal.heptio.com/service=<serviceName>
-gimbal.heptio.com/backend=<nodeName>
-gimbal.heptio.com/load-balancer-id=<LoadBalancer.ID>
-gimbal.heptio.com/load-balancer-name=<LoadBalancer..Name>
+gimbal.projectcontour.io/service=<serviceName>
+gimbal.projectcontour.io/backend=<nodeName>
+gimbal.projectcontour.io/load-balancer-id=<LoadBalancer.ID>
+gimbal.projectcontour.io/load-balancer-name=<LoadBalancer..Name>
 ```

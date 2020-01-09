@@ -179,7 +179,7 @@ NAME            READY     STATUS    RESTARTS   AGE
 contour-lq6mm   2/2       Running   0          5h
 
 # Verify discovered services
-$ kubectl get svc -l gimbal.heptio.com/backend
+$ kubectl get svc -l gimbal.projectcontour.io/backend
 NAME                TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
 nginx-node02        ClusterIP   None         <none>        80/TCP    17m
 kuard-node02        ClusterIP   None         <none>        80/TCP    17m

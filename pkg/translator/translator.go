@@ -22,8 +22,8 @@ import (
 
 const (
 	// GimbalLabelBackend is the key of the label that contains the cluster name
-	GimbalLabelBackend          = "gimbal.heptio.com/backend"
-	gimbalLabelService          = "gimbal.heptio.com/service"
+	GimbalLabelBackend          = "gimbal.projectcontour.io/backend"
+	gimbalLabelService          = "gimbal.projectcontour.io/service"
 	maxKubernetesDNSLabelLength = 63
 )
 
