@@ -1,9 +1,9 @@
-FROM golang:1.12.7 as build
+FROM golang:1.13.5 as build
 LABEL maintainer="Steve Sloka <slokas@vmware.com>"
 
 WORKDIR /gimbal
 
-ENV GOPROXY=https://gocenter.io
+ENV GOPROXY=https://proxy.golang.org
 COPY go.mod go.sum /gimbal/
 RUN go mod download
 
@@ -14,9 +14,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOFLAGS=-ldflags=-w go build -o /go/bin/kubernetes-
 RUN CGO_ENABLED=0 GOOS=linux GOFLAGS=-ldflags=-w go build -o /go/bin/openstack-discoverer -ldflags=-s -v github.com/projectcontour/gimbal/cmd/openstack-discoverer
 
 FROM scratch AS final
-COPY --from=build /go/bin/kubernetes-discoverer /go/bin/kubernetes-discoverer
-COPY --from=build /go/bin/openstack-discoverer /go/bin/openstack-discoverer
-
-USER nobody:nobody
+COPY --from=build /go/bin/kubernetes-discoverer /kubernetes-discoverer
+COPY --from=build /go/bin/openstack-discoverer /openstack-discoverer
 
 ENTRYPOINT [ "/kubernetes-discoverer" ]
