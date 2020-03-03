@@ -120,8 +120,8 @@ func loadbalancerLabels(lb loadbalancers.LoadBalancer) map[string]string {
 		name = translator.ShortenKubernetesLabelValue(name)
 	}
 	return map[string]string{
-		"gimbal.heptio.com/load-balancer-id":   lb.ID,
-		"gimbal.heptio.com/load-balancer-name": name,
+		"gimbal.projectcontour.io/load-balancer-id":   lb.ID,
+		"gimbal.projectcontour.io/load-balancer-name": name,
 	}
 }
 

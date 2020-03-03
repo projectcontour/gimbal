@@ -94,7 +94,7 @@ var serviceTests = []struct {
 				Name:      "kubernetes",
 				Namespace: "default",
 				Labels: map[string]string{
-					"gimbal.heptio.com/backend": "zzzzz",
+					"gimbal.projectcontour.io/backend": "zzzzz",
 				},
 			},
 			Spec: v1.ServiceSpec{

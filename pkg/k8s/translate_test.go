@@ -18,7 +18,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"k8s.io/api/core/v1"
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
@@ -51,7 +51,7 @@ func TestTranslateService(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace:   "default",
 					Name:        "cluster1-kuard",
-					Labels:      map[string]string{"app": "kuard", "gimbal.heptio.com/backend": "cluster1", "gimbal.heptio.com/service": "kuard"},
+					Labels:      map[string]string{"app": "kuard", "gimbal.projectcontour.io/backend": "cluster1", "gimbal.projectcontour.io/service": "kuard"},
 					Annotations: map[string]string{"foo": "bar"},
 				},
 				Spec: v1.ServiceSpec{
@@ -85,7 +85,7 @@ func TestTranslateService(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace:   "default",
 					Name:        "cluster1-kuard",
-					Labels:      map[string]string{"app": "kuard", "gimbal.heptio.com/backend": "cluster1", "gimbal.heptio.com/service": "kuard"},
+					Labels:      map[string]string{"app": "kuard", "gimbal.projectcontour.io/backend": "cluster1", "gimbal.projectcontour.io/service": "kuard"},
 					Annotations: map[string]string{"foo": "bar"},
 				},
 				Spec: v1.ServiceSpec{
@@ -136,7 +136,7 @@ func TestTranslateEndpoints(t *testing.T) {
 				ObjectMeta: metav1.ObjectMeta{
 					Namespace:   "default",
 					Name:        "cluster1-kuard",
-					Labels:      map[string]string{"app": "kuard", "gimbal.heptio.com/backend": "cluster1", "gimbal.heptio.com/service": "kuard"},
+					Labels:      map[string]string{"app": "kuard", "gimbal.projectcontour.io/backend": "cluster1", "gimbal.projectcontour.io/service": "kuard"},
 					Annotations: map[string]string{"foo": "bar"},
 				},
 				Subsets: []v1.EndpointSubset{

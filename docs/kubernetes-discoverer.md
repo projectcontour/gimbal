@@ -107,6 +107,6 @@ All synchronized services & endpoints will contain the same properties as the so
 
 Labels added to service and endpoints:
 ```
-gimbal.heptio.com/service=<serviceName>
-gimbal.heptio.com/backend=<nodeName>
+gimbal.projectcontour.io/service=<serviceName>
+gimbal.projectcontour.io/backend=<nodeName>
 ```

@@ -22,8 +22,8 @@ In order for an Ingress controller to route traffic to endpoints off-cluster, we
 ```
 Name:              nginx-node02
 Namespace:         team1
-Labels:            gimbal.heptio.com/service=nginx
-                   gimbal.heptio.com/backend=node02
+Labels:            gimbal.projectcontour.io/service=nginx
+                   gimbal.projectcontour.io/backend=node02
                    run=nginx
 Annotations:       <none>
 Selector:          <none>
@@ -41,8 +41,8 @@ Events:            <none>
 ```
 Name:         nginx-node02
 Namespace:    team1
-Labels:       gimbal.heptio.com/service=nginx
-              gimbal.heptio.com/backend=node02
+Labels:       gimbal.projectcontour.io/service=nginx
+              gimbal.projectcontour.io/backend=node02
               run=nginx
 Annotations:  <none>
 Subsets:
@@ -76,8 +76,8 @@ If additional processing is required, then an argument can be changed to increas
 
 Those labels are defined as:
 
-- gimbal.heptio.com/backend: BackendName (Defined via argument)
-- gimbal.heptio.com/service: [ServiceName]
+- gimbal.projectcontour.io/backend: BackendName (Defined via argument)
+- gimbal.projectcontour.io/service: [ServiceName]
 
 The name of the synchronized object will be a hash of the `BackendName-ServiceName`. The name is hashed because of length restrictions when creating a service object.
 

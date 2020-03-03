@@ -83,20 +83,20 @@ To remove a backend from the Gimbal cluster, the Discoverer and the discovered s
 1. List the Services that belong to the cluster, and verify the list:
 
     ```sh
-    kubectl --all-namespaces get svc -l gimbal.heptio.com/backend=${CLUSTER_NAME}
+    kubectl --all-namespaces get svc -l gimbal.projectcontour.io/backend=${CLUSTER_NAME}
     ```
 
 1. List the namespaces with Services that were discovered:
 
     ```sh
-    kubectl get svc --all-namespaces  -l gimbal.heptio.com/backend=${CLUSTER_NAME} -o jsonpath='{range .items[*]}{.metadata.namespace}{"\n"}{end}' | uniq
+    kubectl get svc --all-namespaces  -l gimbal.projectcontour.io/backend=${CLUSTER_NAME} -o jsonpath='{range .items[*]}{.metadata.namespace}{"\n"}{end}' | uniq
     ```
 
 1. Iterate over the namespaces and delete all Services and Endpoints:
 
     ```sh
-    NAMESPACES=$(kubectl get svc --all-namespaces  -l gimbal.heptio.com/backend=${CLUSTER_NAME} -o jsonpath='{range .items[*]}{.metadata.namespace}{"\n"}{end}' | uniq)
+    NAMESPACES=$(kubectl get svc --all-namespaces  -l gimbal.projectcontour.io/backend=${CLUSTER_NAME} -o jsonpath='{range .items[*]}{.metadata.namespace}{"\n"}{end}' | uniq)
     for ns in $NAMESPACES
     do
-        kubectl -n $ns delete svc,endpoints -l gimbal.heptio.com/backend=${CLUSTER_NAME}
+        kubectl -n $ns delete svc,endpoints -l gimbal.projectcontour.io/backend=${CLUSTER_NAME}
     done

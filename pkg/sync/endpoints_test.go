@@ -166,7 +166,7 @@ func TestDiscovererEndpointsMetrics(t *testing.T) {
 					Namespace: "foo",
 					Name:      "bar",
 					Labels: map[string]string{
-						"gimbal.heptio.com/backend": backendName,
+						"gimbal.projectcontour.io/backend": backendName,
 					},
 				},
 				Subsets: []v1.EndpointSubset{
@@ -188,7 +188,7 @@ func TestDiscovererEndpointsMetrics(t *testing.T) {
 					Namespace: "foo",
 					Name:      "bar",
 					Labels: map[string]string{
-						"gimbal.heptio.com/backend": backendName,
+						"gimbal.projectcontour.io/backend": backendName,
 					},
 				},
 				Subsets: []v1.EndpointSubset{
@@ -214,7 +214,7 @@ func TestDiscovererEndpointsMetrics(t *testing.T) {
 					Namespace: "foo",
 					Name:      "bar",
 					Labels: map[string]string{
-						"gimbal.heptio.com/backend": backendName,
+						"gimbal.projectcontour.io/backend": backendName,
 					},
 				},
 				Subsets: []v1.EndpointSubset{

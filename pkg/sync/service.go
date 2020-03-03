@@ -144,7 +144,7 @@ func (action serviceAction) SetMetricError(metrics localmetrics.DiscovererMetric
 
 // GetTotalServicesCount returns the number of services in a namespace for the particular backend
 func getTotalServicesCount(gimbalKubeClient kubernetes.Interface, namespace string, metrics localmetrics.DiscovererMetrics) (int, error) {
-	svcs, err := gimbalKubeClient.CoreV1().Services(namespace).List(metav1.ListOptions{LabelSelector: fmt.Sprintf("gimbal.heptio.com/backend=%s", metrics.BackendName)})
+	svcs, err := gimbalKubeClient.CoreV1().Services(namespace).List(metav1.ListOptions{LabelSelector: fmt.Sprintf("gimbal.projectcontour.io/backend=%s", metrics.BackendName)})
 	if err != nil {
 		return 0, err
 	}

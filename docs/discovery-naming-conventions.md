@@ -105,4 +105,4 @@ OpenStack can be renamed. This prevents users from unintentionally renaming
 discovered services in Kubernetes and breaking IngressRoute rules.
 
 Instead, the load balancer's name is available as a label
-(`gimbal.heptio.com/load-balancer-name`) on the service.
+(`gimbal.projectcontour.io/load-balancer-name`) on the service.

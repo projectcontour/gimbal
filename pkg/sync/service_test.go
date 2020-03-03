@@ -165,7 +165,7 @@ func TestDiscovererServiceMetrics(t *testing.T) {
 					Namespace: "foo",
 					Name:      "bar",
 					Labels: map[string]string{
-						"gimbal.heptio.com/backend": backendName,
+						"gimbal.projectcontour.io/backend": backendName,
 					},
 				},
 			},
@@ -186,7 +186,7 @@ func TestDiscovererServiceMetrics(t *testing.T) {
 					Namespace: "foo",
 					Name:      "bar",
 					Labels: map[string]string{
-						"gimbal.heptio.com/backend": backendName,
+						"gimbal.projectcontour.io/backend": backendName,
 					},
 				},
 			},
@@ -195,7 +195,7 @@ func TestDiscovererServiceMetrics(t *testing.T) {
 					Namespace: "foo",
 					Name:      "existing",
 					Labels: map[string]string{
-						"gimbal.heptio.com/backend": backendName,
+						"gimbal.projectcontour.io/backend": backendName,
 					},
 				},
 			},
@@ -215,7 +215,7 @@ func TestDiscovererServiceMetrics(t *testing.T) {
 					Namespace: "foo",
 					Name:      "bar",
 					Labels: map[string]string{
-						"gimbal.heptio.com/backend": backendName,
+						"gimbal.projectcontour.io/backend": backendName,
 					},
 				},
 			},
