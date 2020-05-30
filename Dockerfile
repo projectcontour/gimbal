@@ -1,4 +1,4 @@
-FROM golang:1.13.5 as build
+FROM golang:1.13.11 as build
 LABEL maintainer="Steve Sloka <slokas@vmware.com>"
 
 WORKDIR /gimbal
