@@ -1,7 +1,7 @@
 language: go
 go_import_path: github.com/projectcontour/gimbal
 go:
-  - 1.13.x
+  - 1.14.x
 
 sudo: false
 
