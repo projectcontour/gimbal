@@ -14,6 +14,7 @@
 package sync
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -81,7 +82,7 @@ func (action serviceAction) String() string {
 }
 
 func addService(kubeClient kubernetes.Interface, service *v1.Service) error {
-	_, err := kubeClient.CoreV1().Services(service.Namespace).Create(service)
+	_, err := kubeClient.CoreV1().Services(service.Namespace).Create(context.TODO(), service, metav1.CreateOptions{})
 	if errors.IsAlreadyExists(err) {
 		return updateService(kubeClient, service)
 	}
@@ -89,12 +90,12 @@ func addService(kubeClient kubernetes.Interface, service *v1.Service) error {
 }
 
 func deleteService(kubeClient kubernetes.Interface, service *v1.Service) error {
-	return kubeClient.CoreV1().Services(service.Namespace).Delete(service.Name, &metav1.DeleteOptions{})
+	return kubeClient.CoreV1().Services(service.Namespace).Delete(context.TODO(), service.Name, metav1.DeleteOptions{})
 }
 
 func updateService(kubeClient kubernetes.Interface, service *v1.Service) error {
 	client := kubeClient.CoreV1().Services(service.Namespace)
-	existing, err := client.Get(service.Name, metav1.GetOptions{})
+	existing, err := client.Get(context.TODO(), service.Name, metav1.GetOptions{})
 
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -119,7 +120,7 @@ func updateService(kubeClient kubernetes.Interface, service *v1.Service) error {
 	if err != nil {
 		return err
 	}
-	_, err = client.Patch(service.Name, types.StrategicMergePatchType, patchBytes)
+	_, err = client.Patch(context.TODO(), service.Name, types.StrategicMergePatchType, patchBytes, metav1.PatchOptions{})
 	return err
 }
 
@@ -144,7 +145,7 @@ func (action serviceAction) SetMetricError(metrics localmetrics.DiscovererMetric
 
 // GetTotalServicesCount returns the number of services in a namespace for the particular backend
 func getTotalServicesCount(gimbalKubeClient kubernetes.Interface, namespace string, metrics localmetrics.DiscovererMetrics) (int, error) {
-	svcs, err := gimbalKubeClient.CoreV1().Services(namespace).List(metav1.ListOptions{LabelSelector: fmt.Sprintf("gimbal.projectcontour.io/backend=%s", metrics.BackendName)})
+	svcs, err := gimbalKubeClient.CoreV1().Services(namespace).List(context.TODO(), metav1.ListOptions{LabelSelector: fmt.Sprintf("gimbal.projectcontour.io/backend=%s", metrics.BackendName)})
 	if err != nil {
 		return 0, err
 	}

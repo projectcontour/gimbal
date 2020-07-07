@@ -14,6 +14,7 @@
 package sync
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -91,7 +92,7 @@ func (action endpointsAction) SetMetricError(metrics localmetrics.DiscovererMetr
 }
 
 func addEndpoints(kubeClient kubernetes.Interface, endpoints *v1.Endpoints) error {
-	_, err := kubeClient.CoreV1().Endpoints(endpoints.Namespace).Create(endpoints)
+	_, err := kubeClient.CoreV1().Endpoints(endpoints.Namespace).Create(context.TODO(), endpoints, metav1.CreateOptions{})
 	if errors.IsAlreadyExists(err) {
 		return updateEndpoints(kubeClient, endpoints)
 	}
@@ -99,12 +100,12 @@ func addEndpoints(kubeClient kubernetes.Interface, endpoints *v1.Endpoints) erro
 }
 
 func deleteEndpoints(kubeClient kubernetes.Interface, endpoints *v1.Endpoints) error {
-	return kubeClient.CoreV1().Endpoints(endpoints.Namespace).Delete(endpoints.Name, &metav1.DeleteOptions{})
+	return kubeClient.CoreV1().Endpoints(endpoints.Namespace).Delete(context.TODO(), endpoints.Name, metav1.DeleteOptions{})
 }
 
 func updateEndpoints(kubeClient kubernetes.Interface, endpoints *v1.Endpoints) error {
 	client := kubeClient.CoreV1().Endpoints(endpoints.Namespace)
-	existing, err := client.Get(endpoints.Name, metav1.GetOptions{})
+	existing, err := client.Get(context.TODO(), endpoints.Name, metav1.GetOptions{})
 
 	if err != nil {
 		if errors.IsNotFound(err) {
@@ -129,7 +130,7 @@ func updateEndpoints(kubeClient kubernetes.Interface, endpoints *v1.Endpoints) e
 	if err != nil {
 		return err
 	}
-	_, err = client.Patch(endpoints.Name, types.MergePatchType, patchBytes)
+	_, err = client.Patch(context.TODO(), endpoints.Name, types.MergePatchType, patchBytes, metav1.PatchOptions{})
 	return err
 }
 

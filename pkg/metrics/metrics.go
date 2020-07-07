@@ -16,7 +16,6 @@ package metrics
 
 import (
 	"math"
-	"os"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -170,8 +169,8 @@ func NewMetrics(BackendType, BackendName string) DiscovererMetrics {
 func (d *DiscovererMetrics) RegisterPrometheus(registerDefault bool) {
 
 	if registerDefault {
-		// Register detault process / go collectors
-		d.Registry.MustRegister(prometheus.NewProcessCollector(os.Getpid(), ""))
+		// Register default process / go collectors
+		d.Registry.MustRegister(prometheus.NewProcessCollector(prometheus.ProcessCollectorOpts{}))
 		d.Registry.MustRegister(prometheus.NewGoCollector())
 	}
 

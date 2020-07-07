@@ -14,6 +14,7 @@
 package openstack
 
 import (
+	"context"
 	"fmt"
 	"strings"
 	"time"
@@ -155,14 +156,14 @@ func (r *Reconciler) reconcile() {
 
 		// Get all services and endpoints that exist in the corresponding namespace
 		clusterLabelSelector := fmt.Sprintf("%s=%s", translator.GimbalLabelBackend, r.BackendName)
-		currentServices, err := r.GimbalKubeClient.CoreV1().Services(projectName).List(metav1.ListOptions{LabelSelector: clusterLabelSelector})
+		currentServices, err := r.GimbalKubeClient.CoreV1().Services(projectName).List(context.TODO(), metav1.ListOptions{LabelSelector: clusterLabelSelector})
 		if err != nil {
 			r.Metrics.GenericMetricError("ListServicesInNamespace")
 			log.Errorf("error listing services in namespace %q: %v", projectName, err)
 			continue
 		}
 
-		currentk8sEndpoints, err := r.GimbalKubeClient.CoreV1().Endpoints(projectName).List(metav1.ListOptions{LabelSelector: clusterLabelSelector})
+		currentk8sEndpoints, err := r.GimbalKubeClient.CoreV1().Endpoints(projectName).List(context.TODO(), metav1.ListOptions{LabelSelector: clusterLabelSelector})
 		if err != nil {
 			r.Metrics.GenericMetricError("ListEndpointsInNamespace")
 			log.Errorf("error listing endpoints in namespace:%q: %v", projectName, err)
