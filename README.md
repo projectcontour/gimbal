@@ -1,3 +1,7 @@
+## Deprecation Notice
+
+This repository has been deprecared and archived as read-only. The code here is no longer maintained but is preserved for reference.
+
 # <img src="docs/images/gimbal-logo.png" width="400px" > [![Build Status](https://travis-ci.org/projectcontour/gimbal.svg?branch=master)](https://travis-ci.org/projectcontour/gimbal)
 
 ## Overview
